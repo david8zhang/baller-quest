@@ -10,6 +10,7 @@ export class Player {
   constructor(game: Game) {
     this.game = game
     this.initCourtPlayers()
+    this.handleBallInput()
   }
 
   initCourtPlayers() {
@@ -17,6 +18,7 @@ export class Player {
       position: { x: Constants.GAME_WIDTH / 2, y: Constants.GAME_HEIGHT / 2 },
       side: Side.PLAYER,
     })
+    this.game.ball.setPlayer(newPlayer)
     this.courtPlayers.push(newPlayer)
   }
 
@@ -52,7 +54,7 @@ export class Player {
   handleBallInput() {
     this.game.input.keyboard.on('keydown', (e) => {
       if (e.code === 'Space') {
-        // shoot ball
+        this.game.ball.shoot()
       }
     })
   }

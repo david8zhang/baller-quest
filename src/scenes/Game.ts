@@ -6,15 +6,15 @@ import { Constants } from '~/utils/Constants'
 
 export default class Game extends Phaser.Scene {
   private player!: Player
-  private hoop!: Hoop
-  private ball!: Ball
+  public hoop!: Hoop
+  public ball!: Ball
+  public graphics!: Phaser.GameObjects.Graphics
 
   constructor() {
     super('game')
   }
 
   create() {
-    this.player = new Player(this)
     this.hoop = new Hoop(this)
     this.ball = new Ball(this, {
       position: {
@@ -22,9 +22,12 @@ export default class Game extends Phaser.Scene {
         y: Constants.GAME_HEIGHT / 2,
       },
     })
+    this.player = new Player(this)
+    this.graphics = this.add.graphics()
   }
 
   update() {
     this.player.update()
+    this.ball.update()
   }
 }

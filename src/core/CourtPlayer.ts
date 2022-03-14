@@ -15,7 +15,7 @@ export interface CourtPlayerConfig {
 
 export class CourtPlayer {
   private game: Game
-  private sprite: Phaser.Physics.Arcade.Sprite
+  public sprite: Phaser.Physics.Arcade.Sprite
   private side: Side
 
   constructor(game: Game, config: CourtPlayerConfig) {
