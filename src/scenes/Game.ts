@@ -15,13 +15,13 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    this.hoop = new Hoop(this)
     this.ball = new Ball(this, {
       position: {
         x: Constants.GAME_WIDTH / 2,
         y: Constants.GAME_HEIGHT / 2,
       },
     })
+    this.hoop = new Hoop(this)
     this.player = new Player(this)
     this.graphics = this.add.graphics()
   }

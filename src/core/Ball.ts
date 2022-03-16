@@ -1,3 +1,4 @@
+import bezier from 'bezier-easing'
 import Game from '~/scenes/Game'
 import { CourtPlayer } from './CourtPlayer'
 
@@ -10,7 +11,7 @@ interface BallConfig {
 
 export class Ball {
   private game: Game
-  private sprite: Phaser.Physics.Arcade.Sprite
+  public sprite: Phaser.Physics.Arcade.Sprite
   private player!: CourtPlayer | null
 
   constructor(game: Game, config: BallConfig) {
@@ -20,55 +21,21 @@ export class Ball {
       .sprite(position.x, position.y, 'ball')
       .setScale(0.05)
       .setDepth(100)
+      .setBounce(0.5)
   }
 
   shoot() {
     this.player = null
-
-    this.game.graphics.lineStyle(1, 0x00ff00)
-    const horizLineToHoop = new Phaser.Geom.Line()
     const hoopSprite = this.game.hoop.sprite
-    horizLineToHoop.setTo(this.sprite.x, this.sprite.y, hoopSprite.x, this.sprite.y)
+    const netBottom = new Phaser.Math.Vector2(hoopSprite.x, hoopSprite.y - 50)
+    const rightRim = new Phaser.Math.Vector2(hoopSprite.x + 20, hoopSprite.y - 50)
+    const leftRim = new Phaser.Math.Vector2(hoopSprite.x - 20, hoopSprite.y - 50)
 
-    const verticalLine = new Phaser.Geom.Line()
-    const midPoint = {
-      x: (this.sprite.x + hoopSprite.x) / 2,
-      y: this.sprite.y,
-    }
-    verticalLine.setTo(midPoint.x, midPoint.y, midPoint.x, hoopSprite.y - 100)
-    const verticalLine2 = new Phaser.Geom.Line()
-
-    const quarterPoint = {
-      x: (midPoint.x + hoopSprite.x) / 2,
-      y: this.sprite.y,
-    }
-    verticalLine2.setTo(quarterPoint.x, midPoint.y, quarterPoint.x, hoopSprite.y - 150)
-
-    // this.game.graphics.strokeLineShape(horizLineToHoop)
-    // this.game.graphics.strokeLineShape(verticalLine)
-    // this.game.graphics.strokeLineShape(verticalLine2)
-
-    const arcPeakPoint = new Phaser.Math.Vector2(midPoint.x, hoopSprite.y - 100)
-    const aboveBackboardPoint = new Phaser.Math.Vector2(
-      (midPoint.x + hoopSprite.x) / 2,
-      hoopSprite.y - 125
-    )
-    const backboardPoint = new Phaser.Math.Vector2(hoopSprite.x, hoopSprite.y - 25)
-    const belowNetPoint = new Phaser.Math.Vector2(hoopSprite.x, hoopSprite.y + 100)
-
-    const arcPath = new Phaser.Curves.Path(this.sprite.x, this.sprite.y).splineTo([
-      arcPeakPoint,
-      backboardPoint,
-      belowNetPoint,
-    ])
-    // arcPath.draw(this.game.graphics)
-    this.sprite.setVisible(false)
-    const ballFollower = this.game.add
-      .follower(arcPath, this.sprite.x, this.sprite.y, 'ball')
-      .setScale(0.05)
-    ballFollower.startFollow({
-      duration: 1000,
-    })
+    this.sprite.setGravityY(980)
+    const time = 1.25
+    const xVelocity = (leftRim.x - this.sprite.x) / time
+    const yVelocity = (leftRim.y - this.sprite.y - 490 * Math.pow(time, 2)) / time
+    this.sprite.setVelocity(xVelocity, yVelocity)
   }
 
   setPlayer(player: CourtPlayer) {
