@@ -15,6 +15,15 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
+    const image = this.add.image(
+      Constants.GAME_WIDTH / 2,
+      Constants.GAME_HEIGHT / 2 + 200,
+      'half-court'
+    )
+    image.displayWidth = Constants.GAME_WIDTH
+    image.displayHeight = Constants.GAME_HEIGHT
+    this.cameras.main.setBackgroundColor(0xffffff)
+
     this.ball = new Ball(this, {
       position: {
         x: Constants.GAME_WIDTH / 2,
