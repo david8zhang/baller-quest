@@ -12,9 +12,10 @@ export class Hoop {
     this.sprite.body.offset.y = this.sprite.height * 0.5 - 200
     this.sprite.setPushable(false)
     this.game.physics.add.collider(this.sprite, this.game.ball.sprite, () => {
-      if (this.onCollideRimHandler) {
-        this.onCollideRimHandler()
-      }
+      const randTime = Phaser.Math.Between(900, 1000)
+      this.game.time.delayedCall(randTime, () => {
+        this.game.ball.handleFloorCollision()
+      })
     })
   }
 

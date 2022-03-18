@@ -33,33 +33,39 @@ export class Ball {
     const rimLeft = new Phaser.Math.Vector2(hoopSprite.x - 10, hoopSprite.y - 50)
 
     const randValue = Phaser.Math.Between(0, 2)
-    const posToLand = [rimLeft, rimRight, netBottom][randValue]
+    // const posToLand = [rimLeft, rimRight, netBottom][randValue]
+    const posToLand = netBottom
 
     this.sprite.setGravityY(980)
     const time = 1.25
     const xVelocity = (posToLand.x - this.sprite.x) / time
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(time, 2)) / time
     this.sprite.setVelocity(xVelocity, yVelocity)
+    hoopSprite.body.enable = false
 
-    this.game.hoop.setOnCollideRimHandler(() => {
+    this.game.time.delayedCall(time * 1000, () => {
       if (posToLand === netBottom) {
-        this.sprite.setVisible(false)
-      } else {
-        // Handle ball hitting floor
-        const randTime = Phaser.Math.Between(900, 1100)
-        this.game.time.delayedCall(randTime, () => {
-          const floor = this.game.physics.add
-            .sprite(Constants.GAME_WIDTH / 2, this.sprite.y + 20, '')
-            .setVisible(false)
-          floor.displayHeight = 2
-          floor.displayWidth = Constants.GAME_WIDTH
-          floor.setPushable(false)
-          this.game.physics.world.enable(floor, Phaser.Physics.Arcade.DYNAMIC_BODY)
-          this.game.physics.add.collider(floor, this.sprite, () => {
-            this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.75)
-          })
+        this.sprite.setVelocityX(0)
+        this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)
+        this.game.time.delayedCall(400, () => {
+          this.handleFloorCollision()
         })
+      } else {
+        hoopSprite.body.enable = true
       }
+    })
+  }
+
+  handleFloorCollision() {
+    const floor = this.game.physics.add
+      .sprite(Constants.GAME_WIDTH / 2, this.sprite.y + 20, '')
+      .setVisible(false)
+    floor.displayHeight = 2
+    floor.displayWidth = Constants.GAME_WIDTH
+    floor.setPushable(false)
+    this.game.physics.world.enable(floor, Phaser.Physics.Arcade.DYNAMIC_BODY)
+    this.game.physics.add.collider(floor, this.sprite, () => {
+      this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.75)
     })
   }
 
