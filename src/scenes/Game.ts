@@ -33,6 +33,25 @@ export default class Game extends Phaser.Scene {
     this.hoop = new Hoop(this)
     this.player = new Player(this)
     this.graphics = this.add.graphics()
+    this.setupWorldBounds()
+  }
+
+  setupWorldBounds() {
+    this.physics.world.setBounds(
+      0,
+      0,
+      Constants.GAME_WIDTH,
+      Constants.GAME_HEIGHT,
+      true,
+      true,
+      false,
+      false
+    )
+    this.physics.world.on('worldbounds', (obj) => {
+      if (obj.gameObject.getData('ref') === this.ball) {
+        this.scene.restart()
+      }
+    })
   }
 
   update() {

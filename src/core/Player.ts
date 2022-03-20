@@ -20,6 +20,12 @@ export class Player {
     })
     this.game.ball.setPlayer(newPlayer)
     this.courtPlayers.push(newPlayer)
+    const group = new Phaser.GameObjects.Group(this.game)
+    group.add(newPlayer.sprite)
+    this.game.physics.add.overlap(group, this.game.ball.sprite, (obj1, obj2) => {
+      const collidedPlayer = obj1.getData('ref') as CourtPlayer
+      this.game.ball.setPlayer(collidedPlayer)
+    })
   }
 
   handlePlayerMovement() {

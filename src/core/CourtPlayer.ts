@@ -3,6 +3,7 @@ import Game from '~/scenes/Game'
 export enum Side {
   PLAYER = 'PLAYER',
   CPU = 'CPU',
+  NONE = 'NONE',
 }
 
 export interface CourtPlayerConfig {
@@ -16,13 +17,14 @@ export interface CourtPlayerConfig {
 export class CourtPlayer {
   private game: Game
   public sprite: Phaser.Physics.Arcade.Sprite
-  private side: Side
+  public side: Side
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
     const { position, side } = config
     this.side = side
     this.sprite = this.game.physics.add.sprite(position.x, position.y, 'player')
+    this.sprite.setData('ref', this)
     this.game.physics.world.enable(this.sprite, Phaser.Physics.Arcade.DYNAMIC_BODY)
     this.sprite.setScale(0.5)
   }
