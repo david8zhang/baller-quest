@@ -23,7 +23,7 @@ export class CourtPlayer {
     this.game = game
     const { position, side } = config
     this.side = side
-    this.sprite = this.game.physics.add.sprite(position.x, position.y, 'player')
+    this.sprite = this.game.physics.add.sprite(position.x, position.y, 'player').setDepth(2)
     this.sprite.setData('ref', this)
     this.game.physics.world.enable(this.sprite, Phaser.Physics.Arcade.DYNAMIC_BODY)
     this.sprite.setScale(0.5)
@@ -46,4 +46,6 @@ export class CourtPlayer {
   setVelocityY(yVelocity: number) {
     this.sprite.setVelocityY(yVelocity)
   }
+
+  update() {}
 }

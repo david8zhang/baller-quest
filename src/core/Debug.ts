@@ -5,7 +5,7 @@ export class Debug {
   private game: Game
   private objects: Phaser.GameObjects.Group
   public isVisible: boolean = false
-  public alpha: number = 0.5
+  public alpha: number = 1
   public fishStates: Phaser.GameObjects.Text[] = []
   public bestPlayerSupportPositions: any[] = []
 
@@ -33,7 +33,13 @@ export class Debug {
           .setVisible(this.isVisible)
         const text = this.game.add
           .text(centerPosition.x, centerPosition.y, id.toString())
+          .setTintFill(0x00ff00)
           .setAlpha(this.alpha)
+          .setVisible(this.isVisible)
+        text.setPosition(
+          centerPosition.x - text.displayWidth / 2,
+          centerPosition.y - text.displayHeight / 2
+        )
         this.objects.add(zoneRect)
         this.objects.add(text)
       }

@@ -6,6 +6,6 @@ export enum PlayerStates {
 }
 
 export enum TeamStates {
-  ATTACKING = 'Attacking',
-  DEFENDING = 'Defending',
+  OFFENSE = 'Offense',
+  DEFENSE = 'Defense',
 }

@@ -1,31 +1,26 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { CourtPlayer, Side } from './CourtPlayer'
+import { Cursor } from './Cursor'
+import { TeamStates } from './states/StateTypes'
+import { Team } from './Team'
 
-export class GamePlayer {
-  private game: Game
-  private courtPlayers: CourtPlayer[] = []
-  private selectedPlayerIndex: number = 0
-
+export class GamePlayer extends Team {
+  private cursor: Cursor
+  private selectedCourtPlayerIndex = 0
   constructor(game: Game) {
-    this.game = game
-    this.initCourtPlayers()
+    super(game, TeamStates.OFFENSE, Side.PLAYER)
     this.handleBallInput()
+    this.cursor = new Cursor({ x: 0, y: 0 }, this.game)
+    this.selectCourtPlayer(this.courtPlayers[this.selectedCourtPlayerIndex])
   }
 
-  initCourtPlayers() {
-    const newPlayer = new CourtPlayer(this.game, {
-      position: { x: Constants.GAME_WIDTH / 2, y: Constants.GAME_HEIGHT / 2 },
-      side: Side.PLAYER,
-    })
-    this.game.ball.setPlayer(newPlayer)
-    this.courtPlayers.push(newPlayer)
-    const group = new Phaser.GameObjects.Group(this.game)
-    group.add(newPlayer.sprite)
-    this.game.physics.add.overlap(group, this.game.ball.sprite, (obj1, obj2) => {
-      const collidedPlayer = obj1.getData('ref') as CourtPlayer
-      this.game.ball.setPlayer(collidedPlayer)
-    })
+  selectCourtPlayer(courtPlayer: CourtPlayer) {
+    this.cursor.selectCourtPlayer(courtPlayer)
+  }
+
+  getSelectedCourtPlayer() {
+    return this.courtPlayers[this.selectedCourtPlayerIndex]
   }
 
   handlePlayerMovement() {
@@ -35,7 +30,7 @@ export class GamePlayer {
     const upDown = keyboard.up.isDown
     const downDown = keyboard.down.isDown
 
-    const currentPlayer = this.courtPlayers[this.selectedPlayerIndex]
+    const currentPlayer = this.courtPlayers[this.selectedCourtPlayerIndex]
     const speed = Constants.COURT_PLAYER_SPEED
     if (leftDown || rightDown) {
       let velocityX = leftDown ? -speed : speed
@@ -73,6 +68,8 @@ export class GamePlayer {
   }
 
   update() {
+    super.update()
+    this.cursor.follow()
     this.handlePlayerMovement()
   }
 }

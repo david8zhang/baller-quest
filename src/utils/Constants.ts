@@ -6,4 +6,8 @@ export class Constants {
 
   // Court Player attributes
   public static COURT_PLAYER_SPEED = 200
+
+  // Team attributes
+  public static OFFENSIVE_POSITIONS = [49, 37, 43, 26, 18]
+  public static DEFENSIVE_POSITIONS = [40, 29, 33, 25, 19]
 }

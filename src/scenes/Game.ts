@@ -47,6 +47,9 @@ export default class Game extends Phaser.Scene {
     this.player = new GamePlayer(this)
     this.graphics = this.add.graphics()
     this.debug = new Debug(this)
+
+    // Testing only - give ball to player
+    this.ball.setPlayer(this.player.getSelectedCourtPlayer())
   }
 
   createField() {

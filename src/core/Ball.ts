@@ -27,7 +27,11 @@ export class Ball {
       .setBounce(0.75)
     this.sprite.body.enable = false
     this.sprite.setData('ref', this)
+    this.setupFloor()
+    this.setupOutOfBoundsLogic()
+  }
 
+  setupFloor() {
     // Setup an artificial "floor" to represent when the ball hits the ground after rebounding off the rim
     this.floor = this.game.physics.add
       .sprite(Constants.GAME_WIDTH / 2, this.sprite.y + 20, '')
@@ -40,8 +44,9 @@ export class Ball {
     this.game.physics.add.collider(this.floor, this.sprite, () => {
       this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.75)
     })
+  }
 
-    // Handle out of bounds logic
+  setupOutOfBoundsLogic() {
     const spriteBody = this.sprite.body as Phaser.Physics.Arcade.Body
     spriteBody.setCollideWorldBounds(true)
     spriteBody.onWorldBounds = true

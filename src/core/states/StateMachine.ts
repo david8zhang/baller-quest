@@ -19,6 +19,10 @@ export class StateMachine {
     })
   }
 
+  getInitialState() {
+    return this.initialState
+  }
+
   getState() {
     return this.state
   }
