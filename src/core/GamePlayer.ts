@@ -2,7 +2,7 @@ import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { CourtPlayer, Side } from './CourtPlayer'
 
-export class Player {
+export class GamePlayer {
   private game: Game
   private courtPlayers: CourtPlayer[] = []
   private selectedPlayerIndex: number = 0
@@ -36,7 +36,7 @@ export class Player {
     const downDown = keyboard.down.isDown
 
     const currentPlayer = this.courtPlayers[this.selectedPlayerIndex]
-    const speed = Constants.PLAYER_SPEED
+    const speed = Constants.COURT_PLAYER_SPEED
     if (leftDown || rightDown) {
       let velocityX = leftDown ? -speed : speed
       if (leftDown && rightDown) {
@@ -59,8 +59,15 @@ export class Player {
 
   handleBallInput() {
     this.game.input.keyboard.on('keydown', (e) => {
-      if (e.code === 'Space') {
-        this.game.ball.shoot()
+      switch (e.code) {
+        case 'Space': {
+          this.game.ball.shoot()
+          break
+        }
+        case 'Backquote': {
+          this.game.debug.setVisible(!this.game.debug.isVisible)
+          break
+        }
       }
     })
   }
