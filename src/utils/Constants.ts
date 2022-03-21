@@ -1,3 +1,7 @@
+import { Ball } from '~/core/Ball'
+import { CourtPlayer } from '~/core/CourtPlayer'
+import Game from '~/scenes/Game'
+
 export class Constants {
   public static GAME_WIDTH = 900
   public static GAME_HEIGHT = 600
@@ -6,8 +10,44 @@ export class Constants {
 
   // Court Player attributes
   public static COURT_PLAYER_SPEED = 200
+  public static PASS_SPEED = 1000
 
   // Team attributes
   public static OFFENSIVE_POSITIONS = [49, 37, 43, 26, 18]
   public static DEFENSIVE_POSITIONS = [40, 29, 33, 25, 19]
+
+  public static getClosestPlayerToBall(ball: Ball, courtPlayers: CourtPlayer[]) {
+    let closestPlayer: any = null
+    let shortestDistance = Number.MAX_SAFE_INTEGER
+    const ballPosition = new Phaser.Math.Vector2(ball.sprite.x, ball.sprite.y)
+    courtPlayers.forEach((p: CourtPlayer) => {
+      const position = new Phaser.Math.Vector2(p.sprite.x, p.sprite.y)
+      const distance = Phaser.Math.Distance.BetweenPoints(ballPosition, position)
+      if (distance < shortestDistance) {
+        shortestDistance = distance
+        closestPlayer = p
+      }
+    })
+    return closestPlayer
+  }
+
+  public static getClosestPlayer(src: CourtPlayer, courtPlayers: CourtPlayer[]) {
+    let closestPlayer: any = null
+    let shortestDistance = Number.MAX_SAFE_INTEGER
+    const srcPosition = new Phaser.Math.Vector2(
+      src.sprite.x + src.sprite.body.velocity.x,
+      src.sprite.y + src.sprite.body.velocity.y
+    )
+    courtPlayers.forEach((p: CourtPlayer) => {
+      if (p !== src) {
+        const position = new Phaser.Math.Vector2(p.sprite.x, p.sprite.y)
+        const distance = Phaser.Math.Distance.BetweenPoints(srcPosition, position)
+        if (distance < shortestDistance) {
+          shortestDistance = distance
+          closestPlayer = p
+        }
+      }
+    })
+    return closestPlayer
+  }
 }

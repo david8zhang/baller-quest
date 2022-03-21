@@ -1,7 +1,12 @@
-import bezier from 'bezier-easing'
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { CourtPlayer, Side } from './CourtPlayer'
+
+export enum BallState {
+  DRIBBLE = 'DRIBBLE',
+  LOOSE = 'LOOSE',
+  MIDAIR = 'MIDAIR',
+}
 
 interface BallConfig {
   position: {
@@ -15,7 +20,7 @@ export class Ball {
   public sprite: Phaser.Physics.Arcade.Sprite
   private player!: CourtPlayer | null
   public floor!: Phaser.Physics.Arcade.Sprite
-  public isInFlight: boolean = false
+  public currState: BallState = BallState.LOOSE
 
   constructor(game: Game, config: BallConfig) {
     this.game = game
@@ -77,10 +82,10 @@ export class Ball {
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(time, 2)) / time
     this.sprite.setVelocity(xVelocity, yVelocity)
     hoopSprite.body.enable = false
-    this.isInFlight = true
+    this.currState = BallState.MIDAIR
 
     this.game.time.delayedCall(time * 1000, () => {
-      this.isInFlight = false
+      this.currState = BallState.LOOSE
       if (posToLand === netBottom) {
         this.sprite.setVelocityX(0)
         this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)
@@ -100,12 +105,13 @@ export class Ball {
   }
 
   setPlayer(player: CourtPlayer) {
-    if (this.isInFlight) {
+    if (this.currState == BallState.MIDAIR) {
       return
     }
     this.player = player
     this.sprite.body.enable = false
     this.floor.body.enable = false
+    this.currState = BallState.DRIBBLE
   }
 
   update() {
@@ -113,6 +119,28 @@ export class Ball {
       this.sprite.x = this.player.sprite.x
       this.sprite.y = this.player.sprite.y
     }
+  }
+
+  passTo(target: CourtPlayer) {
+    const angle = Phaser.Math.Angle.BetweenPoints(
+      {
+        x: this.sprite.x,
+        y: this.sprite.y,
+      },
+      {
+        x: target.sprite.x,
+        y: target.sprite.y,
+      }
+    )
+    const velocityVector = new Phaser.Math.Vector2(0, 0)
+    this.game.physics.velocityFromRotation(angle, Constants.PASS_SPEED, velocityVector)
+    this.currState = BallState.MIDAIR
+    this.player = null
+    this.sprite.body.enable = true
+    this.sprite.setVelocity(velocityVector.x, velocityVector.y)
+    this.game.time.delayedCall(100, () => {
+      this.currState = BallState.LOOSE
+    })
   }
 
   getPossessionSide() {

@@ -1,17 +1,24 @@
 import Game from '~/scenes/Game'
 import { CourtPlayer } from './CourtPlayer'
 
+export interface CursorConfig {
+  color: number
+  alpha?: number
+  position: { x: number; y: number }
+}
+
 export class Cursor {
   private game: Game
-  private selectedCourtPlayer?: CourtPlayer
+  protected selectedCourtPlayer?: CourtPlayer
   public highlight: Phaser.GameObjects.Ellipse
 
-  constructor(position: { x: number; y: number }, game: Game) {
+  constructor(config: CursorConfig, game: Game) {
     this.game = game
-    const { x, y } = position
+    const { x, y } = config.position
     this.highlight = this.game.add
-      .ellipse(x, y, 20, 0x00ff00)
-      .setStrokeStyle(4, 0x00ff00)
+      .ellipse(x, y, 20, config.color)
+      .setStrokeStyle(4, config.color)
+      .setAlpha(config.alpha || 1)
       .setOrigin(0)
   }
 

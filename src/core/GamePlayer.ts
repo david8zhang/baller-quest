@@ -2,25 +2,34 @@ import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { CourtPlayer, Side } from './CourtPlayer'
 import { Cursor } from './Cursor'
+import { PassCursor } from './PassCursor'
 import { TeamStates } from './states/StateTypes'
 import { Team } from './Team'
 
 export class GamePlayer extends Team {
   private cursor: Cursor
-  private selectedCourtPlayerIndex = 0
+  private passCursor: PassCursor
   constructor(game: Game) {
     super(game, TeamStates.OFFENSE, Side.PLAYER)
     this.handleBallInput()
-    this.cursor = new Cursor({ x: 0, y: 0 }, this.game)
-    this.selectCourtPlayer(this.courtPlayers[this.selectedCourtPlayerIndex])
+    this.cursor = new Cursor(
+      {
+        color: 0x00ff00,
+        position: { x: 0, y: 0 },
+      },
+      this.game
+    )
+    this.passCursor = new PassCursor(this.game)
+    this.selectCourtPlayer(this.courtPlayers[0])
   }
 
   selectCourtPlayer(courtPlayer: CourtPlayer) {
+    super.selectCourtPlayer(courtPlayer)
     this.cursor.selectCourtPlayer(courtPlayer)
   }
 
   getSelectedCourtPlayer() {
-    return this.courtPlayers[this.selectedCourtPlayerIndex]
+    return this.selectedCourtPlayer
   }
 
   handlePlayerMovement() {
@@ -30,7 +39,7 @@ export class GamePlayer extends Team {
     const upDown = keyboard.up.isDown
     const downDown = keyboard.down.isDown
 
-    const currentPlayer = this.courtPlayers[this.selectedCourtPlayerIndex]
+    const currentPlayer = this.selectedCourtPlayer
     const speed = Constants.COURT_PLAYER_SPEED
     if (leftDown || rightDown) {
       let velocityX = leftDown ? -speed : speed
@@ -55,8 +64,16 @@ export class GamePlayer extends Team {
   handleBallInput() {
     this.game.input.keyboard.on('keydown', (e) => {
       switch (e.code) {
-        case 'Space': {
+        case 'KeyE': {
           this.game.ball.shoot()
+          break
+        }
+        case 'Space': {
+          if (this.canPassBall()) {
+            this.passBall()
+          } else {
+            this.switchPlayer()
+          }
           break
         }
         case 'Backquote': {
@@ -67,9 +84,44 @@ export class GamePlayer extends Team {
     })
   }
 
+  switchPlayer() {
+    const playerClosestToBall = Constants.getClosestPlayerToBall(this.game.ball, this.courtPlayers)
+    this.selectCourtPlayer(playerClosestToBall)
+  }
+
+  canPassBall(): boolean {
+    return this.getBall().getPossessionSide() == this.side
+  }
+
+  passBall() {
+    const playerToPassTo = this.passCursor.getHighlightedCourtPlayer()
+    if (playerToPassTo) {
+      this.getBall().passTo(playerToPassTo)
+    }
+  }
+
+  updatePassCursor() {
+    if (!this.canPassBall()) {
+      this.passCursor.setVisible(false)
+    } else {
+      this.passCursor.setVisible(true)
+      const selectedCourtPlayer = this.getSelectedCourtPlayer()
+      let playerToPassTo: any = null
+      this.game.graphics.lineStyle(1, 0x00ff00)
+      playerToPassTo = Constants.getClosestPlayer(selectedCourtPlayer, this.courtPlayers)
+      this.highlightPassPlayer(playerToPassTo)
+      this.passCursor.follow()
+    }
+  }
+
+  highlightPassPlayer(courtPlayer: CourtPlayer) {
+    this.passCursor.selectCourtPlayer(courtPlayer)
+  }
+
   update() {
     super.update()
     this.cursor.follow()
+    this.updatePassCursor()
     this.handlePlayerMovement()
   }
 }

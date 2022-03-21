@@ -12,6 +12,7 @@ export class Team {
   public stateMachine!: StateMachine
   public side: Side = Side.NONE
   private courtPlayerGroup!: Phaser.GameObjects.Group
+  protected selectedCourtPlayer!: CourtPlayer
 
   constructor(game: Game, initialState: TeamStates, side: Side) {
     this.game = game
@@ -52,7 +53,13 @@ export class Team {
     this.game.physics.add.overlap(this.courtPlayerGroup, this.game.ball.sprite, (obj1) => {
       const collidedPlayer = obj1.getData('ref') as CourtPlayer
       this.game.ball.setPlayer(collidedPlayer)
+      this.selectCourtPlayer(collidedPlayer)
     })
+  }
+
+  selectCourtPlayer(courtPlayer: CourtPlayer) {
+    if (this.selectedCourtPlayer) this.selectedCourtPlayer.setVelocity(0, 0)
+    this.selectedCourtPlayer = courtPlayer
   }
 
   public update() {
