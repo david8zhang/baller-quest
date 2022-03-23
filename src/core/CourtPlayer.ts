@@ -12,6 +12,7 @@ export interface CourtPlayerConfig {
     y: number
   }
   side: Side
+  texture: string
 }
 
 export class CourtPlayer {
@@ -21,9 +22,9 @@ export class CourtPlayer {
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
-    const { position, side } = config
+    const { position, side, texture } = config
     this.side = side
-    this.sprite = this.game.physics.add.sprite(position.x, position.y, 'player').setDepth(2)
+    this.sprite = this.game.physics.add.sprite(position.x, position.y, texture).setDepth(2)
     this.sprite.setData('ref', this)
     this.game.physics.world.enable(this.sprite, Phaser.Physics.Arcade.DYNAMIC_BODY)
     this.sprite.setScale(0.5)

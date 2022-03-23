@@ -4,6 +4,8 @@ import { Hoop } from '~/core/Hoop'
 import { GamePlayer } from '~/core/GamePlayer'
 import { Constants } from '~/utils/Constants'
 import { Debug } from '~/core/Debug'
+import { CPU } from '~/core/CPU'
+import { CourtPlayer } from '~/core/CourtPlayer'
 
 export type FieldZone = {
   centerPosition: {
@@ -15,11 +17,13 @@ export type FieldZone = {
 
 export default class Game extends Phaser.Scene {
   private player!: GamePlayer
+  private cpu!: CPU
   public hoop!: Hoop
   public ball!: Ball
   public graphics!: Phaser.GameObjects.Graphics
   public fieldGrid!: FieldZone[][]
   public debug!: Debug
+  public bgImage!: Phaser.GameObjects.Image
 
   constructor() {
     super('game')
@@ -27,15 +31,8 @@ export default class Game extends Phaser.Scene {
 
   create() {
     this.createField()
+    this.setupBackground()
     this.setupWorldBounds()
-    const image = this.add.image(
-      Constants.GAME_WIDTH / 2,
-      Constants.GAME_HEIGHT / 2 + 200,
-      'half-court'
-    )
-    image.displayWidth = Constants.GAME_WIDTH
-    image.displayHeight = Constants.GAME_HEIGHT
-    this.cameras.main.setBackgroundColor(0xffffff)
 
     this.ball = new Ball(this, {
       position: {
@@ -43,13 +40,15 @@ export default class Game extends Phaser.Scene {
         y: Constants.GAME_HEIGHT / 2,
       },
     })
-    this.hoop = new Hoop(this)
+    // this.hoop = new Hoop(this)
     this.player = new GamePlayer(this)
+    this.cpu = new CPU(this)
     this.graphics = this.add.graphics()
     this.debug = new Debug(this)
 
     // Testing only - give ball to player
     this.ball.setPlayer(this.player.getSelectedCourtPlayer())
+    this.cameras.main.startFollow(this.ball.sprite)
   }
 
   createField() {
@@ -89,8 +88,8 @@ export default class Game extends Phaser.Scene {
     this.physics.world.setBounds(
       0,
       0,
-      Constants.GAME_WIDTH,
-      Constants.GAME_HEIGHT,
+      this.bgImage.displayWidth,
+      this.bgImage.displayHeight,
       true,
       true,
       false,
@@ -103,8 +102,18 @@ export default class Game extends Phaser.Scene {
     })
   }
 
+  setupBackground() {
+    this.bgImage = this.add.image(Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT / 2, 'court')
+    this.bgImage.setScale(1.75, 1)
+    this.bgImage.displayHeight = Constants.GAME_HEIGHT
+    this.cameras.main.setBackgroundColor(0xffffff)
+    this.cameras.main.setBounds(0, 0, this.bgImage.displayWidth, this.bgImage.displayHeight)
+  }
+
   update() {
     this.player.update()
     this.ball.update()
   }
+
+  public focusCamera(player: CourtPlayer) {}
 }

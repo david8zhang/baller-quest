@@ -6,7 +6,7 @@ import { Preloader } from './scenes/Preloader'
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: 900,
-  height: 600,
+  height: 630,
   parent: 'phaser',
   physics: {
     default: 'arcade',

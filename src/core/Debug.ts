@@ -13,6 +13,18 @@ export class Debug {
     this.game = game
     this.objects = this.game.add.group()
     this.debugFieldGrid()
+    this.handleDebugToggleInput()
+  }
+
+  handleDebugToggleInput() {
+    this.game.input.keyboard.on('keydown', (e) => {
+      switch (e.code) {
+        case 'Backquote': {
+          this.game.debug.setVisible(!this.game.debug.isVisible)
+          break
+        }
+      }
+    })
   }
 
   debugFieldGrid() {

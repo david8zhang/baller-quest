@@ -26,6 +26,7 @@ export class GamePlayer extends Team {
   selectCourtPlayer(courtPlayer: CourtPlayer) {
     super.selectCourtPlayer(courtPlayer)
     this.cursor.selectCourtPlayer(courtPlayer)
+    this.game.focusCamera(courtPlayer)
   }
 
   getSelectedCourtPlayer() {
@@ -74,10 +75,6 @@ export class GamePlayer extends Team {
           } else {
             this.switchPlayer()
           }
-          break
-        }
-        case 'Backquote': {
-          this.game.debug.setVisible(!this.game.debug.isVisible)
           break
         }
       }

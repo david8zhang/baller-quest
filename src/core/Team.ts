@@ -17,7 +17,6 @@ export class Team {
   constructor(game: Game, initialState: TeamStates, side: Side) {
     this.game = game
     this.side = side
-    console.log(initialState)
     this.stateMachine = new StateMachine(initialState, {
       [TeamStates.DEFENSE]: new DefenseState(),
       [TeamStates.OFFENSE]: new OffenseState(),
@@ -31,10 +30,7 @@ export class Team {
 
   createCourtPlayers() {
     this.courtPlayerGroup = this.game.add.group()
-    const initialPositions =
-      this.stateMachine.getInitialState() == TeamStates.OFFENSE
-        ? Constants.OFFENSIVE_POSITIONS
-        : Constants.DEFENSIVE_POSITIONS
+    const initialPositions = this.side === Side.PLAYER ? Constants.LEFT_SIDE : Constants.RIGHT_SIDE
 
     for (let i = 0; i < initialPositions.length; i++) {
       const zoneId = initialPositions[i]
@@ -44,6 +40,7 @@ export class Team {
         const courtPlayer = new CourtPlayer(this.game, {
           position: centerPosition,
           side: this.side,
+          texture: this.side === Side.PLAYER ? 'player' : 'cpu-player',
         })
         this.courtPlayers.push(courtPlayer)
         this.courtPlayerGroup.add(courtPlayer.sprite)

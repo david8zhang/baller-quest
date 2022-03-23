@@ -5,9 +5,10 @@ export class Preloader extends Phaser.Scene {
 
   preload() {
     this.load.image('player', 'player/idle.png')
-    this.load.image('hoop', 'basketball-hoop.png')
+    this.load.image('cpu-player', 'cpu/idle.png')
+    this.load.image('hoop', 'hoop.png')
     this.load.image('ball', 'ball.png')
-    this.load.image('half-court', 'half-court.gif')
+    this.load.image('court', 'court.jpeg')
   }
 
   create() {
