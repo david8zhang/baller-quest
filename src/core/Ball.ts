@@ -1,6 +1,7 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { CourtPlayer, Side } from './CourtPlayer'
+import { Hoop } from './Hoop'
 
 export enum BallState {
   DRIBBLE = 'DRIBBLE',
@@ -57,7 +58,7 @@ export class Ball {
     spriteBody.onWorldBounds = true
   }
 
-  shoot() {
+  shoot(hoop: Hoop) {
     if (!this.player) {
       return
     }
@@ -65,16 +66,16 @@ export class Ball {
     const playerHeight = this.player!.sprite.displayHeight
     this.player = null
     this.sprite.y = playerPosition.y - playerHeight / 2
+    this.floor.body.enable = false
 
     // Launch ball at angle to hit the hoop
     this.sprite.body.enable = true
-    const hoopSprite = this.game.hoop.sprite
-    const netBottom = new Phaser.Math.Vector2(hoopSprite.x, hoopSprite.y - 50)
-    const rimRight = new Phaser.Math.Vector2(hoopSprite.x + 10, hoopSprite.y - 50)
-    const rimLeft = new Phaser.Math.Vector2(hoopSprite.x - 10, hoopSprite.y - 50)
-
+    const hoopSprite = hoop.sprite
+    const netBottom = new Phaser.Math.Vector2(hoopSprite.x + 50, hoopSprite.y - 50)
+    const rimBack = new Phaser.Math.Vector2(netBottom.x - 25, hoopSprite.y - 50)
+    const rimFront = new Phaser.Math.Vector2(netBottom.x + 25, hoopSprite.y - 50)
     const randValue = Phaser.Math.Between(0, 2)
-    const posToLand = [rimLeft, rimRight, netBottom][randValue]
+    const posToLand = [rimBack, rimFront, netBottom][randValue]
 
     this.sprite.setGravityY(980)
     const time = 1.25
@@ -84,9 +85,11 @@ export class Ball {
     hoopSprite.body.enable = false
     this.currState = BallState.MIDAIR
 
-    this.game.time.delayedCall(time * 1000, () => {
-      this.currState = BallState.LOOSE
+    let delayedTime = posToLand === netBottom ? time * 1000 : time * 950
+
+    this.game.time.delayedCall(delayedTime, () => {
       if (posToLand === netBottom) {
+        this.currState = BallState.LOOSE
         this.sprite.setVelocityX(0)
         this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)
         this.game.time.delayedCall(400, () => {
@@ -98,8 +101,12 @@ export class Ball {
     })
   }
 
+  setLoose() {
+    this.currState = BallState.LOOSE
+  }
+
   handleFloorCollision() {
-    if (this.player) return
+    if (this.player || this.currState == BallState.MIDAIR) return
     this.floor.setPosition(Constants.GAME_WIDTH / 2, this.sprite.y + 20)
     this.floor.body.enable = true
   }

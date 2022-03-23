@@ -66,7 +66,7 @@ export class GamePlayer extends Team {
     this.game.input.keyboard.on('keydown', (e) => {
       switch (e.code) {
         case 'KeyE': {
-          this.game.ball.shoot()
+          this.game.ball.shoot(this.game.playerHoop)
           break
         }
         case 'Space': {

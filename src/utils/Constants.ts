@@ -1,20 +1,22 @@
 import { Ball } from '~/core/Ball'
 import { CourtPlayer } from '~/core/CourtPlayer'
-import Game from '~/scenes/Game'
 
 export class Constants {
   public static GAME_WIDTH = 900
   public static GAME_HEIGHT = 630
-  static FIELD_ZONE_WIDTH: number = 100
+  static FIELD_ZONE_WIDTH: number = 90
   static FIELD_ZONE_HEIGHT: number = 70
+
+  public static COURT_WIDTH = Constants.GAME_WIDTH * 1.5
+  public static COURT_HEIGHT = Constants.GAME_HEIGHT
 
   // Court Player attributes
   public static COURT_PLAYER_SPEED = 200
   public static PASS_SPEED = 1000
 
   // Team attributes
-  public static RIGHT_SIDE = [37, 39, 21, 57, 49]
-  public static LEFT_SIDE = [43, 41, 23, 59, 31]
+  public static RIGHT_SIDE = [68, 36, 98, 82, 70]
+  public static LEFT_SIDE = [66, 38, 96, 52, 64]
 
   public static getClosestPlayerToBall(ball: Ball, courtPlayers: CourtPlayer[]) {
     let closestPlayer: any = null

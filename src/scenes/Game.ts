@@ -18,10 +18,16 @@ export type FieldZone = {
 export default class Game extends Phaser.Scene {
   private player!: GamePlayer
   private cpu!: CPU
-  public hoop!: Hoop
+
+  // Court setup
+  public playerHoop!: Hoop
+  public cpuHoop!: Hoop
   public ball!: Ball
+
+  // Grid for player positioning
   public graphics!: Phaser.GameObjects.Graphics
   public fieldGrid!: FieldZone[][]
+
   public debug!: Debug
   public bgImage!: Phaser.GameObjects.Image
 
@@ -40,7 +46,13 @@ export default class Game extends Phaser.Scene {
         y: Constants.GAME_HEIGHT / 2,
       },
     })
-    // this.hoop = new Hoop(this)
+    this.playerHoop = new Hoop(this, {
+      position: {
+        x: 50,
+        y: Constants.COURT_HEIGHT / 2 - 50,
+      },
+      isFlipX: true,
+    })
     this.player = new GamePlayer(this)
     this.cpu = new CPU(this)
     this.graphics = this.add.graphics()
@@ -54,8 +66,8 @@ export default class Game extends Phaser.Scene {
   createField() {
     // Create a field grid
     let fieldZoneID: number = 0
-    const numZoneColumns = Constants.GAME_WIDTH / Constants.FIELD_ZONE_WIDTH
-    const numZoneRows = Constants.GAME_HEIGHT / Constants.FIELD_ZONE_HEIGHT
+    const numZoneColumns = Constants.COURT_WIDTH / Constants.FIELD_ZONE_WIDTH
+    const numZoneRows = Constants.COURT_HEIGHT / Constants.FIELD_ZONE_HEIGHT
     this.fieldGrid = new Array(numZoneRows)
       .fill(0)
       .map(() => new Array(numZoneColumns).fill(undefined))
@@ -103,11 +115,11 @@ export default class Game extends Phaser.Scene {
   }
 
   setupBackground() {
-    this.bgImage = this.add.image(Constants.GAME_WIDTH / 2, Constants.GAME_HEIGHT / 2, 'court')
-    this.bgImage.setScale(1.75, 1)
+    this.bgImage = this.add.image(Constants.COURT_WIDTH / 2, Constants.COURT_HEIGHT / 2, 'court')
+    this.bgImage.displayWidth = Constants.GAME_WIDTH * 1.5
     this.bgImage.displayHeight = Constants.GAME_HEIGHT
     this.cameras.main.setBackgroundColor(0xffffff)
-    this.cameras.main.setBounds(0, 0, this.bgImage.displayWidth, this.bgImage.displayHeight)
+    this.cameras.main.setBounds(0, 0, Constants.COURT_WIDTH, Constants.COURT_HEIGHT)
   }
 
   update() {
