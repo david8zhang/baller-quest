@@ -26,7 +26,6 @@ export class GamePlayer extends Team {
   selectCourtPlayer(courtPlayer: CourtPlayer) {
     super.selectCourtPlayer(courtPlayer)
     this.cursor.selectCourtPlayer(courtPlayer)
-    this.game.focusCamera(courtPlayer)
   }
 
   getSelectedCourtPlayer() {

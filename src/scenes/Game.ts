@@ -42,8 +42,8 @@ export default class Game extends Phaser.Scene {
 
     this.ball = new Ball(this, {
       position: {
-        x: Constants.GAME_WIDTH / 2,
-        y: Constants.GAME_HEIGHT / 2,
+        x: Constants.COURT_WIDTH / 2,
+        y: Constants.COURT_HEIGHT / 2,
       },
     })
     this.playerHoop = new Hoop(this, Constants.PLAYER_HOOP_CONFIG)
@@ -54,9 +54,8 @@ export default class Game extends Phaser.Scene {
     this.graphics = this.add.graphics()
     this.debug = new Debug(this)
 
-    // Testing only - give ball to player
-    this.ball.setPlayer(this.player.getSelectedCourtPlayer())
     this.cameras.main.startFollow(this.ball.sprite)
+    this.ball.tipOff()
   }
 
   createField() {
@@ -122,6 +121,4 @@ export default class Game extends Phaser.Scene {
     this.player.update()
     this.ball.update()
   }
-
-  public focusCamera(player: CourtPlayer) {}
 }

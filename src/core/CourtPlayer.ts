@@ -1,4 +1,5 @@
 import Game from '~/scenes/Game'
+import { Constants } from '~/utils/Constants'
 
 export enum Side {
   PLAYER = 'PLAYER',
@@ -19,6 +20,7 @@ export class CourtPlayer {
   private game: Game
   public sprite: Phaser.Physics.Arcade.Sprite
   public side: Side
+  public moveTarget: { x: number; y: number } | null = null
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -48,5 +50,40 @@ export class CourtPlayer {
     this.sprite.setVelocityY(yVelocity)
   }
 
-  update() {}
+  moveTowardsTarget() {
+    if (!this.moveTarget) {
+      return
+    }
+    const distance = Constants.getDistanceBetween(
+      {
+        x: this.sprite.x,
+        y: this.sprite.y,
+      },
+      {
+        x: this.moveTarget.x,
+        y: this.moveTarget.y,
+      }
+    )
+    if (Math.abs(distance) < 5) {
+      this.setVelocity(0, 0)
+    } else {
+      let angle = Phaser.Math.Angle.BetweenPoints(
+        {
+          x: this.sprite.x,
+          y: this.sprite.y,
+        },
+        {
+          x: this.moveTarget.x,
+          y: this.moveTarget.y,
+        }
+      )
+      const velocityVector = new Phaser.Math.Vector2()
+      this.game.physics.velocityFromRotation(angle, Constants.COURT_PLAYER_SPEED, velocityVector)
+      this.setVelocity(velocityVector.x, velocityVector.y)
+    }
+  }
+
+  update() {
+    this.moveTowardsTarget()
+  }
 }

@@ -48,6 +48,10 @@ export class Constants {
   public static RIGHT_SIDE = [68, 36, 98, 82, 70]
   public static LEFT_SIDE = [66, 38, 96, 52, 64]
 
+  // Player to tipoff to
+  public static TIPOFF_RIGHT = 70
+  public static TIPOFF_LEFT = 64
+
   public static getClosestPlayerToBall(ball: Ball, courtPlayers: CourtPlayer[]) {
     let closestPlayer: any = null
     let shortestDistance = Number.MAX_SAFE_INTEGER
@@ -81,5 +85,12 @@ export class Constants {
       }
     })
     return closestPlayer
+  }
+
+  public static getDistanceBetween(
+    point1: { x: number; y: number },
+    point2: { x: number; y: number }
+  ) {
+    return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2))
   }
 }

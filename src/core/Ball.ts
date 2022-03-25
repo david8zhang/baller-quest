@@ -7,6 +7,7 @@ export enum BallState {
   DRIBBLE = 'DRIBBLE',
   LOOSE = 'LOOSE',
   MIDAIR = 'MIDAIR',
+  TIPOFF = 'TIPOFF',
 }
 
 export interface ShotConfig {
@@ -63,6 +64,35 @@ export class Ball {
     spriteBody.onWorldBounds = true
   }
 
+  tipOff() {
+    this.currState = BallState.TIPOFF
+    this.sprite.setGravityY(980)
+    this.sprite.body.enable = true
+    const time = 1.25
+    const posToLand = new Phaser.Math.Vector2(Constants.COURT_WIDTH / 2, Constants.COURT_HEIGHT / 2)
+    this.launchArcTowards(posToLand, time)
+    this.game.time.delayedCall((time * 1000) / 2, () => {
+      const zoneToTipTo =
+        Phaser.Math.Between(0, 1) === 0
+          ? this.game.getZoneForZoneId(Constants.TIPOFF_RIGHT)
+          : this.game.getZoneForZoneId(Constants.TIPOFF_LEFT)
+      if (zoneToTipTo) {
+        const { centerPosition } = zoneToTipTo
+        const posToTipTo = new Phaser.Math.Vector2(centerPosition.x, centerPosition.y)
+        this.launchArcTowards(posToTipTo, time)
+        this.currState = BallState.LOOSE
+      }
+    })
+  }
+
+  launchArcTowards(posToLand: Phaser.Math.Vector2, timeInFlight: number) {
+    this.sprite.setGravityY(980)
+    this.sprite.body.enable = true
+    const xVelocity = (posToLand.x - this.sprite.x) / timeInFlight
+    const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(timeInFlight, 2)) / timeInFlight
+    this.sprite.setVelocity(xVelocity, yVelocity)
+  }
+
   shoot(hoop: Hoop, shotConfig: ShotConfig) {
     if (!this.player) {
       return
@@ -110,6 +140,10 @@ export class Ball {
     })
   }
 
+  setBallState(state: BallState) {
+    this.currState = state
+  }
+
   setLoose() {
     this.currState = BallState.LOOSE
   }
@@ -121,7 +155,7 @@ export class Ball {
   }
 
   setPlayer(player: CourtPlayer) {
-    if (this.currState == BallState.MIDAIR) {
+    if (this.currState == BallState.MIDAIR || this.currState == BallState.TIPOFF) {
       return
     }
     this.player = player
