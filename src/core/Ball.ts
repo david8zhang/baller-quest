@@ -9,6 +9,11 @@ export enum BallState {
   MIDAIR = 'MIDAIR',
 }
 
+export interface ShotConfig {
+  shotRanges: number[]
+  successRange: number[]
+}
+
 interface BallConfig {
   position: {
     x: number
@@ -40,10 +45,10 @@ export class Ball {
   setupFloor() {
     // Setup an artificial "floor" to represent when the ball hits the ground after rebounding off the rim
     this.floor = this.game.physics.add
-      .sprite(Constants.GAME_WIDTH / 2, this.sprite.y + 20, '')
+      .sprite(this.sprite.x, this.sprite.y + 20, '')
       .setVisible(false)
     this.floor.displayHeight = 2
-    this.floor.displayWidth = Constants.GAME_WIDTH
+    this.floor.displayWidth = Constants.COURT_WIDTH
     this.floor.setPushable(false)
     this.game.physics.world.enable(this.floor, Phaser.Physics.Arcade.DYNAMIC_BODY)
     this.floor.body.enable = false
@@ -58,7 +63,7 @@ export class Ball {
     spriteBody.onWorldBounds = true
   }
 
-  shoot(hoop: Hoop) {
+  shoot(hoop: Hoop, shotConfig: ShotConfig) {
     if (!this.player) {
       return
     }
@@ -71,12 +76,17 @@ export class Ball {
     // Launch ball at angle to hit the hoop
     this.sprite.body.enable = true
     const hoopSprite = hoop.sprite
-    const netBottom = new Phaser.Math.Vector2(hoopSprite.x + 50, hoopSprite.y - 50)
-    const rimBack = new Phaser.Math.Vector2(netBottom.x - 25, hoopSprite.y - 50)
-    const rimFront = new Phaser.Math.Vector2(netBottom.x + 25, hoopSprite.y - 50)
-    const randValue = Phaser.Math.Between(0, 2)
-    const posToLand = [rimBack, rimFront, netBottom][randValue]
-
+    const { shotRanges, successRange } = shotConfig
+    const posToLand = new Phaser.Math.Vector2(
+      hoopSprite.x + Phaser.Math.Between(successRange[0], successRange[1]),
+      hoopSprite.y - 50
+    )
+    const isWithinSuccessRange = (posToLand, successRange) => {
+      return (
+        posToLand.x >= hoopSprite.x + successRange[0] &&
+        posToLand.x <= hoopSprite.x + successRange[1]
+      )
+    }
     this.sprite.setGravityY(980)
     const time = 1.25
     const xVelocity = (posToLand.x - this.sprite.x) / time
@@ -84,11 +94,10 @@ export class Ball {
     this.sprite.setVelocity(xVelocity, yVelocity)
     hoopSprite.body.enable = false
     this.currState = BallState.MIDAIR
-
-    let delayedTime = posToLand === netBottom ? time * 1000 : time * 950
-
+    const didMakeShot = isWithinSuccessRange(posToLand, successRange)
+    let delayedTime = didMakeShot ? time * 1010 : time * 950
     this.game.time.delayedCall(delayedTime, () => {
-      if (posToLand === netBottom) {
+      if (didMakeShot) {
         this.currState = BallState.LOOSE
         this.sprite.setVelocityX(0)
         this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)
@@ -107,7 +116,7 @@ export class Ball {
 
   handleFloorCollision() {
     if (this.player || this.currState == BallState.MIDAIR) return
-    this.floor.setPosition(Constants.GAME_WIDTH / 2, this.sprite.y + 20)
+    this.floor.setPosition(this.sprite.x, this.sprite.y + 20)
     this.floor.body.enable = true
   }
 

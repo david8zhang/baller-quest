@@ -13,6 +13,36 @@ export class Constants {
   // Court Player attributes
   public static COURT_PLAYER_SPEED = 200
   public static PASS_SPEED = 1000
+  public static PLAYER_HOOP_CONFIG = {
+    position: {
+      x: 50,
+      y: Constants.COURT_HEIGHT / 2 - 50,
+    },
+    body: {
+      offsetX: 250,
+      offsetY: 75,
+    },
+    backboardPosition: {
+      x: 75,
+      y: Constants.COURT_HEIGHT / 2 - 125,
+    },
+    isFlipX: true,
+  }
+  public static CPU_HOOP_CONFIG = {
+    position: {
+      x: Constants.COURT_WIDTH - 50,
+      y: Constants.COURT_HEIGHT / 2 - 50,
+    },
+    body: {
+      offsetX: -150,
+      offsetY: 75,
+    },
+    backboardPosition: {
+      x: Constants.COURT_WIDTH - 75,
+      y: Constants.COURT_HEIGHT / 2 - 125,
+    },
+    isFlipX: false,
+  }
 
   // Team attributes
   public static RIGHT_SIDE = [68, 36, 98, 82, 70]

@@ -7,6 +7,14 @@ export interface HoopConfig {
     y: number
   }
   isFlipX: boolean
+  body: {
+    offsetX: number
+    offsetY: number
+  }
+  backboardPosition: {
+    x: number
+    y: number
+  }
 }
 
 export class Hoop {
@@ -17,13 +25,13 @@ export class Hoop {
 
   constructor(game: Game, config: HoopConfig) {
     this.game = game
-    const { position, isFlipX } = config
+    const { position, isFlipX, body, backboardPosition } = config
     this.sprite = this.game.physics.add.sprite(position.x, position.y, 'hoop').setScale(0.25)
     this.sprite.flipX = isFlipX
-    this.sprite.body.setSize(0.25 * this.sprite.body.width, 0.25 * this.sprite.body.width)
+    this.sprite.body.setSize(0.4 * this.sprite.body.width, 0.25 * this.sprite.body.width)
 
-    this.sprite.body.offset.x = this.sprite.displayWidth + 250
-    this.sprite.body.offset.y = this.sprite.displayHeight + 75
+    this.sprite.body.offset.x = this.sprite.displayWidth + body.offsetX
+    this.sprite.body.offset.y = this.sprite.displayHeight + body.offsetY
 
     this.sprite.setPushable(false)
     this.game.physics.add.collider(this.sprite, this.game.ball.sprite, () => {
@@ -34,6 +42,13 @@ export class Hoop {
         this.game.ball.handleFloorCollision()
       })
     })
+
+    const backboard = this.game.physics.add
+      .sprite(backboardPosition.x, backboardPosition.y, '')
+      .setVisible(false)
+      .setPushable(false)
+    backboard.body.setSize(10, 75)
+    this.game.physics.add.collider(backboard, this.game.ball.sprite, () => {})
   }
 
   setOnCollideRimHandler(onCollideRimHandler: Function) {

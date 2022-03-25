@@ -46,13 +46,9 @@ export default class Game extends Phaser.Scene {
         y: Constants.GAME_HEIGHT / 2,
       },
     })
-    this.playerHoop = new Hoop(this, {
-      position: {
-        x: 50,
-        y: Constants.COURT_HEIGHT / 2 - 50,
-      },
-      isFlipX: true,
-    })
+    this.playerHoop = new Hoop(this, Constants.PLAYER_HOOP_CONFIG)
+    this.cpuHoop = new Hoop(this, Constants.CPU_HOOP_CONFIG)
+
     this.player = new GamePlayer(this)
     this.cpu = new CPU(this)
     this.graphics = this.add.graphics()
