@@ -1,11 +1,11 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { CourtPlayer, Role } from './CourtPlayer'
-import { StateMachine } from './states/StateMachine'
-import { TeamStates } from './states/StateTypes'
-import { DefenseState } from './states/team/DefenseState'
-import { OffenseState } from './states/team/OffenseState'
-import { TipOffState } from './states/team/TipoffState'
+import { CourtPlayer } from '../CourtPlayer'
+import { StateMachine } from '../states/StateMachine'
+import { TeamStates } from '../states/StateTypes'
+import { DefenseState } from '../states/team/DefenseState'
+import { OffenseState } from '../states/team/OffenseState'
+import { TipOffState } from '../states/team/TipoffState'
 
 export enum DriveDirection {
   LEFT = 'LEFT',
@@ -82,6 +82,10 @@ export abstract class Team {
     })
   }
 
+  getCurrentState(): string {
+    return this.stateMachine.getState()
+  }
+
   setState(state: TeamStates) {
     this.stateMachine.transition(state)
   }
@@ -103,4 +107,6 @@ export abstract class Team {
       courtPlayer.update()
     })
   }
+
+  public getOpposingTeam() {}
 }

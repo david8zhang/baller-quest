@@ -26,6 +26,8 @@ export class Constants {
       x: 75,
       y: Constants.COURT_HEIGHT / 2 - 125,
     },
+    rimRange: [-80, -10],
+    successShotRange: [-50, -45],
     isFlipX: true,
   }
   public static CPU_HOOP_CONFIG = {
@@ -41,6 +43,8 @@ export class Constants {
       x: Constants.COURT_WIDTH - 75,
       y: Constants.COURT_HEIGHT / 2 - 125,
     },
+    rimRange: [-80, -10],
+    successShotRange: [-50, -45],
     isFlipX: false,
   }
 
@@ -95,12 +99,16 @@ export class Constants {
     return closestPlayer
   }
 
-  public static getClosestPlayer(src: CourtPlayer, courtPlayers: CourtPlayer[]) {
+  public static getClosestPlayer(
+    src: CourtPlayer,
+    courtPlayers: CourtPlayer[],
+    velocityVector: Phaser.Math.Vector2
+  ) {
     let closestPlayer: any = null
     let shortestDistance = Number.MAX_SAFE_INTEGER
     const srcPosition = new Phaser.Math.Vector2(
-      src.sprite.x + src.sprite.body.velocity.x,
-      src.sprite.y + src.sprite.body.velocity.y
+      src.sprite.x + velocityVector.x,
+      src.sprite.y + velocityVector.y
     )
     courtPlayers.forEach((p: CourtPlayer) => {
       if (p !== src) {

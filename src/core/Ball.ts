@@ -2,7 +2,7 @@ import Game, { FieldZone } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { CourtPlayer } from './CourtPlayer'
 import { Hoop } from './Hoop'
-import { Side } from './Team'
+import { Side } from './teams/Team'
 
 export enum BallState {
   DRIBBLE = 'DRIBBLE',
@@ -91,7 +91,7 @@ export class Ball {
     this.sprite.setVelocity(xVelocity, yVelocity)
   }
 
-  shoot(hoop: Hoop, shotConfig: ShotConfig) {
+  shoot(hoop: Hoop, isSuccess: boolean) {
     if (!this.player) {
       return
     }
@@ -104,16 +104,19 @@ export class Ball {
     // Launch ball at angle to hit the hoop
     this.sprite.body.enable = true
     const hoopSprite = hoop.sprite
-    const { shotRanges, successRange } = shotConfig
-    const posToLand = new Phaser.Math.Vector2(
-      hoopSprite.x + Phaser.Math.Between(successRange[0], successRange[1]),
-      hoopSprite.y - 50
-    )
-    const isWithinSuccessRange = (posToLand, successRange) => {
-      return (
-        posToLand.x >= hoopSprite.x + successRange[0] &&
-        posToLand.x <= hoopSprite.x + successRange[1]
-      )
+    const successRange = hoop.successShotRange
+    const rimRange = hoop.rimRange
+
+    let posToLand = new Phaser.Math.Vector2(0, 0)
+    if (isSuccess) {
+      posToLand.x = hoopSprite.x + Phaser.Math.Between(successRange[0], successRange[1])
+      posToLand.y = hoopSprite.y - 50
+    } else {
+      let missOffset1 = Phaser.Math.Between(rimRange[0], successRange[0] - 5)
+      let missOffset2 = Phaser.Math.Between(successRange[1] + 5, rimRange[1])
+      const missOffset = Phaser.Math.Between(0, 1) == 0 ? missOffset1 : missOffset2
+      posToLand.x = hoopSprite.x + missOffset
+      posToLand.y = hoopSprite.y - 50
     }
     this.sprite.setGravityY(980)
     const time = 1.25
@@ -122,10 +125,9 @@ export class Ball {
     this.sprite.setVelocity(xVelocity, yVelocity)
     hoopSprite.body.enable = false
     this.currState = BallState.MIDAIR
-    const didMakeShot = isWithinSuccessRange(posToLand, successRange)
-    let delayedTime = didMakeShot ? time * 1010 : time * 950
+    let delayedTime = isSuccess ? time * 1010 : time * 950
     this.game.time.delayedCall(delayedTime, () => {
-      if (didMakeShot) {
+      if (isSuccess) {
         this.currState = BallState.LOOSE
         this.sprite.setVelocityX(0)
         this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)

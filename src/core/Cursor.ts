@@ -32,6 +32,10 @@ export class Cursor {
     )
   }
 
+  setVisible(isVisible: boolean) {
+    this.highlight.setVisible(isVisible)
+  }
+
   selectCourtPlayer(courtPlayer: CourtPlayer) {
     this.selectedCourtPlayer = courtPlayer
     this.highlightCourtPlayer(courtPlayer)

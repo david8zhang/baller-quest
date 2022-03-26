@@ -15,6 +15,8 @@ export interface HoopConfig {
     x: number
     y: number
   }
+  rimRange: number[]
+  successShotRange: number[]
 }
 
 export class Hoop {
@@ -22,10 +24,12 @@ export class Hoop {
   public sprite: Phaser.Physics.Arcade.Sprite
   public onCollideRimHandler!: Function
   public setFloorEvent?: Phaser.Time.TimerEvent
+  public successShotRange: number[] = []
+  public rimRange: number[] = []
 
   constructor(game: Game, config: HoopConfig) {
     this.game = game
-    const { position, isFlipX, body, backboardPosition } = config
+    const { position, isFlipX, body, backboardPosition, successShotRange, rimRange } = config
     this.sprite = this.game.physics.add.sprite(position.x, position.y, 'hoop').setScale(0.25)
     this.sprite.flipX = isFlipX
     this.sprite.body.setSize(0.4 * this.sprite.body.width, 0.25 * this.sprite.body.width)
@@ -34,6 +38,8 @@ export class Hoop {
     this.sprite.body.offset.y = this.sprite.displayHeight + body.offsetY
 
     this.sprite.setPushable(false)
+    this.successShotRange = successShotRange
+    this.rimRange = rimRange
     this.game.physics.add.collider(this.sprite, this.game.ball.sprite, () => {
       const randTime = 1000
       this.game.ball.setLoose()

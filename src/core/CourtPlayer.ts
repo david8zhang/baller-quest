@@ -1,11 +1,12 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
+import { DefendManState } from './states/player/DefendManState'
 import { MoveToSpotState } from './states/player/MoveToSpotState'
 import { PlayerControlState } from './states/player/PlayerControlState'
 import { WaitState } from './states/player/WaitState'
 import { StateMachine } from './states/StateMachine'
 import { PlayerStates } from './states/StateTypes'
-import { Team } from './Team'
+import { Team } from './teams/Team'
 
 export enum Role {
   PG = 'PG',
@@ -26,7 +27,7 @@ export interface CourtPlayerConfig {
 }
 
 export class CourtPlayer {
-  private game: Game
+  public game: Game
   public sprite: Phaser.Physics.Arcade.Sprite
   public moveTarget: { x: number; y: number } | null = null
   public stateMachine: StateMachine
@@ -45,6 +46,7 @@ export class CourtPlayer {
     this.stateMachine = new StateMachine(
       PlayerStates.WAIT,
       {
+        [PlayerStates.DEFEND_MAN]: new DefendManState(),
         [PlayerStates.WAIT]: new WaitState(),
         [PlayerStates.MOVE_TO_SPOT]: new MoveToSpotState(),
         [PlayerStates.PLAYER_CONTROL]: new PlayerControlState(),

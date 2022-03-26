@@ -1,5 +1,5 @@
 import Game from '~/scenes/Game'
-import { TeamStates } from './states/StateTypes'
+import { TeamStates } from '../states/StateTypes'
 import { DriveDirection, Side, Team } from './Team'
 
 export class CPUTeam extends Team {

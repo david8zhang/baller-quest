@@ -1,12 +1,12 @@
 import Phaser from 'phaser'
 import { Ball } from '~/core/Ball'
 import { Hoop } from '~/core/Hoop'
-import { PlayerTeam } from '~/core/PlayerTeam'
-import { CPUTeam } from '~/core/CPUTeam'
+import { PlayerTeam } from '~/core/teams/PlayerTeam'
+import { CPUTeam } from '~/core/teams/CPUTeam'
 import { Constants } from '~/utils/Constants'
 import { Debug } from '~/core/Debug'
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { Side } from '~/core/Team'
+import { Side } from '~/core/teams/Team'
 import { TeamStates } from '~/core/states/StateTypes'
 
 export type FieldZone = {
@@ -18,8 +18,8 @@ export type FieldZone = {
 }
 
 export default class Game extends Phaser.Scene {
-  private playerTeam!: PlayerTeam
-  private cpuTeam!: CPUTeam
+  public playerTeam!: PlayerTeam
+  public cpuTeam!: CPUTeam
 
   // Court setup
   public playerHoop!: Hoop
@@ -73,10 +73,11 @@ export default class Game extends Phaser.Scene {
   }
 
   tipOff() {
-    const zoneToTipTo =
-      Phaser.Math.Between(0, 1) === 0
-        ? this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
-        : this.getZoneForZoneId(Constants.TIPOFF_LEFT)
+    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_LEFT)
+    // const zoneToTipTo =
+    //   Phaser.Math.Between(0, 1) === 0
+    //     ? this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
+    //     : this.getZoneForZoneId(Constants.TIPOFF_LEFT)
     if (zoneToTipTo) {
       this.ball.tipOff(zoneToTipTo)
     }

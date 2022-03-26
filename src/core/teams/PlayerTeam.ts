@@ -1,20 +1,23 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { CourtPlayer } from './CourtPlayer'
-import { Cursor } from './Cursor'
-import { PassCursor } from './PassCursor'
-import { TeamStates } from './states/StateTypes'
+import { CourtPlayer } from '../CourtPlayer'
+import { Cursor } from '../Cursor'
+import { PassCursor } from '../PassCursor'
+import { PlayerStates, TeamStates } from '../states/StateTypes'
 import { DriveDirection, Side, Team } from './Team'
 
 export class PlayerTeam extends Team {
   private cursor: Cursor
   private passCursor: PassCursor
+  public currVelocityVector: Phaser.Math.Vector2
+
   constructor(game: Game) {
     super(game, {
       initialState: TeamStates.TIPOFF,
       side: Side.PLAYER,
       driveDirection: DriveDirection.LEFT,
     })
+    this.currVelocityVector = new Phaser.Math.Vector2(0, 0)
     this.handleBallInput()
     this.cursor = new Cursor(
       {
@@ -44,6 +47,10 @@ export class PlayerTeam extends Team {
     const downDown = keyboard.down.isDown
 
     const currentPlayer = this.selectedCourtPlayer
+    if (currentPlayer.getCurrentState() == PlayerStates.WAIT) {
+      return
+    }
+
     const speed = Constants.COURT_PLAYER_SPEED
     if (leftDown || rightDown) {
       let velocityX = leftDown ? -speed : speed
@@ -51,8 +58,10 @@ export class PlayerTeam extends Team {
         velocityX = 0
       }
       currentPlayer.setVelocityX(velocityX)
+      this.currVelocityVector.x = velocityX
     } else {
       currentPlayer.setVelocityX(0)
+      this.currVelocityVector.x = 0
     }
     if (upDown || downDown) {
       let velocityY = upDown ? -speed : speed
@@ -60,8 +69,10 @@ export class PlayerTeam extends Team {
         velocityY = 0
       }
       currentPlayer.setVelocityY(velocityY)
+      this.currVelocityVector.y = velocityY
     } else {
       currentPlayer.setVelocityY(0)
+      this.currVelocityVector.y = 0
     }
   }
 
@@ -69,10 +80,7 @@ export class PlayerTeam extends Team {
     this.game.input.keyboard.on('keydown', (e) => {
       switch (e.code) {
         case 'KeyE': {
-          this.game.ball.shoot(this.game.cpuHoop, {
-            shotRanges: [-80, -10],
-            successRange: [-50, -45],
-          })
+          this.game.ball.shoot(this.game.cpuHoop, true)
           break
         }
         case 'Space': {
@@ -111,9 +119,22 @@ export class PlayerTeam extends Team {
       const selectedCourtPlayer = this.getSelectedCourtPlayer()
       let playerToPassTo: any = null
       this.game.graphics.lineStyle(1, 0x00ff00)
-      playerToPassTo = Constants.getClosestPlayer(selectedCourtPlayer, this.courtPlayers)
+      playerToPassTo = Constants.getClosestPlayer(
+        selectedCourtPlayer,
+        this.courtPlayers,
+        this.currVelocityVector
+      )
       this.highlightPassPlayer(playerToPassTo)
       this.passCursor.follow()
+    }
+  }
+
+  updateSelectedPlayerCursor() {
+    if (this.getCurrentState() == TeamStates.TIPOFF) {
+      this.cursor.setVisible(false)
+    } else {
+      this.cursor.setVisible(true)
+      this.cursor.follow()
     }
   }
 
@@ -121,9 +142,13 @@ export class PlayerTeam extends Team {
     this.passCursor.selectCourtPlayer(courtPlayer)
   }
 
+  public getOpposingTeam(): Team {
+    return this.game.cpuTeam
+  }
+
   update() {
     super.update()
-    this.cursor.follow()
+    this.updateSelectedPlayerCursor()
     this.updatePassCursor()
     this.handlePlayerMovement()
   }

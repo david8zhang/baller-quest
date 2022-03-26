@@ -1,4 +1,4 @@
-import { Team } from '~/core/Team'
+import { Team } from '~/core/teams/Team'
 import { State } from '../StateMachine'
 import { PlayerStates } from '../StateTypes'
 

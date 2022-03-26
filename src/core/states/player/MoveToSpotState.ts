@@ -1,5 +1,5 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { Team } from '~/core/Team'
+import { Team } from '~/core/teams/Team'
 import { State } from '../StateMachine'
 
 export class MoveToSpotState extends State {
