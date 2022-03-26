@@ -1,9 +1,11 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { CourtPlayer } from '../CourtPlayer'
+import { Hoop } from '../Hoop'
 import { StateMachine } from '../states/StateMachine'
 import { TeamStates } from '../states/StateTypes'
 import { DefenseState } from '../states/team/DefenseState'
+import { InboundBallState } from '../states/team/InboundBallState'
 import { OffenseState } from '../states/team/OffenseState'
 import { TipOffState } from '../states/team/TipoffState'
 
@@ -41,6 +43,7 @@ export abstract class Team {
     this.stateMachine = new StateMachine(
       config.initialState,
       {
+        [TeamStates.INBOUND_BALL]: new InboundBallState(),
         [TeamStates.TIPOFF]: new TipOffState(),
         [TeamStates.DEFENSE]: new DefenseState(),
         [TeamStates.OFFENSE]: new OffenseState(),
@@ -48,6 +51,8 @@ export abstract class Team {
       [this]
     )
   }
+
+  public abstract getHoop(): Hoop
 
   getBall() {
     return this.game.ball
@@ -86,8 +91,8 @@ export abstract class Team {
     return this.stateMachine.getState()
   }
 
-  setState(state: TeamStates) {
-    this.stateMachine.transition(state)
+  setState(state: TeamStates, ...args: any[]) {
+    this.stateMachine.transition(state, ...args)
   }
 
   getOffensiveFormation() {
@@ -108,5 +113,5 @@ export abstract class Team {
     })
   }
 
-  public getOpposingTeam() {}
+  public abstract getOpposingTeam(): Team
 }

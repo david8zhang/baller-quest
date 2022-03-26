@@ -1,11 +1,14 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { DefendManState } from './states/player/DefendManState'
+import { PlayerInboundBallState } from './states/player/PlayerInboundBallState'
 import { MoveToSpotState } from './states/player/MoveToSpotState'
 import { PlayerControlState } from './states/player/PlayerControlState'
+import { ReceiveInboundState } from './states/player/ReceiveInboundState'
 import { WaitState } from './states/player/WaitState'
 import { StateMachine } from './states/StateMachine'
 import { PlayerStates } from './states/StateTypes'
+import { InboundBallState } from './states/team/InboundBallState'
 import { Team } from './teams/Team'
 
 export enum Role {
@@ -46,6 +49,8 @@ export class CourtPlayer {
     this.stateMachine = new StateMachine(
       PlayerStates.WAIT,
       {
+        [PlayerStates.RECEIVE_INBOUND]: new ReceiveInboundState(),
+        [PlayerStates.INBOUND_BALL]: new PlayerInboundBallState(),
         [PlayerStates.DEFEND_MAN]: new DefendManState(),
         [PlayerStates.WAIT]: new WaitState(),
         [PlayerStates.MOVE_TO_SPOT]: new MoveToSpotState(),
@@ -85,8 +90,8 @@ export class CourtPlayer {
     return this.team.driveDirection
   }
 
-  setState(state: string) {
-    this.stateMachine.transition(state)
+  setState(state: string, ...args: any[]) {
+    this.stateMachine.transition(state, ...args)
   }
 
   getCurrentState(): string {

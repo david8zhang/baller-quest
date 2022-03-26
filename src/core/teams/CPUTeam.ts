@@ -10,4 +10,12 @@ export class CPUTeam extends Team {
       driveDirection: DriveDirection.RIGHT,
     })
   }
+
+  getOpposingTeam(): Team {
+    return this.game.playerTeam
+  }
+
+  getHoop() {
+    return this.game.cpuHoop
+  }
 }

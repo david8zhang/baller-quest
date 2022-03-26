@@ -39,6 +39,10 @@ export class PlayerTeam extends Team {
     return this.selectedCourtPlayer
   }
 
+  getHoop() {
+    return this.game.playerHoop
+  }
+
   handlePlayerMovement() {
     const keyboard = this.game.input.keyboard.createCursorKeys()
     const leftDown = keyboard.left.isDown
@@ -80,7 +84,9 @@ export class PlayerTeam extends Team {
     this.game.input.keyboard.on('keydown', (e) => {
       switch (e.code) {
         case 'KeyE': {
-          this.game.ball.shoot(this.game.cpuHoop, true)
+          if (this.game.ball.getPossessionSide() == this.side) {
+            this.game.ball.shoot(this.game.cpuHoop, true)
+          }
           break
         }
         case 'Space': {

@@ -2,7 +2,7 @@ import Game, { FieldZone } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { CourtPlayer } from './CourtPlayer'
 import { Hoop } from './Hoop'
-import { Side } from './teams/Team'
+import { Side, Team } from './teams/Team'
 
 export enum BallState {
   DRIBBLE = 'DRIBBLE',
@@ -30,6 +30,7 @@ export class Ball {
   public floor!: Phaser.Physics.Arcade.Sprite
   public currState: BallState = BallState.LOOSE
   public onPlayerChangedHandlers: Function[] = []
+  public onScoreHandlers: Function[] = []
 
   constructor(game: Game, config: BallConfig) {
     this.game = game
@@ -95,6 +96,7 @@ export class Ball {
     if (!this.player) {
       return
     }
+    const playerTeam: Team = this.player!.team
     const playerPosition = new Phaser.Math.Vector2(this.player!.sprite.x, this.player!.sprite.y)
     const playerHeight = this.player!.sprite.displayHeight
     this.player = null
@@ -133,6 +135,9 @@ export class Ball {
         this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)
         this.game.time.delayedCall(400, () => {
           this.handleFloorCollision()
+          this.onScoreHandlers.forEach((handler: Function) => {
+            handler(playerTeam)
+          })
         })
       } else {
         hoopSprite.body.enable = true
@@ -156,6 +161,14 @@ export class Ball {
 
   registerOnPlayerChangedHandler(fn: Function) {
     this.onPlayerChangedHandlers.push(fn)
+  }
+
+  registerOnScoredHandler(fn: Function) {
+    this.onScoreHandlers.push(fn)
+  }
+
+  isInPossessionOf(player: CourtPlayer) {
+    return this.player == player
   }
 
   setPlayer(player: CourtPlayer) {

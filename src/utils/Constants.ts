@@ -129,4 +129,23 @@ export class Constants {
   ) {
     return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2))
   }
+
+  public static IsAtPosition(
+    player: CourtPlayer,
+    position: { x: number; y: number },
+    threshold: number = 5
+  ) {
+    return (
+      Constants.getDistanceBetween(
+        {
+          x: player.sprite.x,
+          y: player.sprite.y,
+        },
+        {
+          x: position.x,
+          y: position.y,
+        }
+      ) < threshold
+    )
+  }
 }

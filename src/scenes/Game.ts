@@ -6,7 +6,7 @@ import { CPUTeam } from '~/core/teams/CPUTeam'
 import { Constants } from '~/utils/Constants'
 import { Debug } from '~/core/Debug'
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { Side } from '~/core/teams/Team'
+import { Side, Team } from '~/core/teams/Team'
 import { TeamStates } from '~/core/states/StateTypes'
 
 export type FieldZone = {
@@ -57,8 +57,14 @@ export default class Game extends Phaser.Scene {
     this.debug = new Debug(this)
 
     this.cameras.main.startFollow(this.ball.sprite)
+
+    // Register ball handlers
     this.ball.registerOnPlayerChangedHandler((oldPlayer: CourtPlayer, newPlayer: CourtPlayer) => {
-      if (!oldPlayer) {
+      if (
+        !oldPlayer &&
+        this.cpuTeam.getCurrentState() !== TeamStates.INBOUND_BALL &&
+        this.playerTeam.getCurrentState() !== TeamStates.INBOUND_BALL
+      ) {
         const sideWithPosession = newPlayer.getSide()
         if (sideWithPosession == Side.PLAYER) {
           this.playerTeam.setState(TeamStates.OFFENSE)
@@ -69,6 +75,13 @@ export default class Game extends Phaser.Scene {
         }
       }
     })
+
+    this.ball.registerOnScoredHandler((scoredTeam: Team) => {
+      const opposingTeam = scoredTeam.getOpposingTeam()
+      scoredTeam.setState(TeamStates.DEFENSE)
+      opposingTeam.setState(TeamStates.INBOUND_BALL)
+    })
+
     this.tipOff()
   }
 
