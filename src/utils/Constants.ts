@@ -1,5 +1,5 @@
 import { Ball } from '~/core/Ball'
-import { CourtPlayer } from '~/core/CourtPlayer'
+import { CourtPlayer, Role } from '~/core/CourtPlayer'
 
 export class Constants {
   public static GAME_WIDTH = 900
@@ -45,8 +45,36 @@ export class Constants {
   }
 
   // Team attributes
-  public static RIGHT_SIDE = [68, 36, 98, 82, 70]
-  public static LEFT_SIDE = [66, 38, 96, 52, 64]
+  public static RIGHT_SIDE = [
+    { zoneId: 68, role: Role.C },
+    { zoneId: 36, role: Role.SG },
+    { zoneId: 98, role: Role.SF },
+    { zoneId: 82, role: Role.PF },
+    { zoneId: 70, role: Role.PG },
+  ]
+  public static LEFT_SIDE = [
+    { zoneId: 66, role: Role.C },
+    { zoneId: 38, role: Role.SG },
+    { zoneId: 96, role: Role.SF },
+    { zoneId: 52, role: Role.PF },
+    { zoneId: 64, role: Role.PG },
+  ]
+
+  // Offensive positions
+  public static OFFENSE_FROM_LEFT = {
+    [Role.PG]: 69,
+    [Role.SG]: 26,
+    [Role.SF]: 116,
+    [Role.PF]: 87,
+    [Role.C]: 57,
+  }
+  public static OFFENSE_FROM_RIGHT = {
+    [Role.PG]: 65,
+    [Role.SG]: 18,
+    [Role.SF]: 108,
+    [Role.PF]: 77,
+    [Role.C]: 47,
+  }
 
   // Player to tipoff to
   public static TIPOFF_RIGHT = 70

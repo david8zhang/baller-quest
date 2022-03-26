@@ -1,11 +1,13 @@
 import Phaser from 'phaser'
 import { Ball } from '~/core/Ball'
 import { Hoop } from '~/core/Hoop'
-import { GamePlayer } from '~/core/GamePlayer'
+import { PlayerTeam } from '~/core/PlayerTeam'
+import { CPUTeam } from '~/core/CPUTeam'
 import { Constants } from '~/utils/Constants'
 import { Debug } from '~/core/Debug'
-import { CPU } from '~/core/CPU'
 import { CourtPlayer } from '~/core/CourtPlayer'
+import { Side } from '~/core/Team'
+import { TeamStates } from '~/core/states/StateTypes'
 
 export type FieldZone = {
   centerPosition: {
@@ -16,8 +18,8 @@ export type FieldZone = {
 }
 
 export default class Game extends Phaser.Scene {
-  private player!: GamePlayer
-  private cpu!: CPU
+  private playerTeam!: PlayerTeam
+  private cpuTeam!: CPUTeam
 
   // Court setup
   public playerHoop!: Hoop
@@ -49,13 +51,35 @@ export default class Game extends Phaser.Scene {
     this.playerHoop = new Hoop(this, Constants.PLAYER_HOOP_CONFIG)
     this.cpuHoop = new Hoop(this, Constants.CPU_HOOP_CONFIG)
 
-    this.player = new GamePlayer(this)
-    this.cpu = new CPU(this)
+    this.playerTeam = new PlayerTeam(this)
+    this.cpuTeam = new CPUTeam(this)
     this.graphics = this.add.graphics()
     this.debug = new Debug(this)
 
     this.cameras.main.startFollow(this.ball.sprite)
-    this.ball.tipOff()
+    this.ball.registerOnPlayerChangedHandler((oldPlayer: CourtPlayer, newPlayer: CourtPlayer) => {
+      if (!oldPlayer) {
+        const sideWithPosession = newPlayer.getSide()
+        if (sideWithPosession == Side.PLAYER) {
+          this.playerTeam.setState(TeamStates.OFFENSE)
+          this.cpuTeam.setState(TeamStates.DEFENSE)
+        } else {
+          this.cpuTeam.setState(TeamStates.OFFENSE)
+          this.playerTeam.setState(TeamStates.DEFENSE)
+        }
+      }
+    })
+    this.tipOff()
+  }
+
+  tipOff() {
+    const zoneToTipTo =
+      Phaser.Math.Between(0, 1) === 0
+        ? this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
+        : this.getZoneForZoneId(Constants.TIPOFF_LEFT)
+    if (zoneToTipTo) {
+      this.ball.tipOff(zoneToTipTo)
+    }
   }
 
   createField() {
@@ -118,7 +142,8 @@ export default class Game extends Phaser.Scene {
   }
 
   update() {
-    this.player.update()
+    this.playerTeam.update()
+    this.cpuTeam.update()
     this.ball.update()
   }
 }

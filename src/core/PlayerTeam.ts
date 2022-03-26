@@ -1,16 +1,20 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { CourtPlayer, Side } from './CourtPlayer'
+import { CourtPlayer } from './CourtPlayer'
 import { Cursor } from './Cursor'
 import { PassCursor } from './PassCursor'
 import { TeamStates } from './states/StateTypes'
-import { Team } from './Team'
+import { DriveDirection, Side, Team } from './Team'
 
-export class GamePlayer extends Team {
+export class PlayerTeam extends Team {
   private cursor: Cursor
   private passCursor: PassCursor
   constructor(game: Game) {
-    super(game, TeamStates.OFFENSE, Side.PLAYER)
+    super(game, {
+      initialState: TeamStates.TIPOFF,
+      side: Side.PLAYER,
+      driveDirection: DriveDirection.LEFT,
+    })
     this.handleBallInput()
     this.cursor = new Cursor(
       {

@@ -1,7 +1,8 @@
-import Game from '~/scenes/Game'
+import Game, { FieldZone } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { CourtPlayer, Side } from './CourtPlayer'
+import { CourtPlayer } from './CourtPlayer'
 import { Hoop } from './Hoop'
+import { Side } from './Team'
 
 export enum BallState {
   DRIBBLE = 'DRIBBLE',
@@ -28,6 +29,7 @@ export class Ball {
   private player!: CourtPlayer | null
   public floor!: Phaser.Physics.Arcade.Sprite
   public currState: BallState = BallState.LOOSE
+  public onPlayerChangedHandlers: Function[] = []
 
   constructor(game: Game, config: BallConfig) {
     this.game = game
@@ -64,7 +66,7 @@ export class Ball {
     spriteBody.onWorldBounds = true
   }
 
-  tipOff() {
+  tipOff(zoneToTipTo: FieldZone) {
     this.currState = BallState.TIPOFF
     this.sprite.setGravityY(980)
     this.sprite.body.enable = true
@@ -72,10 +74,6 @@ export class Ball {
     const posToLand = new Phaser.Math.Vector2(Constants.COURT_WIDTH / 2, Constants.COURT_HEIGHT / 2)
     this.launchArcTowards(posToLand, time)
     this.game.time.delayedCall((time * 1000) / 2, () => {
-      const zoneToTipTo =
-        Phaser.Math.Between(0, 1) === 0
-          ? this.game.getZoneForZoneId(Constants.TIPOFF_RIGHT)
-          : this.game.getZoneForZoneId(Constants.TIPOFF_LEFT)
       if (zoneToTipTo) {
         const { centerPosition } = zoneToTipTo
         const posToTipTo = new Phaser.Math.Vector2(centerPosition.x, centerPosition.y)
@@ -154,14 +152,22 @@ export class Ball {
     this.floor.body.enable = true
   }
 
+  registerOnPlayerChangedHandler(fn: Function) {
+    this.onPlayerChangedHandlers.push(fn)
+  }
+
   setPlayer(player: CourtPlayer) {
     if (this.currState == BallState.MIDAIR || this.currState == BallState.TIPOFF) {
       return
     }
+    const oldPlayer = this.player
     this.player = player
     this.sprite.body.enable = false
     this.floor.body.enable = false
     this.currState = BallState.DRIBBLE
+    this.onPlayerChangedHandlers.forEach((fn) => {
+      fn(oldPlayer, player)
+    })
   }
 
   update() {
@@ -194,7 +200,7 @@ export class Ball {
   }
 
   getPossessionSide() {
-    if (this.player) return this.player.side
+    if (this.player) return this.player.getSide()
     return Side.NONE
   }
 }

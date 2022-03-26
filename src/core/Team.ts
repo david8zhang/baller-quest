@@ -1,27 +1,52 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { CourtPlayer, Side } from './CourtPlayer'
+import { CourtPlayer, Role } from './CourtPlayer'
 import { StateMachine } from './states/StateMachine'
 import { TeamStates } from './states/StateTypes'
 import { DefenseState } from './states/team/DefenseState'
 import { OffenseState } from './states/team/OffenseState'
+import { TipOffState } from './states/team/TipoffState'
 
-export class Team {
-  protected game: Game
+export enum DriveDirection {
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT',
+}
+
+export enum Side {
+  CPU = 'CPU',
+  PLAYER = 'PLAYER',
+  NONE = 'None',
+}
+
+export interface TeamConfig {
+  initialState: TeamStates
+  side: Side
+  driveDirection: DriveDirection
+}
+
+export abstract class Team {
+  public game: Game
   public courtPlayers: CourtPlayer[] = []
   public stateMachine!: StateMachine
-  public side: Side = Side.NONE
+  public side!: Side
+  public driveDirection!: DriveDirection
   private courtPlayerGroup!: Phaser.GameObjects.Group
   protected selectedCourtPlayer!: CourtPlayer
 
-  constructor(game: Game, initialState: TeamStates, side: Side) {
+  constructor(game: Game, config: TeamConfig) {
     this.game = game
-    this.side = side
-    this.stateMachine = new StateMachine(initialState, {
-      [TeamStates.DEFENSE]: new DefenseState(),
-      [TeamStates.OFFENSE]: new OffenseState(),
-    })
+    this.side = config.side
+    this.driveDirection = config.driveDirection
     this.createCourtPlayers()
+    this.stateMachine = new StateMachine(
+      config.initialState,
+      {
+        [TeamStates.TIPOFF]: new TipOffState(),
+        [TeamStates.DEFENSE]: new DefenseState(),
+        [TeamStates.OFFENSE]: new OffenseState(),
+      },
+      [this]
+    )
   }
 
   getBall() {
@@ -30,16 +55,19 @@ export class Team {
 
   createCourtPlayers() {
     this.courtPlayerGroup = this.game.add.group()
-    const initialPositions = this.side === Side.PLAYER ? Constants.LEFT_SIDE : Constants.RIGHT_SIDE
+    const configs =
+      this.driveDirection === DriveDirection.LEFT ? Constants.LEFT_SIDE : Constants.RIGHT_SIDE
 
-    for (let i = 0; i < initialPositions.length; i++) {
-      const zoneId = initialPositions[i]
+    for (let i = 0; i < configs.length; i++) {
+      const configObj = configs[i]
+      const { zoneId, role } = configObj
       const zone = this.game.getZoneForZoneId(zoneId)
       if (zone) {
         const { centerPosition } = zone
         const courtPlayer = new CourtPlayer(this.game, {
           position: centerPosition,
-          side: this.side,
+          team: this,
+          role: role,
           texture: this.side === Side.PLAYER ? 'player' : 'cpu-player',
         })
         this.courtPlayers.push(courtPlayer)
@@ -52,6 +80,16 @@ export class Team {
       this.game.ball.setPlayer(collidedPlayer)
       this.selectCourtPlayer(collidedPlayer)
     })
+  }
+
+  setState(state: TeamStates) {
+    this.stateMachine.transition(state)
+  }
+
+  getOffensiveFormation() {
+    return this.driveDirection === DriveDirection.LEFT
+      ? Constants.OFFENSE_FROM_LEFT
+      : Constants.OFFENSE_FROM_RIGHT
   }
 
   selectCourtPlayer(courtPlayer: CourtPlayer) {
