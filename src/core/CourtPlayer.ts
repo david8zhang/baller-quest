@@ -8,7 +8,6 @@ import { ReceiveInboundState } from './states/player/ReceiveInboundState'
 import { WaitState } from './states/player/WaitState'
 import { StateMachine } from './states/StateMachine'
 import { PlayerStates } from './states/StateTypes'
-import { InboundBallState } from './states/team/InboundBallState'
 import { Team } from './teams/Team'
 
 export enum Role {
@@ -36,6 +35,7 @@ export class CourtPlayer {
   public stateMachine: StateMachine
   public role: Role
   public team: Team
+  public currVelocityVector: Phaser.Math.Vector2
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -45,7 +45,10 @@ export class CourtPlayer {
     this.sprite = this.game.physics.add.sprite(position.x, position.y, texture).setDepth(2)
     this.sprite.setData('ref', this)
     this.game.physics.world.enable(this.sprite, Phaser.Physics.Arcade.DYNAMIC_BODY)
+    this.sprite.body.setSize(0.5 * this.sprite.displayWidth, 0.5 * this.sprite.displayHeight)
+    this.sprite.body.offset.y = this.sprite.displayHeight / 2
     this.sprite.setScale(0.5)
+    this.currVelocityVector = new Phaser.Math.Vector2(0, 0)
     this.stateMachine = new StateMachine(
       PlayerStates.WAIT,
       {
@@ -64,6 +67,8 @@ export class CourtPlayer {
     if (xVel != 0) {
       this.sprite.setFlipX(xVel < 0)
     }
+    this.currVelocityVector.x = xVel
+    this.currVelocityVector.y = yVel
     this.sprite.setVelocity(xVel, yVel)
   }
 
@@ -71,10 +76,12 @@ export class CourtPlayer {
     if (xVelocity != 0) {
       this.sprite.setFlipX(xVelocity < 0)
     }
+    this.currVelocityVector.x = xVelocity
     this.sprite.setVelocityX(xVelocity)
   }
 
   setVelocityY(yVelocity: number) {
+    this.currVelocityVector.y = yVelocity
     this.sprite.setVelocityY(yVelocity)
   }
 
@@ -128,6 +135,20 @@ export class CourtPlayer {
       const velocityVector = new Phaser.Math.Vector2()
       this.game.physics.velocityFromRotation(angle, Constants.COURT_PLAYER_SPEED, velocityVector)
       this.setVelocity(velocityVector.x, velocityVector.y)
+    }
+  }
+
+  shootBall() {
+    if (this.game.ball.getPossessionSide() == this.team.side) {
+      const enemyHoop = this.team.getOpposingTeam().getHoop()
+      const shotMakePercentage = Phaser.Math.Between(1, 100)
+      this.game.ball.shoot(enemyHoop, shotMakePercentage <= 50)
+    }
+  }
+
+  passBall(receiver: CourtPlayer) {
+    if (this.game.ball.isInPossessionOf(this)) {
+      this.game.ball.passTo(receiver)
     }
   }
 

@@ -32,7 +32,7 @@ export abstract class Team {
   public stateMachine!: StateMachine
   public side!: Side
   public driveDirection!: DriveDirection
-  private courtPlayerGroup!: Phaser.GameObjects.Group
+  public courtPlayerGroup!: Phaser.GameObjects.Group
   protected selectedCourtPlayer!: CourtPlayer
 
   constructor(game: Game, config: TeamConfig) {

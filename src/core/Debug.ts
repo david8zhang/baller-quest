@@ -8,6 +8,7 @@ export class Debug {
   public alpha: number = 1
   public fishStates: Phaser.GameObjects.Text[] = []
   public bestPlayerSupportPositions: any[] = []
+  public stateMappings: any = {}
 
   constructor(game: Game) {
     this.game = game

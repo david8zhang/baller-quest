@@ -193,6 +193,7 @@ export class Ball {
   }
 
   passTo(target: CourtPlayer) {
+    this.sprite.setGravity(0)
     const angle = Phaser.Math.Angle.BetweenPoints(
       {
         x: this.sprite.x,
