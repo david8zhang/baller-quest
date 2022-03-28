@@ -200,17 +200,28 @@ export class Ball {
         y: this.sprite.y,
       },
       {
-        x: target.sprite.x,
-        y: target.sprite.y,
+        x: target.sprite.x + target.currVelocityVector.x * 0.25,
+        y: target.sprite.y + target.currVelocityVector.y * 0.25,
       }
     )
+    const posAfterOneSec = {
+      x: target.sprite.x + target.currVelocityVector.x * 0.25,
+      y: target.sprite.y + target.currVelocityVector.y * 0.25,
+    }
+    const distance = Constants.getDistanceBetween(
+      {
+        x: this.sprite.x,
+        y: this.sprite.y,
+      },
+      posAfterOneSec
+    )
     const velocityVector = new Phaser.Math.Vector2(0, 0)
-    this.game.physics.velocityFromRotation(angle, Constants.PASS_SPEED, velocityVector)
+    this.game.physics.velocityFromRotation(angle, distance * 4, velocityVector)
     this.currState = BallState.MIDAIR
     this.player = null
     this.sprite.body.enable = true
     this.sprite.setVelocity(velocityVector.x, velocityVector.y)
-    this.game.time.delayedCall(100, () => {
+    this.game.time.delayedCall(200, () => {
       this.currState = BallState.LOOSE
     })
   }
