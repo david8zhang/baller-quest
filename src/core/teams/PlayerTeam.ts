@@ -118,7 +118,6 @@ export class PlayerTeam extends Team {
       this.passCursor.setVisible(true)
       const selectedCourtPlayer = this.getSelectedCourtPlayer()
       let playerToPassTo: any = null
-      this.game.graphics.lineStyle(1, 0x00ff00)
       playerToPassTo = Constants.getClosestPlayer(selectedCourtPlayer, this.courtPlayers)
       this.highlightPassPlayer(playerToPassTo)
       this.passCursor.follow()

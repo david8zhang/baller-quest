@@ -15,4 +15,4 @@ A basketball game that takes place in a medieval fantasy world.
 
 ## Known bugs
 
-- Pass to receiving player while receiving player is moving results in weird behavior
+- some three point shots don't register correctly

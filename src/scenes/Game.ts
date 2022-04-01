@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { Ball } from '~/core/Ball'
+import { Ball, ShotType } from '~/core/Ball'
 import { Hoop } from '~/core/Hoop'
 import { PlayerTeam } from '~/core/teams/PlayerTeam'
 import { CPUTeam } from '~/core/teams/CPUTeam'
@@ -8,40 +8,34 @@ import { Debug } from '~/core/Debug'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Side, Team } from '~/core/teams/Team'
 import { TeamStates } from '~/core/states/StateTypes'
-
-export type FieldZone = {
-  centerPosition: {
-    x: number
-    y: number
-  }
-  id: number
-}
+import { Score } from '~/core/Score'
+import { Court } from '~/core/Court'
+import { UI } from './UI'
 
 export default class Game extends Phaser.Scene {
   public playerTeam!: PlayerTeam
   public cpuTeam!: CPUTeam
+  private static _instance: Game
 
   // Court setup
   public playerHoop!: Hoop
   public cpuHoop!: Hoop
   public ball!: Ball
-
-  // Grid for player positioning
-  public graphics!: Phaser.GameObjects.Graphics
-  public fieldGrid!: FieldZone[][]
-
-  public debug!: Debug
-  public bgImage!: Phaser.GameObjects.Image
+  public score!: Score
+  public court!: Court
 
   constructor() {
     super('game')
+    Game._instance = this
+  }
+
+  static get instance() {
+    return this._instance
   }
 
   create() {
-    this.createField()
-    this.setupBackground()
     this.setupWorldBounds()
-
+    this.court = new Court(this)
     this.ball = new Ball(this, {
       position: {
         x: Constants.COURT_WIDTH / 2,
@@ -53,8 +47,6 @@ export default class Game extends Phaser.Scene {
 
     this.playerTeam = new PlayerTeam(this)
     this.cpuTeam = new CPUTeam(this)
-    this.graphics = this.add.graphics()
-    this.debug = new Debug(this)
 
     this.cameras.main.startFollow(this.ball.sprite)
 
@@ -72,8 +64,9 @@ export default class Game extends Phaser.Scene {
       }
     })
 
-    this.ball.registerOnScoredHandler((scoredTeam: Team) => {
+    this.ball.registerOnScoredHandler((scoredTeam: Team, shotType: ShotType) => {
       const opposingTeam = scoredTeam.getOpposingTeam()
+      UI.instance.score.addPoints(scoredTeam.side, shotType === ShotType.THREE_POINTER ? 3 : 2)
       scoredTeam.setState(TeamStates.DEFENSE)
       opposingTeam.setState(TeamStates.INBOUND_BALL)
     })
@@ -95,45 +88,20 @@ export default class Game extends Phaser.Scene {
     }
   }
 
-  createField() {
-    // Create a field grid
-    let fieldZoneID: number = 0
-    const numZoneColumns = Constants.COURT_WIDTH / Constants.FIELD_ZONE_WIDTH
-    const numZoneRows = Constants.COURT_HEIGHT / Constants.FIELD_ZONE_HEIGHT
-    this.fieldGrid = new Array(numZoneRows)
-      .fill(0)
-      .map(() => new Array(numZoneColumns).fill(undefined))
-
-    for (let i = 0; i < this.fieldGrid.length; i++) {
-      for (let j = 0; j < this.fieldGrid[0].length; j++) {
-        this.fieldGrid[i][j] = {
-          centerPosition: {
-            x: j * Constants.FIELD_ZONE_WIDTH + Constants.FIELD_ZONE_WIDTH / 2,
-            y: i * Constants.FIELD_ZONE_HEIGHT + Constants.FIELD_ZONE_HEIGHT / 2,
-          },
-          id: fieldZoneID++,
-        }
-      }
-    }
+  get fieldGrid() {
+    return this.court.fieldGrid
   }
 
   getZoneForZoneId(zoneId: number) {
-    for (let i = 0; i < this.fieldGrid.length; i++) {
-      for (let j = 0; j < this.fieldGrid[0].length; j++) {
-        if (this.fieldGrid[i][j].id === zoneId) {
-          return this.fieldGrid[i][j]
-        }
-      }
-    }
-    return null
+    return this.court.getZoneForZoneId(zoneId)
   }
 
   setupWorldBounds() {
     this.physics.world.setBounds(
       0,
       0,
-      this.bgImage.displayWidth,
-      this.bgImage.displayHeight,
+      Constants.COURT_WIDTH,
+      Constants.COURT_HEIGHT,
       true,
       true,
       false,
@@ -144,14 +112,6 @@ export default class Game extends Phaser.Scene {
         this.scene.restart()
       }
     })
-  }
-
-  setupBackground() {
-    this.bgImage = this.add.image(Constants.COURT_WIDTH / 2, Constants.COURT_HEIGHT / 2, 'court')
-    this.bgImage.displayWidth = Constants.GAME_WIDTH * 1.5
-    this.bgImage.displayHeight = Constants.GAME_HEIGHT
-    this.cameras.main.setBackgroundColor(0xffffff)
-    this.cameras.main.setBounds(0, 0, Constants.COURT_WIDTH, Constants.COURT_HEIGHT)
   }
 
   update() {

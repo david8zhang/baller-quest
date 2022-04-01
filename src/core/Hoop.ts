@@ -1,5 +1,4 @@
-import Game, { FieldZone } from '~/scenes/Game'
-import { Constants } from '~/utils/Constants'
+import Game from '~/scenes/Game'
 
 export interface HoopConfig {
   position: {

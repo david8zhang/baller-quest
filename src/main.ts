@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 
 import Game from './scenes/Game'
 import { Preloader } from './scenes/Preloader'
+import { UI } from './scenes/UI'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -23,7 +24,7 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Preloader, Game],
+  scene: [Preloader, Game, UI],
 }
 
 export default new Phaser.Game(config)

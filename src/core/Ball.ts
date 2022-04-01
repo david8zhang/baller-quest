@@ -1,5 +1,6 @@
-import Game, { FieldZone } from '~/scenes/Game'
+import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
+import { FieldZone } from './Court'
 import { CourtPlayer } from './CourtPlayer'
 import { Hoop } from './Hoop'
 import { Side, Team } from './teams/Team'
@@ -9,6 +10,11 @@ export enum BallState {
   LOOSE = 'LOOSE',
   MIDAIR = 'MIDAIR',
   TIPOFF = 'TIPOFF',
+}
+
+export enum ShotType {
+  THREE_POINTER = 'THREE',
+  TWO_POINTER = 'TWO',
 }
 
 export interface ShotConfig {
@@ -99,7 +105,6 @@ export class Ball {
     const playerTeam: Team = this.player!.team
     const playerPosition = new Phaser.Math.Vector2(this.player!.sprite.x, this.player!.sprite.y)
     const playerHeight = this.player!.sprite.displayHeight
-    this.player = null
     this.sprite.y = playerPosition.y - playerHeight / 2
     this.floor.body.enable = false
 
@@ -121,13 +126,23 @@ export class Ball {
       posToLand.y = hoopSprite.y - 50
     }
     this.sprite.setGravityY(980)
-    const time = 1.25
+
+    // Tweak shot arc based on distance to the basket
+    const shotType = this.game.court.getShotType(
+      {
+        x: this.player.sprite.x,
+        y: this.player.sprite.y,
+      },
+      this.player.team.driveDirection
+    )
+    const time = shotType === ShotType.THREE_POINTER ? 1.25 : 1
     const xVelocity = (posToLand.x - this.sprite.x) / time
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(time, 2)) / time
     this.sprite.setVelocity(xVelocity, yVelocity)
     hoopSprite.body.enable = false
     this.currState = BallState.MIDAIR
     let delayedTime = isSuccess ? time * 1010 : time * 950
+    this.player = null
     this.game.time.delayedCall(delayedTime, () => {
       if (isSuccess) {
         this.currState = BallState.LOOSE
@@ -136,7 +151,7 @@ export class Ball {
         this.game.time.delayedCall(400, () => {
           this.handleFloorCollision()
           this.onScoreHandlers.forEach((handler: Function) => {
-            handler(playerTeam)
+            handler(playerTeam, shotType)
           })
         })
       } else {
@@ -144,6 +159,13 @@ export class Ball {
       }
     })
   }
+
+  getShotType(
+    playerSprite: Phaser.Physics.Arcade.Sprite,
+    hoopSprite: Phaser.Physics.Arcade.Sprite
+  ) {}
+
+  getTimeForShotArc(shotType: ShotType) {}
 
   setBallState(state: BallState) {
     this.currState = state
