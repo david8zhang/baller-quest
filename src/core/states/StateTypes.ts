@@ -5,6 +5,7 @@ export enum PlayerStates {
   DEFEND_MAN = 'DefendMan',
   INBOUND_BALL = 'InboundBall',
   RECEIVE_INBOUND = 'ReceiveInbound',
+  CHASE_REBOUND = 'ChaseRebound',
 }
 
 export enum TeamStates {

@@ -8,7 +8,9 @@ import { Side, Team } from './teams/Team'
 export enum BallState {
   DRIBBLE = 'DRIBBLE',
   LOOSE = 'LOOSE',
-  MIDAIR = 'MIDAIR',
+  MID_SHOT = 'MID_SHOT',
+  PASS = 'PASS',
+  REBOUND = 'REBOUND',
   TIPOFF = 'TIPOFF',
 }
 
@@ -33,6 +35,7 @@ export class Ball {
   private game: Game
   public sprite: Phaser.Physics.Arcade.Sprite
   private player!: CourtPlayer | null
+  private prevPlayer!: CourtPlayer | null
   public floor!: Phaser.Physics.Arcade.Sprite
   public currState: BallState = BallState.LOOSE
   public onPlayerChangedHandlers: Function[] = []
@@ -140,7 +143,7 @@ export class Ball {
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(time, 2)) / time
     this.sprite.setVelocity(xVelocity, yVelocity)
     hoopSprite.body.enable = false
-    this.currState = BallState.MIDAIR
+    this.currState = BallState.MID_SHOT
     let delayedTime = isSuccess ? time * 1010 : time * 950
     this.player = null
     this.game.time.delayedCall(delayedTime, () => {
@@ -160,13 +163,6 @@ export class Ball {
     })
   }
 
-  getShotType(
-    playerSprite: Phaser.Physics.Arcade.Sprite,
-    hoopSprite: Phaser.Physics.Arcade.Sprite
-  ) {}
-
-  getTimeForShotArc(shotType: ShotType) {}
-
   setBallState(state: BallState) {
     this.currState = state
   }
@@ -176,7 +172,7 @@ export class Ball {
   }
 
   handleFloorCollision() {
-    if (this.player || this.currState == BallState.MIDAIR) return
+    if (this.player || this.currState == BallState.MID_SHOT) return
     this.floor.setPosition(this.sprite.x, this.sprite.y + 20)
     this.floor.body.enable = true
   }
@@ -194,7 +190,10 @@ export class Ball {
   }
 
   setPlayer(player: CourtPlayer) {
-    if (this.currState == BallState.MIDAIR || this.currState == BallState.TIPOFF) {
+    if (this.currState == BallState.MID_SHOT || this.currState == BallState.TIPOFF) {
+      return
+    }
+    if (this.currState === BallState.PASS && this.prevPlayer === player) {
       return
     }
     const oldPlayer = this.player
@@ -239,13 +238,14 @@ export class Ball {
     )
     const velocityVector = new Phaser.Math.Vector2(0, 0)
     this.game.physics.velocityFromRotation(angle, distance * 4, velocityVector)
-    this.currState = BallState.MIDAIR
+    this.currState = BallState.PASS
+    this.prevPlayer = this.player
     this.player = null
     this.sprite.body.enable = true
     this.sprite.setVelocity(velocityVector.x, velocityVector.y)
-    this.game.time.delayedCall(200, () => {
-      this.currState = BallState.LOOSE
-    })
+    // this.game.time.delayedCall(200, () => {
+    //   this.currState = BallState.LOOSE
+    // })
   }
 
   getPossessionSide() {

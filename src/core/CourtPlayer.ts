@@ -9,6 +9,7 @@ import { WaitState } from './states/player/WaitState'
 import { StateMachine } from './states/StateMachine'
 import { PlayerStates } from './states/StateTypes'
 import { Team } from './teams/Team'
+import { ChaseReboundState } from './states/player/ChaseReboundState'
 
 export enum Role {
   PG = 'PG',
@@ -58,6 +59,7 @@ export class CourtPlayer {
         [PlayerStates.WAIT]: new WaitState(),
         [PlayerStates.MOVE_TO_SPOT]: new MoveToSpotState(),
         [PlayerStates.PLAYER_CONTROL]: new PlayerControlState(),
+        [PlayerStates.CHASE_REBOUND]: new ChaseReboundState(),
       },
       [this, this.team]
     )
@@ -142,7 +144,8 @@ export class CourtPlayer {
     if (this.game.ball.getPossessionSide() == this.team.side) {
       const enemyHoop = this.team.getOpposingTeam().getHoop()
       const shotMakePercentage = Phaser.Math.Between(1, 100)
-      this.game.ball.shoot(enemyHoop, shotMakePercentage <= 50)
+      // this.game.ball.shoot(enemyHoop, shotMakePercentage <= 50)
+      this.game.ball.shoot(enemyHoop, false)
     }
   }
 
