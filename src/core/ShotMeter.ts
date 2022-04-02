@@ -54,7 +54,7 @@ export class ShotMeter {
       repeat: -1,
       delay: 20,
       callback: () => {
-        if (!this.isLayup) {
+        if (!this.isLayup && this.game.ball.getPossessionSide() === team.side) {
           if (this.keyE.isDown) {
             this.windUpShot()
             this.isShooting = true
@@ -95,6 +95,7 @@ export class ShotMeter {
           if (distanceToHoop < 150) {
             this.isLayup = true
             selectedCourtPlayer.shootBall(true, ShotType.TWO_POINTER)
+            this.isLayup = false
           } else {
             const shotType = this.game.court.getShotType(
               {
