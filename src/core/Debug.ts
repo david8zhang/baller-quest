@@ -65,5 +65,11 @@ export class Debug {
   setVisible(isVisible: boolean) {
     this.isVisible = isVisible
     this.objects.setVisible(isVisible)
+    this.game.playerTeam.courtPlayers.forEach((p) => {
+      p.setNameVisible(isVisible)
+    })
+    this.game.cpuTeam.courtPlayers.forEach((p) => {
+      p.setNameVisible(isVisible)
+    })
   }
 }

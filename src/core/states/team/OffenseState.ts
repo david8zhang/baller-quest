@@ -29,7 +29,6 @@ export class OffenseState extends State {
           y: ball.sprite.y,
         }
       )
-      console.log(distance)
       if (distance <= reboundRadius) {
         player.setState(PlayerStates.CHASE_REBOUND)
       }

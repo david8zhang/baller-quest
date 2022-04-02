@@ -3,12 +3,14 @@ import { Constants } from '~/utils/Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
 import { PassCursor } from '../PassCursor'
+import { ShotMeter } from '../ShotMeter'
 import { PlayerStates, TeamStates } from '../states/StateTypes'
 import { DriveDirection, Side, Team } from './Team'
 
 export class PlayerTeam extends Team {
   private cursor: Cursor
   private passCursor: PassCursor
+  private shotMeter: ShotMeter
 
   constructor(game: Game) {
     super(game, {
@@ -26,6 +28,7 @@ export class PlayerTeam extends Team {
     )
     this.passCursor = new PassCursor(this.game)
     this.selectCourtPlayer(this.courtPlayers[0])
+    this.shotMeter = new ShotMeter(this.game, this)
   }
 
   selectCourtPlayer(courtPlayer: CourtPlayer) {
@@ -83,10 +86,6 @@ export class PlayerTeam extends Team {
     this.game.input.keyboard.on('keydown', (e) => {
       const selectedCourtPlayer = this.getSelectedCourtPlayer()
       switch (e.code) {
-        case 'KeyE': {
-          selectedCourtPlayer.shootBall()
-          break
-        }
         case 'Space': {
           if (this.canPassBall()) {
             const playerToPassTo = this.passCursor.getHighlightedCourtPlayer()

@@ -10,6 +10,7 @@ import { StateMachine } from './states/StateMachine'
 import { PlayerStates } from './states/StateTypes'
 import { Team } from './teams/Team'
 import { ChaseReboundState } from './states/player/ChaseReboundState'
+import { MissType } from './ShotMeter'
 
 export enum Role {
   PG = 'PG',
@@ -27,6 +28,7 @@ export interface CourtPlayerConfig {
   team: Team
   texture: string
   role: Role
+  name: string
 }
 
 export class CourtPlayer {
@@ -37,10 +39,13 @@ export class CourtPlayer {
   public role: Role
   public team: Team
   public currVelocityVector: Phaser.Math.Vector2
+  public name: string
+  public nameText!: Phaser.GameObjects.Text
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
-    const { position, texture, role, team } = config
+    const { position, texture, role, team, name } = config
+    this.name = name
     this.role = role
     this.team = team
     this.sprite = this.game.physics.add.sprite(position.x, position.y, texture).setDepth(2)
@@ -49,6 +54,7 @@ export class CourtPlayer {
     this.sprite.body.setSize(0.5 * this.sprite.displayWidth, 0.5 * this.sprite.displayHeight)
     this.sprite.body.offset.y = this.sprite.displayHeight / 2
     this.sprite.setScale(0.5)
+    this.setupPlayerName()
     this.currVelocityVector = new Phaser.Math.Vector2(0, 0)
     this.stateMachine = new StateMachine(
       PlayerStates.WAIT,
@@ -63,6 +69,16 @@ export class CourtPlayer {
       },
       [this, this.team]
     )
+  }
+
+  setupPlayerName() {
+    this.nameText = this.game.add.text(0, 0, this.name, {
+      color: 'black',
+      fontSize: '12px',
+    })
+    this.nameText.setPosition(this.sprite.x - this.nameText.displayWidth / 2, this.sprite.y + 40)
+    this.nameText.setDepth(100)
+    this.nameText.setVisible(false)
   }
 
   setVelocity(xVel: number, yVel: number) {
@@ -140,12 +156,10 @@ export class CourtPlayer {
     }
   }
 
-  shootBall() {
+  shootBall(isSuccess: boolean, missType?: MissType) {
     if (this.game.ball.getPossessionSide() == this.team.side) {
       const enemyHoop = this.team.getOpposingTeam().getHoop()
-      const shotMakePercentage = Phaser.Math.Between(1, 100)
-      // this.game.ball.shoot(enemyHoop, shotMakePercentage <= 50)
-      this.game.ball.shoot(enemyHoop, false)
+      this.game.ball.shoot(enemyHoop, isSuccess, missType)
     }
   }
 
@@ -155,8 +169,13 @@ export class CourtPlayer {
     }
   }
 
+  setNameVisible(isVisible: boolean) {
+    this.nameText.setVisible(isVisible)
+  }
+
   update() {
     this.stateMachine.step()
     this.moveTowardsTarget()
+    this.nameText.setPosition(this.sprite.x - this.nameText.displayWidth / 2, this.sprite.y + 40)
   }
 }

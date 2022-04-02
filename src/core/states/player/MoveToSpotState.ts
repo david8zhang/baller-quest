@@ -13,7 +13,8 @@ export class MoveToSpotState extends State {
         Constants.getDistanceBetween(player.sprite, zone.centerPosition) < 5 &&
         team.getBall().isInPossessionOf(player)
       ) {
-        player.shootBall()
+        const randValue = Phaser.Math.Between(0, 100)
+        player.shootBall(randValue <= 40)
       } else {
         player.setMoveTarget({
           x: zone.centerPosition.x,

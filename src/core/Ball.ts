@@ -3,6 +3,7 @@ import { Constants } from '~/utils/Constants'
 import { FieldZone } from './Court'
 import { CourtPlayer } from './CourtPlayer'
 import { Hoop } from './Hoop'
+import { MissType } from './ShotMeter'
 import { Side, Team } from './teams/Team'
 
 export enum BallState {
@@ -101,7 +102,7 @@ export class Ball {
     this.sprite.setVelocity(xVelocity, yVelocity)
   }
 
-  shoot(hoop: Hoop, isSuccess: boolean) {
+  shoot(hoop: Hoop, isSuccess: boolean, missType?: MissType) {
     if (!this.player) {
       return
     }
@@ -122,9 +123,9 @@ export class Ball {
       posToLand.x = hoopSprite.x + Phaser.Math.Between(successRange[0], successRange[1])
       posToLand.y = hoopSprite.y - 50
     } else {
-      let missOffset1 = Phaser.Math.Between(rimRange[0], successRange[0] - 5)
-      let missOffset2 = Phaser.Math.Between(successRange[1] + 5, rimRange[1])
-      const missOffset = Phaser.Math.Between(0, 1) == 0 ? missOffset1 : missOffset2
+      let undershotOffset = Phaser.Math.Between(rimRange[0], successRange[0] - 5)
+      let overshotOffset = Phaser.Math.Between(successRange[1] + 5, rimRange[1])
+      const missOffset = missType === MissType.UNDERSHOT ? undershotOffset : overshotOffset
       posToLand.x = hoopSprite.x + missOffset
       posToLand.y = hoopSprite.y - 50
     }

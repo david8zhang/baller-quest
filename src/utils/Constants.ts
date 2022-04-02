@@ -1,5 +1,6 @@
 import { Ball } from '~/core/Ball'
 import { CourtPlayer, Role } from '~/core/CourtPlayer'
+import { LAST_NAMES, MALE_FIRST_NAMES } from './names'
 
 export class Constants {
   public static GAME_WIDTH = 900
@@ -144,5 +145,11 @@ export class Constants {
         }
       ) < threshold
     )
+  }
+
+  public static generateRandomName() {
+    const firstName = MALE_FIRST_NAMES[Phaser.Math.Between(0, MALE_FIRST_NAMES.length - 1)]
+    const lastName = LAST_NAMES[Phaser.Math.Between(0, LAST_NAMES.length - 1)]
+    return `${firstName} ${lastName}`
   }
 }

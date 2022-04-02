@@ -74,6 +74,7 @@ export abstract class Team {
           team: this,
           role: role,
           texture: this.side === Side.PLAYER ? 'player' : 'cpu-player',
+          name: Constants.generateRandomName(),
         })
         this.courtPlayers.push(courtPlayer)
         this.courtPlayerGroup.add(courtPlayer.sprite)
@@ -104,6 +105,10 @@ export abstract class Team {
   selectCourtPlayer(courtPlayer: CourtPlayer) {
     if (this.selectedCourtPlayer) this.selectedCourtPlayer.setVelocity(0, 0)
     this.selectedCourtPlayer = courtPlayer
+  }
+
+  getSelectedCourtPlayer() {
+    return this.selectedCourtPlayer
   }
 
   public update() {
