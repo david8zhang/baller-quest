@@ -3,7 +3,7 @@ import { Constants } from '~/utils/Constants'
 import { FieldZone } from './Court'
 import { CourtPlayer } from './CourtPlayer'
 import { Hoop } from './Hoop'
-import { MissType } from './ShotMeter'
+import { MissType, ShotConfig, ShotType } from './ShotMeter'
 import { Side, Team } from './teams/Team'
 
 export enum BallState {
@@ -13,16 +13,6 @@ export enum BallState {
   PASS = 'PASS',
   REBOUND = 'REBOUND',
   TIPOFF = 'TIPOFF',
-}
-
-export enum ShotType {
-  THREE_POINTER = 'THREE',
-  TWO_POINTER = 'TWO',
-}
-
-export interface ShotConfig {
-  shotRanges: number[]
-  successRange: number[]
 }
 
 interface BallConfig {
@@ -102,10 +92,11 @@ export class Ball {
     this.sprite.setVelocity(xVelocity, yVelocity)
   }
 
-  shoot(hoop: Hoop, isSuccess: boolean, missType?: MissType) {
+  shoot(hoop: Hoop, shotConfig: ShotConfig) {
     if (!this.player) {
       return
     }
+    const { isSuccess, shotType } = shotConfig
     const playerTeam: Team = this.player!.team
     const playerPosition = new Phaser.Math.Vector2(this.player!.sprite.x, this.player!.sprite.y)
     const playerHeight = this.player!.sprite.displayHeight
@@ -125,20 +116,14 @@ export class Ball {
     } else {
       let undershotOffset = Phaser.Math.Between(rimRange[0], successRange[0] - 5)
       let overshotOffset = Phaser.Math.Between(successRange[1] + 5, rimRange[1])
-      const missOffset = missType === MissType.UNDERSHOT ? undershotOffset : overshotOffset
+      const missOffset =
+        shotConfig.missType === MissType.UNDERSHOT ? undershotOffset : overshotOffset
       posToLand.x = hoopSprite.x + missOffset
       posToLand.y = hoopSprite.y - 50
     }
     this.sprite.setGravityY(980)
 
     // Tweak shot arc based on distance to the basket
-    const shotType = this.game.court.getShotType(
-      {
-        x: this.player.sprite.x,
-        y: this.player.sprite.y,
-      },
-      this.player.team.driveDirection
-    )
     const time = shotType === ShotType.THREE_POINTER ? 1.25 : 1
     const xVelocity = (posToLand.x - this.sprite.x) / time
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(time, 2)) / time
@@ -244,9 +229,6 @@ export class Ball {
     this.player = null
     this.sprite.body.enable = true
     this.sprite.setVelocity(velocityVector.x, velocityVector.y)
-    // this.game.time.delayedCall(200, () => {
-    //   this.currState = BallState.LOOSE
-    // })
   }
 
   getPossessionSide() {

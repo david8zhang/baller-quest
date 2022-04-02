@@ -10,7 +10,7 @@ import { StateMachine } from './states/StateMachine'
 import { PlayerStates } from './states/StateTypes'
 import { Team } from './teams/Team'
 import { ChaseReboundState } from './states/player/ChaseReboundState'
-import { MissType } from './ShotMeter'
+import { MissType, ShotType } from './ShotMeter'
 
 export enum Role {
   PG = 'PG',
@@ -156,10 +156,14 @@ export class CourtPlayer {
     }
   }
 
-  shootBall(isSuccess: boolean, missType?: MissType) {
+  shootBall(isSuccess: boolean, shotType: ShotType, missType?: MissType) {
     if (this.game.ball.getPossessionSide() == this.team.side) {
       const enemyHoop = this.team.getOpposingTeam().getHoop()
-      this.game.ball.shoot(enemyHoop, isSuccess, missType)
+      this.game.ball.shoot(enemyHoop, {
+        isSuccess,
+        missType,
+        shotType,
+      })
     }
   }
 

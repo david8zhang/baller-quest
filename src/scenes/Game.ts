@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { Ball, ShotType } from '~/core/Ball'
+import { Ball } from '~/core/Ball'
 import { Hoop } from '~/core/Hoop'
 import { PlayerTeam } from '~/core/teams/PlayerTeam'
 import { CPUTeam } from '~/core/teams/CPUTeam'
@@ -11,6 +11,7 @@ import { TeamStates } from '~/core/states/StateTypes'
 import { Score } from '~/core/Score'
 import { Court } from '~/core/Court'
 import { UI } from './UI'
+import { ShotType } from '~/core/ShotMeter'
 
 export default class Game extends Phaser.Scene {
   public playerTeam!: PlayerTeam
