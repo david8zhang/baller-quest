@@ -1,5 +1,6 @@
 import { Ball } from '~/core/Ball'
 import { CourtPlayer, Role } from '~/core/CourtPlayer'
+import { MissType, ShotOpenness, ShotType } from '~/core/ShotMeter'
 import { LAST_NAMES, MALE_FIRST_NAMES } from './names'
 
 export class Constants {
@@ -85,6 +86,153 @@ export class Constants {
   public static TIPOFF_RIGHT = 70
   public static TIPOFF_LEFT = 64
 
+  // Zones for each shot type
+  public static MID_RANGE_LEFT = [
+    15, 16, 17, 30, 31, 32, 33, 47, 48, 49, 62, 63, 64, 77, 78, 79, 90, 91, 92, 93, 105, 106, 107,
+  ]
+  public static LAYUP_RANGE_LEFT = [45, 46, 60, 61, 75, 76]
+  public static THREE_POINT_RANGE_LEFT = [
+    0, 1, 2, 3, 4, 5, 6, 18, 19, 20, 21, 34, 35, 36, 50, 51, 65, 66, 80, 81, 94, 95, 96, 108, 109,
+    110, 11, 120, 121, 122, 123, 124, 125, 126,
+  ]
+
+  public static MID_RANGE_RIGHT = [
+    27, 28, 29, 41, 42, 43, 44, 55, 56, 57, 70, 71, 72, 85, 86, 87, 101, 102, 103, 104, 117, 118,
+    119,
+  ]
+  public static LAYUP_RANGE_RIGHT = [58, 59, 73, 74, 88, 89]
+  public static THREE_POINT_RANGE_RIGHT = [
+    8, 9, 10, 11, 12, 13, 14, 23, 24, 25, 26, 38, 39, 40, 53, 54, 68, 69, 83, 84, 98, 99, 100, 113,
+    114, 115, 116, 128, 129, 130, 131, 132, 133, 134,
+  ]
+
+  public static SHOT_PERCENTAGES = {
+    [ShotOpenness.WIDE_OPEN]: {
+      [ShotType.LAYUP]: {
+        percentage: 90,
+      },
+      [ShotType.MID_RANGE]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 25,
+          lowerBound: 10,
+        },
+        percentage: 60,
+      },
+      [ShotType.THREE_POINTER]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 30,
+          lowerBound: 20,
+        },
+        percentage: 45,
+      },
+      [ShotType.HALF_COURT_PRAYER]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 37,
+          lowerBound: 34,
+        },
+        percentage: 15,
+      },
+    },
+    [ShotOpenness.OPEN]: {
+      [ShotType.LAYUP]: {
+        percentage: 80,
+      },
+      [ShotType.MID_RANGE]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 30,
+          lowerBound: 20,
+        },
+        percentage: 50,
+      },
+      [ShotType.THREE_POINTER]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 32,
+          lowerBound: 24,
+        },
+        percentage: 40,
+      },
+      [ShotType.HALF_COURT_PRAYER]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 39,
+          lowerBound: 38,
+        },
+        percentage: 10,
+      },
+    },
+    [ShotOpenness.CONTESTED]: {
+      [ShotType.LAYUP]: {
+        percentage: 65,
+      },
+      [ShotType.MID_RANGE]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 32,
+          lowerBound: 24,
+        },
+        percentage: 45,
+      },
+      [ShotType.THREE_POINTER]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 35,
+          lowerBound: 30,
+        },
+        percentage: 35,
+      },
+      [ShotType.HALF_COURT_PRAYER]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 39,
+          lowerBound: 38,
+        },
+        percentage: 5,
+      },
+    },
+
+    [ShotOpenness.SMOTHERED]: {
+      [ShotType.LAYUP]: {
+        percentage: 50,
+      },
+      [ShotType.MID_RANGE]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 35,
+          lowerBound: 30,
+        },
+        percentage: 40,
+      },
+      [ShotType.THREE_POINTER]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 37,
+          lowerBound: 34,
+        },
+        percentage: 25,
+      },
+      [ShotType.HALF_COURT_PRAYER]: {
+        threshold: {
+          upperBound: 40,
+          perfectReleaseValue: 40,
+          lowerBound: 40,
+        },
+        percentage: 1,
+      },
+    },
+  }
+
+  public static SHOT_ARC_CONFIG = {
+    [ShotType.HALF_COURT_PRAYER]: 1.35,
+    [ShotType.THREE_POINTER]: 1.25,
+    [ShotType.MID_RANGE]: 1,
+    [ShotType.LAYUP]: 0.8,
+  }
+
   public static getClosestPlayerToBall(ball: Ball, courtPlayers: CourtPlayer[]) {
     let closestPlayer: any = null
     let shortestDistance = Number.MAX_SAFE_INTEGER
@@ -151,5 +299,14 @@ export class Constants {
     const firstName = MALE_FIRST_NAMES[Phaser.Math.Between(0, MALE_FIRST_NAMES.length - 1)]
     const lastName = LAST_NAMES[Phaser.Math.Between(0, LAST_NAMES.length - 1)]
     return `${firstName} ${lastName}`
+  }
+
+  public static getSuccessBasedOnPercentage(percentage: number) {
+    const randValue = Phaser.Math.Between(1, 100)
+    return randValue <= percentage
+  }
+
+  public static getRandomMissType(): MissType {
+    return Phaser.Math.Between(0, 1) == 0 ? MissType.UNDERSHOT : MissType.OVERSHOT
   }
 }

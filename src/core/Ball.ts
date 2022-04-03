@@ -114,17 +114,17 @@ export class Ball {
       posToLand.x = hoopSprite.x + Phaser.Math.Between(successRange[0], successRange[1])
       posToLand.y = hoopSprite.y - 50
     } else {
+      const missType = shotConfig.missType ? shotConfig.missType : Constants.getRandomMissType()
       let undershotOffset = Phaser.Math.Between(rimRange[0], successRange[0] - 5)
       let overshotOffset = Phaser.Math.Between(successRange[1] + 5, rimRange[1])
-      const missOffset =
-        shotConfig.missType === MissType.UNDERSHOT ? undershotOffset : overshotOffset
+      const missOffset = missType === MissType.UNDERSHOT ? undershotOffset : overshotOffset
       posToLand.x = hoopSprite.x + missOffset
       posToLand.y = hoopSprite.y - 50
     }
     this.sprite.setGravityY(980)
 
     // Tweak shot arc based on distance to the basket
-    const time = shotType === ShotType.THREE_POINTER ? 1.25 : 1
+    const time = Constants.SHOT_ARC_CONFIG[shotType]
     const xVelocity = (posToLand.x - this.sprite.x) / time
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(time, 2)) / time
     this.sprite.setVelocity(xVelocity, yVelocity)

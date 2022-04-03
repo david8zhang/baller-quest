@@ -41,6 +41,7 @@ export class CourtPlayer {
   public currVelocityVector: Phaser.Math.Vector2
   public name: string
   public nameText!: Phaser.GameObjects.Text
+  public markerRectangle!: Phaser.Geom.Rectangle
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -55,7 +56,9 @@ export class CourtPlayer {
     this.sprite.body.offset.y = this.sprite.displayHeight / 2
     this.sprite.setScale(0.5)
     this.setupPlayerName()
+    this.setupMarkerRectangle()
     this.currVelocityVector = new Phaser.Math.Vector2(0, 0)
+
     this.stateMachine = new StateMachine(
       PlayerStates.WAIT,
       {
@@ -69,6 +72,23 @@ export class CourtPlayer {
       },
       [this, this.team]
     )
+  }
+
+  setupMarkerRectangle() {
+    const width = this.sprite.displayWidth * 0.75
+    const height = this.sprite.displayHeight * 0.75
+    this.markerRectangle = new Phaser.Geom.Rectangle(
+      this.sprite.x - width / 2,
+      this.sprite.y - height / 2,
+      width,
+      height
+    )
+  }
+
+  updateMarkerRectPosition() {
+    const width = this.sprite.displayWidth * 0.75
+    const height = this.sprite.displayHeight * 0.75
+    this.markerRectangle.setPosition(this.sprite.x - width / 2, this.sprite.y - height / 2)
   }
 
   setupPlayerName() {
@@ -181,5 +201,6 @@ export class CourtPlayer {
     this.stateMachine.step()
     this.moveTowardsTarget()
     this.nameText.setPosition(this.sprite.x - this.nameText.displayWidth / 2, this.sprite.y + 40)
+    this.updateMarkerRectPosition()
   }
 }

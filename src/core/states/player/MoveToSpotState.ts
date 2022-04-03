@@ -25,18 +25,6 @@ export class MoveToSpotState extends State {
   }
 
   cpuTakeShot(player: CourtPlayer, team: Team) {
-    const randValue = Phaser.Math.Between(0, 100)
-    const shotType = team.game.court.getShotType(
-      {
-        x: player.sprite.x,
-        y: player.sprite.y,
-      },
-      team.driveDirection
-    )
-    player.shootBall(
-      randValue <= 40,
-      shotType,
-      Phaser.Math.Between(0, 1) === 0 ? MissType.UNDERSHOT : MissType.OVERSHOT
-    )
+    team.shoot(player, team)
   }
 }

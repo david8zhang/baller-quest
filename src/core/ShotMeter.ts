@@ -1,6 +1,8 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { Team } from './teams/Team'
+import { Court } from './Court'
+import { CourtPlayer } from './CourtPlayer'
+import { DriveDirection, Team } from './teams/Team'
 
 export interface ShotThreshold {
   lowerBound: number
@@ -16,8 +18,10 @@ export enum ShotOpenness {
 }
 
 export enum ShotType {
-  THREE_POINTER = 'THREE',
-  TWO_POINTER = 'TWO',
+  HALF_COURT_PRAYER = 'HALF_COURT_PRAYER',
+  THREE_POINTER = 'THREE_POINTER',
+  MID_RANGE = 'MID_RANGE',
+  LAYUP = 'LAYUP',
 }
 
 export interface ShotConfig {
@@ -35,26 +39,27 @@ export class ShotMeter {
   private static MAX_LENGTH = 60
   private static WIDTH = 10
 
-  public shotThreshold: ShotThreshold
+  public shotThreshold!: ShotThreshold
   public currValue: number = 0
   private team: Team
   private game: Game
   private isShooting: boolean = false
   private keyE: Phaser.Input.Keyboard.Key
-  private isLayup: boolean = false
-  private bar: Phaser.GameObjects.Graphics
+  private bar!: Phaser.GameObjects.Graphics
   private shotType!: ShotType
+  private shotOpenness!: ShotOpenness
+  public detectShotEvent!: Phaser.Time.TimerEvent
+  public hasSetupShotPercentages: boolean = false
 
   constructor(game: Game, team: Team) {
     this.game = game
     this.team = team
     this.keyE = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
-    this.setupInitialKeyPressListener()
-    this.game.time.addEvent({
+    this.detectShotEvent = this.game.time.addEvent({
       repeat: -1,
       delay: 20,
       callback: () => {
-        if (!this.isLayup && this.game.ball.getPossessionSide() === team.side) {
+        if (this.game.ball.getPossessionSide() === team.side) {
           if (this.keyE.isDown) {
             this.windUpShot()
             this.isShooting = true
@@ -74,43 +79,16 @@ export class ShotMeter {
     this.bar = new Phaser.GameObjects.Graphics(this.game)
     this.bar.setDepth(100)
     this.game.add.existing(this.bar)
+    this.setupInitialKeyPressListener()
   }
 
   private setupInitialKeyPressListener() {
     this.game.input.keyboard.on('keydown', (e) => {
-      const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
-      const opposingHoop = this.team.getOpposingTeam().getHoop()
       switch (e.code) {
         case 'KeyE': {
-          const distanceToHoop = Constants.getDistanceBetween(
-            {
-              x: selectedCourtPlayer.sprite.x,
-              y: selectedCourtPlayer.sprite.y,
-            },
-            {
-              x: opposingHoop.sprite.x,
-              y: opposingHoop.sprite.y,
-            }
-          )
-          if (distanceToHoop < 150) {
-            this.isLayup = true
-            selectedCourtPlayer.shootBall(true, ShotType.TWO_POINTER)
-            this.isLayup = false
-          } else {
-            const shotType = this.game.court.getShotType(
-              {
-                x: selectedCourtPlayer.sprite.x,
-                y: selectedCourtPlayer.sprite.y,
-              },
-              this.team.driveDirection
-            )
-            if (shotType === ShotType.THREE_POINTER) {
-              this.setupThreshold({ lowerBound: 25, upperBound: 35, perfectReleaseValue: 30 })
-            }
-            if (shotType === ShotType.TWO_POINTER) {
-              this.setupThreshold({ lowerBound: 20, upperBound: 40, perfectReleaseValue: 30 })
-            }
-            this.shotType = shotType
+          if (!this.hasSetupShotPercentages) {
+            this.hasSetupShotPercentages = true
+            this.handleShotWithMeter()
           }
           break
         }
@@ -120,7 +98,70 @@ export class ShotMeter {
     })
   }
 
-  public getOpenness() {}
+  public handleShotWithMeter() {
+    const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+    const openness = ShotMeter.getOpenness(selectedCourtPlayer, this.team)
+    const shotType = ShotMeter.getShotType(
+      {
+        x: selectedCourtPlayer.sprite.x,
+        y: selectedCourtPlayer.sprite.y,
+      },
+      this.team.driveDirection,
+      this.team.game.court
+    ) as ShotType
+    const shotPercentages = Constants.SHOT_PERCENTAGES[openness]
+    if (shotType === ShotType.LAYUP) {
+      const { percentage } = shotPercentages[shotType]
+      this.detectShotEvent.paused = true
+      const isSuccess = Constants.getSuccessBasedOnPercentage(percentage)
+      selectedCourtPlayer.shootBall(isSuccess, shotType)
+      this.postShotCleanup()
+    } else {
+      const { threshold } = shotPercentages[shotType]
+      this.setupThreshold(threshold)
+    }
+    this.shotOpenness = openness
+    this.shotType = shotType
+    console.log(openness, shotType)
+  }
+
+  public static getOpenness(selectedCourtPlayer: CourtPlayer, team: Team) {
+    const hoop = team.getOpposingTeam().getHoop()
+    const lineToHoop = new Phaser.Geom.Line(
+      selectedCourtPlayer.sprite.x,
+      selectedCourtPlayer.sprite.y,
+      hoop.sprite.x,
+      hoop.sprite.y
+    )
+    const enemyPlayers = team.getOpposingTeam().courtPlayers
+    let guardingPlayer: any = null
+    enemyPlayers.forEach((enemyPlayer: CourtPlayer) => {
+      if (Phaser.Geom.Intersects.LineToRectangle(lineToHoop, enemyPlayer.markerRectangle)) {
+        guardingPlayer = enemyPlayer
+      }
+    })
+    if (!guardingPlayer) {
+      return ShotOpenness.WIDE_OPEN
+    } else {
+      const distanceToGuardingPlayer = Constants.getDistanceBetween(
+        {
+          x: selectedCourtPlayer.sprite.x,
+          y: selectedCourtPlayer.sprite.y,
+        },
+        {
+          x: guardingPlayer.sprite.x,
+          y: guardingPlayer.sprite.y,
+        }
+      )
+      if (distanceToGuardingPlayer >= 150) {
+        return ShotOpenness.OPEN
+      } else if (distanceToGuardingPlayer < 150 && distanceToGuardingPlayer >= 50) {
+        return ShotOpenness.CONTESTED
+      } else {
+        return ShotOpenness.SMOTHERED
+      }
+    }
+  }
 
   private windUpShot() {
     this.currValue += 2
@@ -190,6 +231,7 @@ export class ShotMeter {
   }
 
   private shoot() {
+    const diff = this.currValue - this.shotThreshold.perfectReleaseValue
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
     if (this.currValue < this.shotThreshold.lowerBound) {
       this.showShotMiss()
@@ -201,15 +243,56 @@ export class ShotMeter {
       this.showPerfectRelease()
       selectedCourtPlayer.shootBall(true, this.shotType)
     } else {
-      const randValue = Phaser.Math.Between(0, 100)
-      const diff = this.currValue - this.shotThreshold.perfectReleaseValue
-      const isSuccess = randValue <= 40
       const missType = diff < 0 ? MissType.UNDERSHOT : MissType.OVERSHOT
+      const percentage = Constants.SHOT_PERCENTAGES[this.shotOpenness][this.shotType].percentage
+      const isSuccess = Constants.getSuccessBasedOnPercentage(percentage)
       selectedCourtPlayer.shootBall(isSuccess, this.shotType, missType)
     }
+    if (diff == 0) {
+      console.log('Perfect!')
+    } else {
+      console.log(diff < 0 ? 'Early' : 'Late')
+    }
+    this.postShotCleanup()
+  }
+
+  postShotCleanup() {
+    // Post shot cleanup
+    this.hasSetupShotPercentages = false
     this.game.time.delayedCall(1000, () => {
       this.bar.clear()
     })
+    this.detectShotEvent.paused = false
     this.currValue = 0
+  }
+
+  public static getShotType(
+    position: { x: number; y: number },
+    driveDirection: DriveDirection,
+    court: Court
+  ): ShotType {
+    const allZones = {
+      [ShotType.MID_RANGE]:
+        driveDirection === DriveDirection.LEFT
+          ? Constants.MID_RANGE_RIGHT
+          : Constants.MID_RANGE_LEFT,
+      [ShotType.THREE_POINTER]:
+        driveDirection === DriveDirection.LEFT
+          ? Constants.THREE_POINT_RANGE_RIGHT
+          : Constants.THREE_POINT_RANGE_LEFT,
+      [ShotType.LAYUP]:
+        driveDirection === DriveDirection.LEFT
+          ? Constants.LAYUP_RANGE_RIGHT
+          : Constants.LAYUP_RANGE_LEFT,
+    }
+    const playerZone = court.getNearestZoneForPosition(position)
+    let shotType: ShotType = ShotType.HALF_COURT_PRAYER
+    Object.keys(allZones).forEach((key) => {
+      const zones = allZones[key]
+      if (zones.includes(playerZone)) {
+        shotType = key as ShotType
+      }
+    })
+    return shotType as ShotType
   }
 }

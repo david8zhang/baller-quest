@@ -16,3 +16,4 @@ A basketball game that takes place in a medieval fantasy world.
 ## Known bugs
 
 - some three point shots don't register correctly
+- Fix rebounding logic (rebounds always go to the same place)

@@ -1,4 +1,7 @@
 import Game from '~/scenes/Game'
+import { Constants } from '~/utils/Constants'
+import { CourtPlayer } from '../CourtPlayer'
+import { ShotMeter } from '../ShotMeter'
 import { TeamStates } from '../states/StateTypes'
 import { DriveDirection, Side, Team } from './Team'
 
@@ -17,5 +20,21 @@ export class CPUTeam extends Team {
 
   getHoop() {
     return this.game.cpuHoop
+  }
+
+  shoot(courtPlayer: CourtPlayer, team: Team) {
+    const openness = ShotMeter.getOpenness(courtPlayer, team)
+    const shotType = ShotMeter.getShotType(
+      {
+        x: courtPlayer.sprite.x,
+        y: courtPlayer.sprite.y,
+      },
+      team.driveDirection,
+      team.game.court
+    )
+    const { percentage } = Constants.SHOT_PERCENTAGES[openness][shotType]
+    const isSuccess = Constants.getSuccessBasedOnPercentage(percentage)
+    console.log(openness, shotType)
+    courtPlayer.shootBall(isSuccess, shotType)
   }
 }

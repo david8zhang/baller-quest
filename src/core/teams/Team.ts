@@ -53,6 +53,7 @@ export abstract class Team {
   }
 
   public abstract getHoop(): Hoop
+  public abstract shoot(player: CourtPlayer, team: Team): void
 
   getBall() {
     return this.game.ball

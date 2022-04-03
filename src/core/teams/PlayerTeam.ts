@@ -123,6 +123,10 @@ export class PlayerTeam extends Team {
     }
   }
 
+  shoot(player: CourtPlayer, team: Team): void {
+    return
+  }
+
   updateSelectedPlayerCursor() {
     if (this.getCurrentState() == TeamStates.TIPOFF) {
       this.cursor.setVisible(false)

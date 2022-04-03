@@ -19,20 +19,6 @@ export class Court {
   public debug: Debug
   public fieldGrid!: FieldZone[][]
 
-  public twoPointZonesLeft = [
-    15, 16, 17, 30, 31, 32, 33, 45, 46, 47, 48, 49, 60, 61, 62, 63, 64, 75, 76, 77, 78, 79, 90, 91,
-    92, 93, 105, 106, 107,
-  ]
-  public topWingZonesLeft = [18, 34]
-  public bottomWingZonesLeft = [94, 108]
-
-  public twoPointZonesRight = [
-    27, 28, 29, 41, 42, 43, 44, 55, 56, 57, 58, 59, 70, 71, 72, 73, 74, 85, 86, 87, 88, 89, 101,
-    102, 103, 104, 117, 118, 119,
-  ]
-  public topWingZonesRight = [26, 40]
-  public bottomWingZonesRight = [100, 116]
-
   constructor(game: Game) {
     this.game = game
     this.graphics = this.game.add.graphics()
@@ -100,16 +86,5 @@ export class Court {
       }
     }
     return closestZoneId
-  }
-
-  getShotType(position: { x: number; y: number }, driveDirection: DriveDirection): ShotType {
-    const zoneId = this.getNearestZoneForPosition(position)
-    const twoPointZones =
-      driveDirection === DriveDirection.LEFT ? this.twoPointZonesRight : this.twoPointZonesLeft
-    if (twoPointZones.includes(zoneId)) {
-      return ShotType.TWO_POINTER
-    } else {
-      return ShotType.THREE_POINTER
-    }
   }
 }
