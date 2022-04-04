@@ -1,8 +1,9 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { Team } from '~/core/teams/Team'
+import { PlayerTeam } from '~/core/teams/PlayerTeam'
+import { Side, Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
 import { State } from '../StateMachine'
-import { TeamStates } from '../StateTypes'
+import { PlayerStates, TeamStates } from '../StateTypes'
 
 export class ReceiveInboundState extends State {
   public receiveInboundPosition: Phaser.Math.Vector2 | null = null
@@ -15,6 +16,10 @@ export class ReceiveInboundState extends State {
     if (Constants.IsAtPosition(player, this.receiveInboundPosition!)) {
       const ball = team.getBall()
       if (ball.isInPossessionOf(player)) {
+        if (player.getSide() === Side.PLAYER) {
+          player.setState(PlayerStates.WAIT)
+        }
+        player.team.selectCourtPlayer(player)
         player.team.setState(TeamStates.OFFENSE)
       }
     } else {

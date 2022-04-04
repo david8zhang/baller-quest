@@ -73,13 +73,13 @@ export default class Game extends Phaser.Scene {
     })
 
     // Add colliders between opposing team's players
-    // this.physics.add.collider(this.playerTeam.courtPlayerGroup, this.cpuTeam.courtPlayerGroup)
+    this.physics.add.collider(this.playerTeam.courtPlayerGroup, this.cpuTeam.courtPlayerGroup)
 
     this.tipOff()
   }
 
   tipOff() {
-    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_LEFT)
+    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
     // const zoneToTipTo =
     //   Phaser.Math.Between(0, 1) === 0
     //     ? this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
@@ -110,7 +110,15 @@ export default class Game extends Phaser.Scene {
     )
     this.physics.world.on('worldbounds', (obj) => {
       if (obj.gameObject.getData('ref') === this.ball) {
-        this.scene.restart()
+        const lastTouched = this.ball.getPrevPlayer()
+        if (lastTouched) {
+          const teamWithPossession =
+            lastTouched.getSide() === Side.PLAYER ? this.cpuTeam : this.playerTeam
+          const teamOnDefense =
+            lastTouched.getSide() === Side.PLAYER ? this.playerTeam : this.cpuTeam
+          teamWithPossession.setState(TeamStates.INBOUND_BALL)
+          teamOnDefense.setState(TeamStates.DEFENSE)
+        }
       }
     })
   }

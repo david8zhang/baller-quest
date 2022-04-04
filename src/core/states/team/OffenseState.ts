@@ -1,6 +1,6 @@
 import { BallState } from '~/core/Ball'
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { Team } from '~/core/teams/Team'
+import { Side, Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
 import { State } from '../StateMachine'
 import { PlayerStates } from '../StateTypes'

@@ -36,6 +36,16 @@ export class PlayerTeam extends Team {
     if (oldPlayer) {
       oldPlayer.setState(PlayerStates.WAIT)
     }
+    this.playerTakeControl(courtPlayer)
+  }
+
+  clearPlayerControl() {
+    console.log('Went here!')
+    this.selectedCourtPlayer.setState(PlayerStates.WAIT)
+    this.cursor.setVisible(false)
+  }
+
+  playerTakeControl(courtPlayer: CourtPlayer) {
     courtPlayer.setState(PlayerStates.PLAYER_CONTROL, courtPlayer.getCurrentState())
     super.selectCourtPlayer(courtPlayer)
     this.cursor.selectCourtPlayer(courtPlayer)

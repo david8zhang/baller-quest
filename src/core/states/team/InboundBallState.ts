@@ -1,5 +1,5 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { Team } from '~/core/teams/Team'
+import { Side, Team } from '~/core/teams/Team'
 import { State } from '../StateMachine'
 import { PlayerStates } from '../StateTypes'
 

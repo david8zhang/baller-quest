@@ -11,6 +11,7 @@ export enum BallState {
   LOOSE = 'LOOSE',
   MID_SHOT = 'MID_SHOT',
   PASS = 'PASS',
+  INBOUND = 'INBOUND',
   REBOUND = 'REBOUND',
   TIPOFF = 'TIPOFF',
 }
@@ -111,7 +112,7 @@ export class Ball {
 
     let posToLand = new Phaser.Math.Vector2(0, 0)
     if (isSuccess) {
-      posToLand.x = hoopSprite.x + Phaser.Math.Between(successRange[0], successRange[1])
+      posToLand.x = hoopSprite.x + successRange[0]
       posToLand.y = hoopSprite.y - 50
     } else {
       const missType = shotConfig.missType ? shotConfig.missType : Constants.getRandomMissType()
@@ -130,10 +131,14 @@ export class Ball {
     this.sprite.setVelocity(xVelocity, yVelocity)
     hoopSprite.body.enable = false
     this.currState = BallState.MID_SHOT
-    let delayedTime = isSuccess ? time * 1010 : time * 950
     this.player = null
-    this.game.time.delayedCall(delayedTime, () => {
-      if (isSuccess) {
+
+    if (!isSuccess) {
+      this.game.time.delayedCall(time * 500, () => {
+        hoopSprite.body.enable = true
+      })
+    } else {
+      this.game.time.delayedCall(time * 1000, () => {
         this.currState = BallState.LOOSE
         this.sprite.setVelocityX(0)
         this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)
@@ -143,10 +148,8 @@ export class Ball {
             handler(playerTeam, shotType)
           })
         })
-      } else {
-        hoopSprite.body.enable = true
-      }
-    })
+      })
+    }
   }
 
   setBallState(state: BallState) {
@@ -175,11 +178,28 @@ export class Ball {
     return this.player == player
   }
 
+  getPlayer() {
+    return this.player
+  }
+
+  getPrevPlayer() {
+    return this.prevPlayer
+  }
+
   setPlayer(player: CourtPlayer) {
     if (this.currState == BallState.MID_SHOT || this.currState == BallState.TIPOFF) {
       return
     }
     if (this.currState === BallState.PASS && this.prevPlayer === player) {
+      return
+    }
+
+    // Prevent stealing inbounds (For now)
+    if (
+      this.currState === BallState.INBOUND &&
+      this.prevPlayer &&
+      this.prevPlayer.getSide() !== player.getSide()
+    ) {
       return
     }
     const oldPlayer = this.player
@@ -199,7 +219,7 @@ export class Ball {
     }
   }
 
-  passTo(target: CourtPlayer) {
+  passTo(target: CourtPlayer, isInbound?: boolean) {
     this.sprite.setGravity(0)
     const angle = Phaser.Math.Angle.BetweenPoints(
       {
@@ -224,7 +244,7 @@ export class Ball {
     )
     const velocityVector = new Phaser.Math.Vector2(0, 0)
     this.game.physics.velocityFromRotation(angle, distance * 4, velocityVector)
-    this.currState = BallState.PASS
+    this.currState = isInbound ? BallState.INBOUND : BallState.PASS
     this.prevPlayer = this.player
     this.player = null
     this.sprite.body.enable = true

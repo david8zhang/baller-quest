@@ -28,8 +28,8 @@ export class Constants {
       x: 75,
       y: Constants.COURT_HEIGHT / 2 - 125,
     },
-    rimRange: [80, 90],
-    successShotRange: [50, 45],
+    rimRange: [40, 60],
+    successShotRange: [50, 50],
     isFlipX: true,
   }
   public static CPU_HOOP_CONFIG = {
@@ -45,8 +45,8 @@ export class Constants {
       x: Constants.COURT_WIDTH - 75,
       y: Constants.COURT_HEIGHT / 2 - 125,
     },
-    rimRange: [-80, -10],
-    successShotRange: [-50, -45],
+    rimRange: [-60, -40],
+    successShotRange: [-52, -52],
     isFlipX: false,
   }
 
