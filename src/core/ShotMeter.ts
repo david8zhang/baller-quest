@@ -2,6 +2,7 @@ import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Court } from './Court'
 import { CourtPlayer } from './CourtPlayer'
+import { PlayerTeam } from './teams/PlayerTeam'
 import { DriveDirection, Team } from './teams/Team'
 
 export interface ShotThreshold {
@@ -41,7 +42,7 @@ export class ShotMeter {
 
   public shotThreshold!: ShotThreshold
   public currValue: number = 0
-  private team: Team
+  private team: PlayerTeam
   private game: Game
   private isShooting: boolean = false
   private keyE: Phaser.Input.Keyboard.Key
@@ -51,7 +52,7 @@ export class ShotMeter {
   public detectShotEvent!: Phaser.Time.TimerEvent
   public hasSetupShotPercentages: boolean = false
 
-  constructor(game: Game, team: Team) {
+  constructor(game: Game, team: PlayerTeam) {
     this.game = game
     this.team = team
     this.keyE = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
@@ -100,6 +101,9 @@ export class ShotMeter {
 
   public handleShotWithMeter() {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+    if (!selectedCourtPlayer) {
+      return
+    }
     const openness = ShotMeter.getOpenness(selectedCourtPlayer, this.team)
     const shotType = ShotMeter.getShotType(
       {
@@ -169,10 +173,13 @@ export class ShotMeter {
   }
 
   private draw() {
+    const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+    if (!selectedCourtPlayer) {
+      return
+    }
     this.bar.clear()
 
     // Background rectangle
-    const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
     const percentage = this.currValue / this.shotThreshold.upperBound
     const length = Math.min(ShotMeter.MAX_LENGTH, Math.floor(percentage * ShotMeter.MAX_LENGTH))
     this.bar.fillStyle(0xdddddd)
@@ -214,6 +221,9 @@ export class ShotMeter {
 
   showPerfectRelease() {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+    if (!selectedCourtPlayer) {
+      return
+    }
     const yPos = selectedCourtPlayer.sprite.y - 50
     const xPos = selectedCourtPlayer.sprite.x + 20
     this.bar.clear()
@@ -223,6 +233,9 @@ export class ShotMeter {
 
   showShotMiss() {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+    if (!selectedCourtPlayer) {
+      return
+    }
     const yPos = selectedCourtPlayer.sprite.y - 50
     const xPos = selectedCourtPlayer.sprite.x + 20
     this.bar.clear()
@@ -231,8 +244,11 @@ export class ShotMeter {
   }
 
   private shoot() {
-    const diff = this.currValue - this.shotThreshold.perfectReleaseValue
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+    if (!selectedCourtPlayer) {
+      return
+    }
+    const diff = this.currValue - this.shotThreshold.perfectReleaseValue
     if (this.currValue < this.shotThreshold.lowerBound) {
       this.showShotMiss()
       selectedCourtPlayer.shootBall(false, this.shotType, MissType.UNDERSHOT)

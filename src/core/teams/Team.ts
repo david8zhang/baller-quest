@@ -33,13 +33,11 @@ export abstract class Team {
   public side!: Side
   public driveDirection!: DriveDirection
   public courtPlayerGroup!: Phaser.GameObjects.Group
-  protected selectedCourtPlayer!: CourtPlayer
 
   constructor(game: Game, config: TeamConfig) {
     this.game = game
     this.side = config.side
     this.driveDirection = config.driveDirection
-    this.createCourtPlayers()
     this.stateMachine = new StateMachine(
       config.initialState,
       {
@@ -50,6 +48,7 @@ export abstract class Team {
       },
       [this]
     )
+    this.createCourtPlayers()
   }
 
   public abstract getHoop(): Hoop
@@ -83,10 +82,13 @@ export abstract class Team {
     }
     // Add a collider for the ball
     this.game.physics.add.overlap(this.courtPlayerGroup, this.game.ball.sprite, (obj1) => {
-      const collidedPlayer = obj1.getData('ref') as CourtPlayer
-      this.game.ball.setPlayer(collidedPlayer)
-      this.selectCourtPlayer(collidedPlayer)
+      this.handlePlayerBallOverlap(obj1)
     })
+  }
+
+  handlePlayerBallOverlap(obj1) {
+    const collidedPlayer = obj1.getData('ref') as CourtPlayer
+    this.game.ball.setPlayer(collidedPlayer)
   }
 
   getCurrentState(): string {
@@ -101,15 +103,6 @@ export abstract class Team {
     return this.driveDirection === DriveDirection.LEFT
       ? Constants.OFFENSE_FROM_LEFT
       : Constants.OFFENSE_FROM_RIGHT
-  }
-
-  selectCourtPlayer(courtPlayer: CourtPlayer) {
-    if (this.selectedCourtPlayer) this.selectedCourtPlayer.setVelocity(0, 0)
-    this.selectedCourtPlayer = courtPlayer
-  }
-
-  getSelectedCourtPlayer() {
-    return this.selectedCourtPlayer
   }
 
   public update() {

@@ -20,6 +20,7 @@ export class Cursor {
       .setStrokeStyle(4, config.color)
       .setAlpha(config.alpha || 1)
       .setOrigin(0)
+      .setVisible(false)
   }
 
   highlightCourtPlayer(courtPlayer: CourtPlayer) {

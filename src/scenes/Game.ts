@@ -110,13 +110,17 @@ export default class Game extends Phaser.Scene {
     )
     this.physics.world.on('worldbounds', (obj) => {
       if (obj.gameObject.getData('ref') === this.ball) {
+        const position = {
+          x: this.ball.sprite.x,
+          y: this.ball.sprite.y,
+        }
         const lastTouched = this.ball.getPrevPlayer()
         if (lastTouched) {
           const teamWithPossession =
             lastTouched.getSide() === Side.PLAYER ? this.cpuTeam : this.playerTeam
           const teamOnDefense =
             lastTouched.getSide() === Side.PLAYER ? this.playerTeam : this.cpuTeam
-          teamWithPossession.setState(TeamStates.INBOUND_BALL)
+          teamWithPossession.setState(TeamStates.INBOUND_BALL, position)
           teamOnDefense.setState(TeamStates.DEFENSE)
         }
       }

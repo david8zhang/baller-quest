@@ -11,6 +11,7 @@ export class PlayerTeam extends Team {
   private cursor: Cursor
   private passCursor: PassCursor
   private shotMeter: ShotMeter
+  public selectedCourtPlayer: CourtPlayer | null = null
 
   constructor(game: Game) {
     super(game, {
@@ -27,7 +28,6 @@ export class PlayerTeam extends Team {
       this.game
     )
     this.passCursor = new PassCursor(this.game)
-    this.selectCourtPlayer(this.courtPlayers[0])
     this.shotMeter = new ShotMeter(this.game, this)
   }
 
@@ -36,18 +36,8 @@ export class PlayerTeam extends Team {
     if (oldPlayer) {
       oldPlayer.setState(PlayerStates.WAIT)
     }
-    this.playerTakeControl(courtPlayer)
-  }
-
-  clearPlayerControl() {
-    console.log('Went here!')
-    this.selectedCourtPlayer.setState(PlayerStates.WAIT)
-    this.cursor.setVisible(false)
-  }
-
-  playerTakeControl(courtPlayer: CourtPlayer) {
-    courtPlayer.setState(PlayerStates.PLAYER_CONTROL, courtPlayer.getCurrentState())
-    super.selectCourtPlayer(courtPlayer)
+    this.selectedCourtPlayer = courtPlayer
+    this.selectedCourtPlayer.setState(PlayerStates.PLAYER_CONTROL, courtPlayer.getCurrentState())
     this.cursor.selectCourtPlayer(courtPlayer)
   }
 
@@ -67,7 +57,7 @@ export class PlayerTeam extends Team {
     const downDown = keyboard.down.isDown
 
     const currentPlayer = this.selectedCourtPlayer
-    if (currentPlayer.getCurrentState() == PlayerStates.WAIT) {
+    if (!currentPlayer || currentPlayer.getCurrentState() == PlayerStates.WAIT) {
       return
     }
 
@@ -95,6 +85,9 @@ export class PlayerTeam extends Team {
   handleBallInput() {
     this.game.input.keyboard.on('keydown', (e) => {
       const selectedCourtPlayer = this.getSelectedCourtPlayer()
+      if (!selectedCourtPlayer) {
+        return
+      }
       switch (e.code) {
         case 'Space': {
           if (this.canPassBall()) {
@@ -117,7 +110,7 @@ export class PlayerTeam extends Team {
   }
 
   canPassBall(): boolean {
-    return this.getBall().getPossessionSide() == this.side
+    return this.selectedCourtPlayer !== null && this.getBall().getPossessionSide() == this.side
   }
 
   updatePassCursor() {
@@ -127,7 +120,7 @@ export class PlayerTeam extends Team {
       this.passCursor.setVisible(true)
       const selectedCourtPlayer = this.getSelectedCourtPlayer()
       let playerToPassTo: any = null
-      playerToPassTo = Constants.getClosestPlayer(selectedCourtPlayer, this.courtPlayers)
+      playerToPassTo = Constants.getClosestPlayer(selectedCourtPlayer!, this.courtPlayers)
       this.highlightPassPlayer(playerToPassTo)
       this.passCursor.follow()
     }
@@ -138,7 +131,7 @@ export class PlayerTeam extends Team {
   }
 
   updateSelectedPlayerCursor() {
-    if (this.getCurrentState() == TeamStates.TIPOFF) {
+    if (this.getCurrentState() == TeamStates.TIPOFF || !this.selectedCourtPlayer) {
       this.cursor.setVisible(false)
     } else {
       this.cursor.setVisible(true)
@@ -148,6 +141,13 @@ export class PlayerTeam extends Team {
 
   highlightPassPlayer(courtPlayer: CourtPlayer) {
     this.passCursor.selectCourtPlayer(courtPlayer)
+  }
+
+  public handlePlayerBallOverlap(obj1: any): void {
+    super.handlePlayerBallOverlap(obj1)
+    if (this.getCurrentState() !== TeamStates.TIPOFF) {
+      this.selectCourtPlayer(obj1.getData('ref') as CourtPlayer)
+    }
   }
 
   public getOpposingTeam(): Team {

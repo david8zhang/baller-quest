@@ -6,7 +6,7 @@ import { PlayerStates } from '../StateTypes'
 export class DefenseState extends State {
   execute(team: Team) {
     team.courtPlayers.forEach((player: CourtPlayer) => {
-      if (player.getCurrentState() != PlayerStates.PLAYER_CONTROL) {
+      if (player.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
         player.setState(PlayerStates.DEFEND_MAN)
       }
     })

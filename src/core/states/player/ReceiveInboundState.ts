@@ -16,10 +16,6 @@ export class ReceiveInboundState extends State {
     if (Constants.IsAtPosition(player, this.receiveInboundPosition!)) {
       const ball = team.getBall()
       if (ball.isInPossessionOf(player)) {
-        if (player.getSide() === Side.PLAYER) {
-          player.setState(PlayerStates.WAIT)
-        }
-        player.team.selectCourtPlayer(player)
         player.team.setState(TeamStates.OFFENSE)
       }
     } else {
