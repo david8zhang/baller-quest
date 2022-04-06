@@ -130,6 +130,27 @@ export class PlayerTeam extends Team {
     return
   }
 
+  setState(state: TeamStates, ...args: any[]) {
+    // Pre-set state logic to select court player
+    if (state === TeamStates.OFFENSE) {
+      const player = this.getBall().getPlayer()
+      if (player) {
+        this.selectCourtPlayer(player)
+      }
+    } else if (state === TeamStates.DEFENSE) {
+      const playerClosestToBall = Constants.getClosestPlayerToBall(
+        this.game.ball,
+        this.courtPlayers
+      )
+      if (playerClosestToBall) {
+        this.selectCourtPlayer(playerClosestToBall)
+      }
+    } else if (state === TeamStates.INBOUND_BALL) {
+      this.deselectPlayer()
+    }
+    super.setState(state, ...args)
+  }
+
   updateSelectedPlayerCursor() {
     if (this.getCurrentState() == TeamStates.TIPOFF || !this.selectedCourtPlayer) {
       this.cursor.setVisible(false)
@@ -139,15 +160,19 @@ export class PlayerTeam extends Team {
     }
   }
 
+  deselectPlayer() {
+    const oldSelectedPlayer = this.selectedCourtPlayer
+    if (oldSelectedPlayer) oldSelectedPlayer?.setState(PlayerStates.WAIT)
+    this.selectedCourtPlayer = null
+    this.cursor.setVisible(false)
+  }
+
   highlightPassPlayer(courtPlayer: CourtPlayer) {
     this.passCursor.selectCourtPlayer(courtPlayer)
   }
 
   public handlePlayerBallOverlap(obj1: any): void {
     super.handlePlayerBallOverlap(obj1)
-    if (this.getCurrentState() !== TeamStates.TIPOFF) {
-      this.selectCourtPlayer(obj1.getData('ref') as CourtPlayer)
-    }
   }
 
   public getOpposingTeam(): Team {

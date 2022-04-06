@@ -53,7 +53,11 @@ export default class Game extends Phaser.Scene {
 
     // Register ball handlers
     this.ball.registerOnPlayerChangedHandler((oldPlayer: CourtPlayer, newPlayer: CourtPlayer) => {
-      if (!oldPlayer && this.cpuTeam.getCurrentState() !== TeamStates.INBOUND_BALL) {
+      if (
+        !oldPlayer &&
+        this.cpuTeam.getCurrentState() !== TeamStates.INBOUND_BALL &&
+        this.playerTeam.getCurrentState() !== TeamStates.INBOUND_BALL
+      ) {
         const sideWithPosession = newPlayer.getSide()
         if (sideWithPosession == Side.PLAYER) {
           this.playerTeam.setState(TeamStates.OFFENSE)
@@ -73,7 +77,7 @@ export default class Game extends Phaser.Scene {
     })
 
     // Add colliders between opposing team's players
-    this.physics.add.collider(this.playerTeam.courtPlayerGroup, this.cpuTeam.courtPlayerGroup)
+    // this.physics.add.collider(this.playerTeam.courtPlayerGroup, this.cpuTeam.courtPlayerGroup)
 
     this.tipOff()
   }
