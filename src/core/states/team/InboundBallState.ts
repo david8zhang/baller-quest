@@ -1,5 +1,6 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Side, Team } from '~/core/teams/Team'
+import { Constants } from '~/utils/Constants'
 import { State } from '../StateMachine'
 import { PlayerStates } from '../StateTypes'
 
@@ -12,9 +13,9 @@ export class InboundBallState extends State {
     const inboundLocation = outOfBoundsLocation
       ? outOfBoundsLocation
       : new Phaser.Math.Vector2(hoopSprite.x, hoopSprite.y)
-    this.playerToInbound = team.courtPlayers[0]
-    this.playerToReceiveInbound = team.courtPlayers[1]
-    this.playerToInbound.setState(
+    this.playerToInbound = Constants.getClosestPlayerToBall(team.getBall(), team.courtPlayers)
+    this.playerToReceiveInbound = this.getPlayerToReceiveBall(team, this.playerToInbound!)
+    this.playerToInbound!.setState(
       PlayerStates.INBOUND_BALL,
       inboundLocation,
       this.playerToReceiveInbound
@@ -29,7 +30,15 @@ export class InboundBallState extends State {
       opposingHoop.sprite.y
     )
     const positionToReceiveInbound = lineToOpposingHoop.getPoint(0.1)
-    this.playerToReceiveInbound.setState(PlayerStates.RECEIVE_INBOUND, positionToReceiveInbound)
+    this.playerToReceiveInbound!.setState(PlayerStates.RECEIVE_INBOUND, positionToReceiveInbound)
+  }
+
+  getPlayerToReceiveBall(team: Team, playerToInbound: CourtPlayer) {
+    const eligiblePlayers = team.courtPlayers.filter((player) => {
+      return player !== playerToInbound
+    })
+    const closestPlayerToBall = Constants.getClosestPlayerToBall(team.getBall(), eligiblePlayers)
+    return closestPlayerToBall
   }
 
   execute(team: Team) {

@@ -34,7 +34,6 @@ export class CPUTeam extends Team {
     )
     const { percentage } = Constants.SHOT_PERCENTAGES[openness][shotType]
     const isSuccess = Constants.getSuccessBasedOnPercentage(percentage)
-    console.log(openness, shotType)
     courtPlayer.shootBall(true, shotType)
   }
 }

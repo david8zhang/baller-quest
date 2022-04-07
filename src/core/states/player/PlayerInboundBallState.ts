@@ -13,6 +13,7 @@ export class PlayerInboundBallState extends State {
     positionToInboundFrom: Phaser.Math.Vector2,
     playerToReceiveInbound: CourtPlayer
   ) {
+    console.log(positionToInboundFrom, playerToReceiveInbound)
     this.positionToInboundFrom = positionToInboundFrom
     this.playerToReceiveInbound = playerToReceiveInbound
   }
