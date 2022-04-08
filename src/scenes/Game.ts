@@ -19,8 +19,8 @@ export default class Game extends Phaser.Scene {
   private static _instance: Game
 
   // Court setup
-  public playerHoop!: Hoop
-  public cpuHoop!: Hoop
+  public leftHoop!: Hoop
+  public rightHoop!: Hoop
   public ball!: Ball
   public score!: Score
   public court!: Court
@@ -43,8 +43,8 @@ export default class Game extends Phaser.Scene {
         y: Constants.COURT_HEIGHT / 2,
       },
     })
-    this.playerHoop = new Hoop(this, Constants.PLAYER_HOOP_CONFIG)
-    this.cpuHoop = new Hoop(this, Constants.CPU_HOOP_CONFIG)
+    this.leftHoop = new Hoop(this, Constants.HOOP_LEFT)
+    this.rightHoop = new Hoop(this, Constants.HOOP_RIGHT)
 
     this.playerTeam = new PlayerTeam(this)
     this.cpuTeam = new CPUTeam(this)
@@ -83,7 +83,7 @@ export default class Game extends Phaser.Scene {
   }
 
   tipOff() {
-    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
+    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_LEFT)
     // const zoneToTipTo =
     //   Phaser.Math.Between(0, 1) === 0
     //     ? this.getZoneForZoneId(Constants.TIPOFF_RIGHT)

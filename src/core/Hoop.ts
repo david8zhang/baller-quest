@@ -1,4 +1,5 @@
 import Game from '~/scenes/Game'
+import { DriveDirection, Side } from './teams/Team'
 
 export interface HoopConfig {
   position: {
@@ -16,6 +17,7 @@ export interface HoopConfig {
   }
   rimRange: number[]
   successShotRange: number[]
+  driveDirection: DriveDirection
 }
 
 export class Hoop {
@@ -25,10 +27,21 @@ export class Hoop {
   public setFloorEvent?: Phaser.Time.TimerEvent
   public successShotRange: number[] = []
   public rimRange: number[] = []
+  public hasBallCollidedWithRim: boolean = false
+  public driveDirection: DriveDirection
 
   constructor(game: Game, config: HoopConfig) {
     this.game = game
-    const { position, isFlipX, body, backboardPosition, successShotRange, rimRange } = config
+    const {
+      position,
+      isFlipX,
+      body,
+      backboardPosition,
+      successShotRange,
+      rimRange,
+      driveDirection,
+    } = config
+    this.driveDirection = driveDirection
     this.sprite = this.game.physics.add.sprite(position.x, position.y, 'hoop').setScale(0.25)
     this.sprite.flipX = isFlipX
     this.sprite.body.setSize(0.4 * this.sprite.body.width, 0.25 * this.sprite.body.width)
@@ -40,12 +53,13 @@ export class Hoop {
     this.successShotRange = successShotRange
     this.rimRange = rimRange
     this.game.physics.add.collider(this.sprite, this.game.ball.sprite, () => {
-      const randTime = 1000
-      this.game.ball.setLoose()
-      this.sprite.body.enable = false
-      this.setFloorEvent = this.game.time.delayedCall(randTime, () => {
-        this.game.ball.handleFloorCollision()
-      })
+      if (!this.hasBallCollidedWithRim) {
+        this.hasBallCollidedWithRim = true
+        this.sprite.body.enable = false
+        this.game.ball.setRandomRebound(this, () => {
+          this.hasBallCollidedWithRim = false
+        })
+      }
     })
 
     const backboard = this.game.physics.add

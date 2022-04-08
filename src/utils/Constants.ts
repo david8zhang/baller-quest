@@ -1,6 +1,7 @@
 import { Ball } from '~/core/Ball'
 import { CourtPlayer, Role } from '~/core/CourtPlayer'
 import { MissType, ShotOpenness, ShotType } from '~/core/ShotMeter'
+import { DriveDirection } from '~/core/teams/Team'
 import { LAST_NAMES, MALE_FIRST_NAMES } from './names'
 
 export class Constants {
@@ -15,7 +16,7 @@ export class Constants {
   // Court Player attributes
   public static COURT_PLAYER_SPEED = 200
   public static PASS_SPEED = 1000
-  public static PLAYER_HOOP_CONFIG = {
+  public static HOOP_LEFT = {
     position: {
       x: 50,
       y: Constants.COURT_HEIGHT / 2 - 50,
@@ -31,8 +32,9 @@ export class Constants {
     rimRange: [40, 60],
     successShotRange: [50, 50],
     isFlipX: true,
+    driveDirection: DriveDirection.LEFT,
   }
-  public static CPU_HOOP_CONFIG = {
+  public static HOOP_RIGHT = {
     position: {
       x: Constants.COURT_WIDTH - 50,
       y: Constants.COURT_HEIGHT / 2 - 50,
@@ -48,6 +50,7 @@ export class Constants {
     rimRange: [-60, -40],
     successShotRange: [-52, -52],
     isFlipX: false,
+    driveDirection: DriveDirection.RIGHT,
   }
 
   // Team attributes
@@ -86,7 +89,7 @@ export class Constants {
   public static TIPOFF_RIGHT = 70
   public static TIPOFF_LEFT = 64
 
-  // Zones for each shot type
+  // Zones for shot types left side
   public static MID_RANGE_LEFT = [
     15, 16, 17, 30, 31, 32, 33, 47, 48, 49, 62, 63, 64, 77, 78, 79, 90, 91, 92, 93, 105, 106, 107,
   ]
@@ -96,6 +99,7 @@ export class Constants {
     110, 11, 120, 121, 122, 123, 124, 125, 126,
   ]
 
+  // Zone for shot types right side
   public static MID_RANGE_RIGHT = [
     27, 28, 29, 41, 42, 43, 44, 55, 56, 57, 70, 71, 72, 85, 86, 87, 101, 102, 103, 104, 117, 118,
     119,

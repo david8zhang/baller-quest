@@ -4,7 +4,7 @@ import { FieldZone } from './Court'
 import { CourtPlayer } from './CourtPlayer'
 import { Hoop } from './Hoop'
 import { MissType, ShotConfig, ShotType } from './ShotMeter'
-import { Side, Team } from './teams/Team'
+import { DriveDirection, Side, Team } from './teams/Team'
 
 export enum BallState {
   DRIBBLE = 'DRIBBLE',
@@ -32,6 +32,8 @@ export class Ball {
   public currState: BallState = BallState.LOOSE
   public onPlayerChangedHandlers: Function[] = []
   public onScoreHandlers: Function[] = []
+  public arcDestination: Phaser.GameObjects.Arc
+  public shotType!: ShotType
 
   constructor(game: Game, config: BallConfig) {
     this.game = game
@@ -43,6 +45,7 @@ export class Ball {
       .setBounce(0.75)
     this.sprite.body.enable = false
     this.sprite.setData('ref', this)
+    this.arcDestination = this.game.add.circle(0, 0, 5, 0x00ff00).setVisible(false).setDepth(1000)
     this.setupFloor()
     this.setupOutOfBoundsLogic()
   }
@@ -88,6 +91,8 @@ export class Ball {
   launchArcTowards(posToLand: Phaser.Math.Vector2, timeInFlight: number) {
     this.sprite.setGravityY(980)
     this.sprite.body.enable = true
+    this.arcDestination.setVisible(true)
+    this.arcDestination.setPosition(posToLand.x, posToLand.y)
     const xVelocity = (posToLand.x - this.sprite.x) / timeInFlight
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(timeInFlight, 2)) / timeInFlight
     this.sprite.setVelocity(xVelocity, yVelocity)
@@ -103,6 +108,7 @@ export class Ball {
     const playerHeight = this.player!.sprite.displayHeight
     this.sprite.y = playerPosition.y - playerHeight / 2
     this.floor.body.enable = false
+    this.shotType = shotType
 
     // Launch ball at angle to hit the hoop
     this.sprite.body.enable = true
@@ -148,6 +154,35 @@ export class Ball {
             handler(playerTeam, shotType)
           })
         })
+      })
+    }
+  }
+
+  setRandomRebound(hoop: Hoop, onHitFloorCallback: Function) {
+    let reboundZones =
+      hoop.driveDirection === DriveDirection.RIGHT
+        ? Constants.MID_RANGE_RIGHT
+        : Constants.MID_RANGE_LEFT
+
+    if (this.shotType === ShotType.LAYUP) {
+      reboundZones =
+        hoop.driveDirection === DriveDirection.RIGHT
+          ? Constants.LAYUP_RANGE_RIGHT
+          : Constants.LAYUP_RANGE_LEFT
+    }
+    const randomZoneId = reboundZones[Phaser.Math.Between(0, reboundZones.length - 1)]
+    const randomZone = this.game.court.getZoneForZoneId(randomZoneId)
+
+    const flightTime = 1
+    if (randomZone) {
+      const { centerPosition } = randomZone
+      this.launchArcTowards(new Phaser.Math.Vector2(centerPosition.x, centerPosition.y), flightTime)
+      this.game.time.delayedCall(flightTime * 500, () => {
+        this.setLoose()
+      })
+      this.game.time.delayedCall(flightTime * 1000, () => {
+        this.handleFloorCollision()
+        onHitFloorCallback()
       })
     }
   }
@@ -221,29 +256,30 @@ export class Ball {
 
   passTo(target: CourtPlayer, isInbound?: boolean) {
     this.sprite.setGravity(0)
+    const timeToPass = 0.25
     const angle = Phaser.Math.Angle.BetweenPoints(
       {
         x: this.sprite.x,
         y: this.sprite.y,
       },
       {
-        x: target.sprite.x + target.currVelocityVector.x * 0.25,
-        y: target.sprite.y + target.currVelocityVector.y * 0.25,
+        x: target.sprite.x + target.currVelocityVector.x * timeToPass,
+        y: target.sprite.y + target.currVelocityVector.y * timeToPass,
       }
     )
-    const posAfterOneSec = {
-      x: target.sprite.x + target.currVelocityVector.x * 0.25,
-      y: target.sprite.y + target.currVelocityVector.y * 0.25,
+    const posAfterGivenTime = {
+      x: target.sprite.x + target.currVelocityVector.x * timeToPass,
+      y: target.sprite.y + target.currVelocityVector.y * timeToPass,
     }
     const distance = Constants.getDistanceBetween(
       {
         x: this.sprite.x,
         y: this.sprite.y,
       },
-      posAfterOneSec
+      posAfterGivenTime
     )
     const velocityVector = new Phaser.Math.Vector2(0, 0)
-    this.game.physics.velocityFromRotation(angle, distance * 4, velocityVector)
+    this.game.physics.velocityFromRotation(angle, distance * (1 / timeToPass), velocityVector)
     this.currState = isInbound ? BallState.INBOUND : BallState.PASS
     this.prevPlayer = this.player
     this.player = null

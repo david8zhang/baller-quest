@@ -5,15 +5,17 @@ import { State } from '../StateMachine'
 
 export class PlayerInboundBallState extends State {
   private positionToInboundFrom: Phaser.Math.Vector2 | null = null
+  private positionToReceiveInbound!: Phaser.Math.Vector2
   private playerToReceiveInbound: CourtPlayer | null = null
 
   enter(
     player: CourtPlayer,
     team: Team,
     positionToInboundFrom: Phaser.Math.Vector2,
+    positionToReceiveInbound: Phaser.Math.Vector2,
     playerToReceiveInbound: CourtPlayer
   ) {
-    console.log(positionToInboundFrom, playerToReceiveInbound)
+    this.positionToReceiveInbound = positionToReceiveInbound
     this.positionToInboundFrom = positionToInboundFrom
     this.playerToReceiveInbound = playerToReceiveInbound
   }
@@ -21,7 +23,11 @@ export class PlayerInboundBallState extends State {
   execute(player: CourtPlayer, team: Team) {
     const ball = team.getBall()
     if (ball.isInPossessionOf(player)) {
-      if (Constants.IsAtPosition(player, this.positionToInboundFrom!)) {
+      if (
+        Constants.IsAtPosition(player, this.positionToInboundFrom!) &&
+        this.playerToReceiveInbound &&
+        Constants.IsAtPosition(this.playerToReceiveInbound, this.positionToReceiveInbound)
+      ) {
         ball.passTo(this.playerToReceiveInbound!, true)
       } else {
         player.setMoveTarget(this.positionToInboundFrom)

@@ -2,6 +2,7 @@ import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
+import { Hoop } from '../Hoop'
 import { PassCursor } from '../PassCursor'
 import { ShotMeter } from '../ShotMeter'
 import { PlayerStates, TeamStates } from '../states/StateTypes'
@@ -43,10 +44,6 @@ export class PlayerTeam extends Team {
 
   getSelectedCourtPlayer() {
     return this.selectedCourtPlayer
-  }
-
-  getHoop() {
-    return this.game.playerHoop
   }
 
   handlePlayerMovement() {

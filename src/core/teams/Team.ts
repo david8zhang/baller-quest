@@ -51,7 +51,13 @@ export abstract class Team {
     this.createCourtPlayers()
   }
 
-  public abstract getHoop(): Hoop
+  public getHoop() {
+    if (this.driveDirection === DriveDirection.LEFT) {
+      return this.game.leftHoop
+    } else {
+      return this.game.rightHoop
+    }
+  }
   public abstract shoot(player: CourtPlayer, team: Team): void
 
   getBall() {

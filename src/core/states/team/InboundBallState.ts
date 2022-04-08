@@ -13,15 +13,6 @@ export class InboundBallState extends State {
     const inboundLocation = outOfBoundsLocation
       ? outOfBoundsLocation
       : new Phaser.Math.Vector2(hoopSprite.x, hoopSprite.y)
-    this.playerToInbound = Constants.getClosestPlayerToBall(team.getBall(), team.courtPlayers)
-    this.playerToReceiveInbound = this.getPlayerToReceiveBall(team, this.playerToInbound!)
-    this.playerToInbound!.setState(
-      PlayerStates.INBOUND_BALL,
-      inboundLocation,
-      this.playerToReceiveInbound
-    )
-
-    // Receive inbound
     const opposingHoop = team.getOpposingTeam().getHoop()
     const lineToOpposingHoop = new Phaser.Geom.Line(
       inboundLocation.x,
@@ -30,6 +21,17 @@ export class InboundBallState extends State {
       opposingHoop.sprite.y
     )
     const positionToReceiveInbound = lineToOpposingHoop.getPoint(0.1)
+
+    this.playerToInbound = Constants.getClosestPlayerToBall(team.getBall(), team.courtPlayers)
+    this.playerToReceiveInbound = this.getPlayerToReceiveBall(team, this.playerToInbound!)
+    this.playerToInbound!.setState(
+      PlayerStates.INBOUND_BALL,
+      inboundLocation,
+      positionToReceiveInbound,
+      this.playerToReceiveInbound
+    )
+
+    // Receive inbound
     this.playerToReceiveInbound!.setState(PlayerStates.RECEIVE_INBOUND, positionToReceiveInbound)
   }
 

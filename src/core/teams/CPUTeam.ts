@@ -18,10 +18,6 @@ export class CPUTeam extends Team {
     return this.game.playerTeam
   }
 
-  getHoop() {
-    return this.game.cpuHoop
-  }
-
   shoot(courtPlayer: CourtPlayer, team: Team) {
     const openness = ShotMeter.getOpenness(courtPlayer, team)
     const shotType = ShotMeter.getShotType(
