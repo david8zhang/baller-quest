@@ -11,6 +11,8 @@ import { PlayerStates } from './states/StateTypes'
 import { Team } from './teams/Team'
 import { ChaseReboundState } from './states/player/ChaseReboundState'
 import { MissType, ShotType } from './ShotMeter'
+import { ShootingBallState } from './states/player/ShootingBallState'
+import { DriveToBasketState } from './states/player/DriveToBasketState'
 
 export enum Role {
   PG = 'PG',
@@ -43,6 +45,7 @@ export class CourtPlayer {
   public nameText!: Phaser.GameObjects.Text
   public stateText!: Phaser.GameObjects.Text
   public markerRectangle!: Phaser.Geom.Rectangle
+  public isAtPosition: boolean = false
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -70,6 +73,8 @@ export class CourtPlayer {
         [PlayerStates.MOVE_TO_SPOT]: new MoveToSpotState(),
         [PlayerStates.PLAYER_CONTROL]: new PlayerControlState(),
         [PlayerStates.CHASE_REBOUND]: new ChaseReboundState(),
+        [PlayerStates.SHOOTING_BALL]: new ShootingBallState(),
+        [PlayerStates.DRIVE_TO_BASKET]: new DriveToBasketState(),
       },
       [this, this.team]
     )
@@ -161,6 +166,7 @@ export class CourtPlayer {
 
   moveTowardsTarget() {
     if (!this.moveTarget) {
+      this.isAtPosition = false
       return
     }
     const distance = Constants.getDistanceBetween(
@@ -175,7 +181,9 @@ export class CourtPlayer {
     )
     if (Math.abs(distance) < 5) {
       this.setVelocity(0, 0)
+      this.isAtPosition = true
     } else {
+      this.isAtPosition = false
       let angle = Phaser.Math.Angle.BetweenPoints(
         {
           x: this.sprite.x,

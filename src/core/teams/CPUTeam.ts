@@ -30,6 +30,8 @@ export class CPUTeam extends Team {
     )
     const { percentage } = Constants.SHOT_PERCENTAGES[openness][shotType]
     const isSuccess = Constants.getSuccessBasedOnPercentage(percentage)
-    courtPlayer.shootBall(true, shotType)
+    this.game.time.delayedCall(200, () => {
+      courtPlayer.shootBall(isSuccess, shotType)
+    })
   }
 }

@@ -6,6 +6,8 @@ export enum PlayerStates {
   INBOUND_BALL = 'InboundBall',
   RECEIVE_INBOUND = 'ReceiveInbound',
   CHASE_REBOUND = 'ChaseRebound',
+  SHOOTING_BALL = 'ShootingBall',
+  DRIVE_TO_BASKET = 'DriveToBasket',
 }
 
 export enum TeamStates {

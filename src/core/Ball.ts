@@ -14,6 +14,7 @@ export enum BallState {
   INBOUND = 'INBOUND',
   REBOUND = 'REBOUND',
   TIPOFF = 'TIPOFF',
+  RETRIEVE_AFTER_SCORE = 'RETRIEVE_AFTER_SCORE',
 }
 
 interface BallConfig {
@@ -131,6 +132,8 @@ export class Ball {
     this.sprite.setGravityY(980)
 
     // Tweak shot arc based on distance to the basket
+    this.arcDestination.setPosition(posToLand.x, posToLand.y)
+    this.arcDestination.setVisible(true)
     const time = Constants.SHOT_ARC_CONFIG[shotType]
     const xVelocity = (posToLand.x - this.sprite.x) / time
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(time, 2)) / time
@@ -144,8 +147,8 @@ export class Ball {
         hoopSprite.body.enable = true
       })
     } else {
+      this.currState = BallState.RETRIEVE_AFTER_SCORE
       this.game.time.delayedCall(time * 1000, () => {
-        this.currState = BallState.LOOSE
         this.sprite.setVelocityX(0)
         this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)
         this.game.time.delayedCall(400, () => {

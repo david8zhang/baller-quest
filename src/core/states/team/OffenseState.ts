@@ -1,5 +1,6 @@
 import { BallState } from '~/core/Ball'
 import { CourtPlayer } from '~/core/CourtPlayer'
+import { ShotMeter, ShotOpenness } from '~/core/ShotMeter'
 import { Side, Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
 import { State } from '../StateMachine'
@@ -8,7 +9,7 @@ import { PlayerStates } from '../StateTypes'
 export class OffenseState extends State {
   execute(team: Team) {
     const ball = team.getBall()
-    if (ball.currState === BallState.LOOSE) {
+    if (ball.currState === BallState.LOOSE && team.side === Side.CPU) {
       this.chaseRebound(team)
     } else {
       this.setUpOffensiveFormation(team)
@@ -37,9 +38,88 @@ export class OffenseState extends State {
 
   setUpOffensiveFormation(team: Team) {
     team.courtPlayers.forEach((player) => {
-      if (player.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
+      this.handlePlayerAction(player, team)
+    })
+  }
+
+  handlePlayerAction(player: CourtPlayer, team: Team) {
+    if (player.getCurrentState() === PlayerStates.PLAYER_CONTROL) {
+      return
+    }
+    switch (player.getCurrentState()) {
+      case PlayerStates.MOVE_TO_SPOT: {
+        const offensiveFormation = team.getOffensiveFormation()
+        const targetZoneId = offensiveFormation[player.role]
+        const zone = team.game.court.getZoneForZoneId(targetZoneId)
+
+        // If the player is at their designated zone
+        if (zone && Constants.IsAtPosition(player, zone.centerPosition)) {
+          // If this player currently has the ball
+          if (team.getBall().isInPossessionOf(player)) {
+            if (this.hasOpenShot(player, team)) {
+              team.shoot(player, team)
+            } else {
+              const passTarget = this.getOpenPassTarget(player, team)
+              if (!passTarget) {
+                player.setState(PlayerStates.DRIVE_TO_BASKET)
+              } else {
+                player.passBall(passTarget)
+              }
+            }
+          } else {
+          }
+        }
+        break
+      }
+      case PlayerStates.DRIVE_TO_BASKET: {
+        break
+      }
+      default: {
         player.setState(PlayerStates.MOVE_TO_SPOT)
+        break
+      }
+    }
+  }
+
+  getOpenPassTarget(courtPlayer: CourtPlayer, team: Team): CourtPlayer | null {
+    let minPassDistance = Number.MAX_SAFE_INTEGER
+    let passTarget: any = null
+    team.courtPlayers.forEach((player: CourtPlayer) => {
+      if (player !== courtPlayer) {
+        const passVector = new Phaser.Geom.Line(
+          courtPlayer.sprite.x,
+          courtPlayer.sprite.y,
+          player.sprite.x,
+          player.sprite.y
+        )
+        if (!Phaser.Geom.Intersects.LineToRectangle(passVector, player.markerRectangle)) {
+          const distanceToPlayer = Constants.getDistanceBetween(
+            {
+              x: courtPlayer.sprite.x,
+              y: courtPlayer.sprite.y,
+            },
+            {
+              x: player.sprite.x,
+              y: player.sprite.y,
+            }
+          )
+          if (!passTarget) {
+            passTarget = player
+            minPassDistance = distanceToPlayer
+          } else {
+            if (distanceToPlayer < minPassDistance) {
+              passTarget = player
+              minPassDistance = distanceToPlayer
+            }
+          }
+        }
       }
     })
+    return passTarget
+  }
+
+  hasOpenShot(courtPlayer: CourtPlayer, team: Team): boolean {
+    const shotOpenness = ShotMeter.getOpenness(courtPlayer, team)
+    return shotOpenness === ShotOpenness.OPEN || shotOpenness === ShotOpenness.WIDE_OPEN
   }
 }

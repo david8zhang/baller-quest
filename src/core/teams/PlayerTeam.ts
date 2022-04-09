@@ -168,10 +168,6 @@ export class PlayerTeam extends Team {
     this.passCursor.selectCourtPlayer(courtPlayer)
   }
 
-  public handlePlayerBallOverlap(obj1: any): void {
-    super.handlePlayerBallOverlap(obj1)
-  }
-
   public getOpposingTeam(): Team {
     return this.game.cpuTeam
   }

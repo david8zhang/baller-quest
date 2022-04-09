@@ -1,3 +1,4 @@
+import { BallState } from '~/core/Ball'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Side, Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
@@ -9,6 +10,7 @@ export class InboundBallState extends State {
   public playerToReceiveInbound: CourtPlayer | null = null
 
   enter(team: Team, outOfBoundsLocation?: Phaser.Math.Vector2) {
+    team.getBall().setBallState(BallState.RETRIEVE_AFTER_SCORE)
     const hoopSprite = team.getHoop().sprite
     const inboundLocation = outOfBoundsLocation
       ? outOfBoundsLocation
