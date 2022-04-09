@@ -13,6 +13,7 @@ import { ChaseReboundState } from './states/player/ChaseReboundState'
 import { MissType, ShotType } from './ShotMeter'
 import { ShootingBallState } from './states/player/ShootingBallState'
 import { DriveToBasketState } from './states/player/DriveToBasketState'
+import { Ball, BallState } from './Ball'
 
 export enum Role {
   PG = 'PG',
@@ -45,7 +46,6 @@ export class CourtPlayer {
   public nameText!: Phaser.GameObjects.Text
   public stateText!: Phaser.GameObjects.Text
   public markerRectangle!: Phaser.Geom.Rectangle
-  public isAtPosition: boolean = false
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -166,7 +166,6 @@ export class CourtPlayer {
 
   moveTowardsTarget() {
     if (!this.moveTarget) {
-      this.isAtPosition = false
       return
     }
     const distance = Constants.getDistanceBetween(
@@ -181,9 +180,7 @@ export class CourtPlayer {
     )
     if (Math.abs(distance) < 5) {
       this.setVelocity(0, 0)
-      this.isAtPosition = true
     } else {
-      this.isAtPosition = false
       let angle = Phaser.Math.Angle.BetweenPoints(
         {
           x: this.sprite.x,
@@ -211,9 +208,40 @@ export class CourtPlayer {
     }
   }
 
-  passBall(receiver: CourtPlayer) {
-    if (this.game.ball.isInPossessionOf(this)) {
-      this.game.ball.passTo(receiver)
+  passBall(receiver: CourtPlayer, isInbound?: boolean) {
+    const ball = this.game.ball
+
+    if (ball.isInPossessionOf(this) && ball.currState !== BallState.PASS) {
+      const timeToPass = 0.25
+      const angle = Phaser.Math.Angle.BetweenPoints(
+        {
+          x: this.sprite.x,
+          y: this.sprite.y,
+        },
+        {
+          x: receiver.sprite.x + receiver.currVelocityVector.x * timeToPass,
+          y: receiver.sprite.y + receiver.currVelocityVector.y * timeToPass,
+        }
+      )
+      const posAfterGivenTime = {
+        x: receiver.sprite.x + receiver.currVelocityVector.x * timeToPass,
+        y: receiver.sprite.y + receiver.currVelocityVector.y * timeToPass,
+      }
+      const distance = Constants.getDistanceBetween(
+        {
+          x: this.sprite.x,
+          y: this.sprite.y,
+        },
+        posAfterGivenTime
+      )
+      const velocityVector = new Phaser.Math.Vector2(0, 0)
+      this.game.physics.velocityFromRotation(angle, distance * (1 / timeToPass), velocityVector)
+
+      // Apply velocity to ball
+      ball.sprite.setGravity(0)
+      ball.sprite.body.enable = true
+      ball.currState = isInbound ? BallState.INBOUND : BallState.PASS
+      ball.setVelocity(velocityVector.x, velocityVector.y)
     }
   }
 

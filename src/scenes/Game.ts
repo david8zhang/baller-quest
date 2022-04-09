@@ -54,7 +54,6 @@ export default class Game extends Phaser.Scene {
     // Register ball handlers
     this.ball.registerOnPlayerChangedHandler((oldPlayer: CourtPlayer, newPlayer: CourtPlayer) => {
       if (
-        !oldPlayer &&
         this.cpuTeam.getCurrentState() !== TeamStates.INBOUND_BALL &&
         this.playerTeam.getCurrentState() !== TeamStates.INBOUND_BALL
       ) {
@@ -83,7 +82,7 @@ export default class Game extends Phaser.Scene {
   }
 
   tipOff() {
-    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_LEFT)
+    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
     // const zoneToTipTo =
     //   Phaser.Math.Between(0, 1) === 0
     //     ? this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
@@ -110,24 +109,24 @@ export default class Game extends Phaser.Scene {
       true,
       true,
       false,
-      false
+      true
     )
     this.physics.world.on('worldbounds', (obj) => {
-      if (obj.gameObject.getData('ref') === this.ball) {
-        const position = {
-          x: this.ball.sprite.x,
-          y: this.ball.sprite.y,
-        }
-        const lastTouched = this.ball.getPrevPlayer()
-        if (lastTouched) {
-          const teamWithPossession =
-            lastTouched.getSide() === Side.PLAYER ? this.cpuTeam : this.playerTeam
-          const teamOnDefense =
-            lastTouched.getSide() === Side.PLAYER ? this.playerTeam : this.cpuTeam
-          teamWithPossession.setState(TeamStates.INBOUND_BALL, position)
-          teamOnDefense.setState(TeamStates.DEFENSE)
-        }
-      }
+      // if (obj.gameObject.getData('ref') === this.ball) {
+      //   const position = {
+      //     x: this.ball.sprite.x,
+      //     y: this.ball.sprite.y,
+      //   }
+      //   const lastTouched = this.ball.getPrevPlayer()
+      //   if (lastTouched) {
+      //     const teamWithPossession =
+      //       lastTouched.getSide() === Side.PLAYER ? this.cpuTeam : this.playerTeam
+      //     const teamOnDefense =
+      //       lastTouched.getSide() === Side.PLAYER ? this.playerTeam : this.cpuTeam
+      //     teamWithPossession.setState(TeamStates.INBOUND_BALL, position)
+      //     teamOnDefense.setState(TeamStates.DEFENSE)
+      //   }
+      // }
     })
   }
 

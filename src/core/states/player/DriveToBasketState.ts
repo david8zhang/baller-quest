@@ -3,7 +3,6 @@ import { DriveDirection, Team } from '~/core/teams/Team'
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { State } from '../StateMachine'
-import { PlayerStates } from '../StateTypes'
 
 export class DriveToBasketState extends State {
   public zoneToDriveToId: number = -1
@@ -16,8 +15,8 @@ export class DriveToBasketState extends State {
     const randomZone = Game.instance.court.getZoneForZoneId(randomZoneId)
     if (randomZone) {
       if (Constants.IsAtPosition(player, randomZone.centerPosition)) {
+        console.log('Drive to basket')
         team.shoot(player, team)
-        player.setState(PlayerStates.WAIT)
       } else {
         player.setMoveTarget(randomZone.centerPosition)
       }

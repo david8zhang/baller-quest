@@ -4,7 +4,7 @@ import { State } from '../StateMachine'
 import { PlayerStates } from '../StateTypes'
 
 export class TipOffState extends State {
-  execute(team: Team) {
+  enter(team: Team) {
     team.courtPlayers.forEach((player: CourtPlayer) => {
       player.setState(PlayerStates.WAIT)
     })

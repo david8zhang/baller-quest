@@ -9,7 +9,7 @@ import { PlayerStates } from '../StateTypes'
 export class OffenseState extends State {
   execute(team: Team) {
     const ball = team.getBall()
-    if (ball.currState === BallState.LOOSE && team.side === Side.CPU) {
+    if (ball.currState === BallState.LOOSE) {
       this.chaseRebound(team)
     } else {
       this.setUpOffensiveFormation(team)
@@ -63,15 +63,19 @@ export class OffenseState extends State {
               if (!passTarget) {
                 player.setState(PlayerStates.DRIVE_TO_BASKET)
               } else {
-                player.passBall(passTarget)
+                team.game.time.delayedCall(250, () => {
+                  player.passBall(passTarget)
+                })
               }
             }
-          } else {
           }
         }
         break
       }
       case PlayerStates.DRIVE_TO_BASKET: {
+        if (!team.getBall().isInPossessionOf(player)) {
+          player.setState(PlayerStates.MOVE_TO_SPOT)
+        }
         break
       }
       default: {
@@ -84,15 +88,10 @@ export class OffenseState extends State {
   getOpenPassTarget(courtPlayer: CourtPlayer, team: Team): CourtPlayer | null {
     let minPassDistance = Number.MAX_SAFE_INTEGER
     let passTarget: any = null
+    const enemyPlayers = team.getOpposingTeam().courtPlayers
     team.courtPlayers.forEach((player: CourtPlayer) => {
       if (player !== courtPlayer) {
-        const passVector = new Phaser.Geom.Line(
-          courtPlayer.sprite.x,
-          courtPlayer.sprite.y,
-          player.sprite.x,
-          player.sprite.y
-        )
-        if (!Phaser.Geom.Intersects.LineToRectangle(passVector, player.markerRectangle)) {
+        if (!this.checkPlayerIntersects(courtPlayer, player, enemyPlayers)) {
           const distanceToPlayer = Constants.getDistanceBetween(
             {
               x: courtPlayer.sprite.x,
@@ -116,6 +115,22 @@ export class OffenseState extends State {
       }
     })
     return passTarget
+  }
+
+  checkPlayerIntersects(src: CourtPlayer, target: CourtPlayer, playersToCheck: CourtPlayer[]) {
+    const raySrcToTarget = new Phaser.Geom.Line(
+      src.sprite.x,
+      src.sprite.y,
+      target.sprite.x,
+      target.sprite.y
+    )
+    for (let i = 0; i < playersToCheck.length; i++) {
+      const p = playersToCheck[i]
+      if (Phaser.Geom.Intersects.LineToRectangle(raySrcToTarget, p.markerRectangle)) {
+        return true
+      }
+    }
+    return false
   }
 
   hasOpenShot(courtPlayer: CourtPlayer, team: Team): boolean {

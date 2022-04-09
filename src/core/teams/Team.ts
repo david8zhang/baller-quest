@@ -94,7 +94,7 @@ export abstract class Team {
 
   handlePlayerBallOverlap(obj1) {
     const collidedPlayer = obj1.getData('ref') as CourtPlayer
-    this.game.ball.setPlayer(collidedPlayer)
+    this.game.ball.updatePlayerWithBall(collidedPlayer)
   }
 
   getCurrentState(): string {

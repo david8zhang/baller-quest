@@ -24,11 +24,11 @@ export class PlayerInboundBallState extends State {
     const ball = team.getBall()
     if (ball.isInPossessionOf(player)) {
       if (
-        Constants.IsAtPosition(player, this.positionToInboundFrom!) &&
         this.playerToReceiveInbound &&
+        Constants.IsAtPosition(player, this.positionToInboundFrom!) &&
         Constants.IsAtPosition(this.playerToReceiveInbound, this.positionToReceiveInbound)
       ) {
-        ball.passTo(this.playerToReceiveInbound!, true)
+        player.passBall(this.playerToReceiveInbound!, true)
       } else {
         player.setMoveTarget(this.positionToInboundFrom)
       }
