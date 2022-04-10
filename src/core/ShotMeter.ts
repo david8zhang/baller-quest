@@ -52,7 +52,7 @@ export class ShotMeter {
   public detectShotEvent!: Phaser.Time.TimerEvent
   public hasSetupShotPercentages: boolean = false
 
-  constructor(game: Game, team: PlayerTeam) {
+  constructor(team: PlayerTeam, game: Game) {
     this.game = game
     this.team = team
     this.keyE = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)

@@ -14,6 +14,7 @@ import { MissType, ShotType } from './ShotMeter'
 import { ShootingBallState } from './states/player/ShootingBallState'
 import { DriveToBasketState } from './states/player/DriveToBasketState'
 import { Ball, BallState } from './Ball'
+import { SetScreenState } from './states/player/SetScreenState'
 
 export enum Role {
   PG = 'PG',
@@ -46,6 +47,15 @@ export class CourtPlayer {
   public nameText!: Phaser.GameObjects.Text
   public stateText!: Phaser.GameObjects.Text
   public markerRectangle!: Phaser.Geom.Rectangle
+  public speed: number = Constants.COURT_PLAYER_SPEED
+
+  // Other player collider
+  public otherPlayerToCollideWith: CourtPlayer | null = null
+  public otherPlayerCollider: Phaser.Physics.Arcade.Collider | null = null
+
+  // Defensive assignments / defender
+  public playerToDefend: CourtPlayer | null = null
+  public defender: CourtPlayer | null = null
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -62,7 +72,6 @@ export class CourtPlayer {
     this.setupPlayerName()
     this.setupMarkerRectangle()
     this.currVelocityVector = new Phaser.Math.Vector2(0, 0)
-
     this.stateMachine = new StateMachine(
       PlayerStates.WAIT,
       {
@@ -75,10 +84,46 @@ export class CourtPlayer {
         [PlayerStates.CHASE_REBOUND]: new ChaseReboundState(),
         [PlayerStates.SHOOTING_BALL]: new ShootingBallState(),
         [PlayerStates.DRIVE_TO_BASKET]: new DriveToBasketState(),
+        [PlayerStates.SET_SCREEN]: new SetScreenState(),
       },
       [this, this.team]
     )
     this.setupPlayerStateText()
+  }
+
+  turnOnColliderForOtherPlayer(otherPlayer: CourtPlayer) {
+    if (this.otherPlayerToCollideWith == otherPlayer) {
+      return
+    }
+    if (this.otherPlayerCollider) {
+      this.otherPlayerCollider.destroy()
+    }
+    this.otherPlayerToCollideWith = otherPlayer
+    this.otherPlayerCollider = this.game.physics.add.collider(otherPlayer.sprite, this.sprite)
+  }
+
+  get currDefender() {
+    return this.defender
+  }
+
+  get defensiveAssignment() {
+    return this.playerToDefend
+  }
+
+  setDefensiveAssignment(courtPlayer: CourtPlayer) {
+    this.playerToDefend = courtPlayer
+  }
+
+  setDefender(courtPlayer: CourtPlayer) {
+    this.defender = courtPlayer
+  }
+
+  clearOtherPlayerCollider() {
+    if (this.otherPlayerCollider) {
+      this.otherPlayerCollider.destroy()
+      this.otherPlayerCollider = null
+      this.otherPlayerToCollideWith = null
+    }
   }
 
   setupMarkerRectangle() {
@@ -195,6 +240,16 @@ export class CourtPlayer {
       this.game.physics.velocityFromRotation(angle, Constants.COURT_PLAYER_SPEED, velocityVector)
       this.setVelocity(velocityVector.x, velocityVector.y)
     }
+  }
+
+  playIntenseDefense() {
+    if (this.defensiveAssignment) {
+      this.turnOnColliderForOtherPlayer(this.defensiveAssignment)
+    }
+  }
+
+  stopPlayingIntenseDefense() {
+    this.clearOtherPlayerCollider()
   }
 
   shootBall(isSuccess: boolean, shotType: ShotType, missType?: MissType) {

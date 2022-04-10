@@ -8,6 +8,7 @@ export enum PlayerStates {
   CHASE_REBOUND = 'ChaseRebound',
   SHOOTING_BALL = 'ShootingBall',
   DRIVE_TO_BASKET = 'DriveToBasket',
+  SET_SCREEN = 'SetScreen',
 }
 
 export enum TeamStates {

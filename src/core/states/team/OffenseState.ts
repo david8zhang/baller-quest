@@ -47,6 +47,10 @@ export class OffenseState extends State {
       return
     }
     switch (player.getCurrentState()) {
+      case PlayerStates.DRIVE_TO_BASKET:
+      case PlayerStates.SET_SCREEN: {
+        break
+      }
       case PlayerStates.MOVE_TO_SPOT: {
         const offensiveFormation = team.getOffensiveFormation()
         const targetZoneId = offensiveFormation[player.role]
@@ -56,25 +60,20 @@ export class OffenseState extends State {
         if (zone && Constants.IsAtPosition(player, zone.centerPosition)) {
           // If this player currently has the ball
           if (team.getBall().isInPossessionOf(player)) {
-            if (this.hasOpenShot(player, team)) {
-              team.shoot(player, team)
-            } else {
-              const passTarget = this.getOpenPassTarget(player, team)
-              if (!passTarget) {
-                player.setState(PlayerStates.DRIVE_TO_BASKET)
-              } else {
-                team.game.time.delayedCall(250, () => {
-                  player.passBall(passTarget)
-                })
-              }
-            }
+            team.shoot(player, team)
+            // if (this.hasOpenShot(player, team)) {
+            //   team.shoot(player, team)
+            // } else {
+            //   const passTarget = this.getOpenPassTarget(player, team)
+            //   if (!passTarget) {
+            //     player.setState(PlayerStates.DRIVE_TO_BASKET)
+            //   } else {
+            //     team.game.time.delayedCall(250, () => {
+            //       player.passBall(passTarget)
+            //     })
+            //   }
+            // }
           }
-        }
-        break
-      }
-      case PlayerStates.DRIVE_TO_BASKET: {
-        if (!team.getBall().isInPossessionOf(player)) {
-          player.setState(PlayerStates.MOVE_TO_SPOT)
         }
         break
       }

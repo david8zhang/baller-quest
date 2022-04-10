@@ -75,14 +75,11 @@ export default class Game extends Phaser.Scene {
       opposingTeam.setState(TeamStates.INBOUND_BALL)
     })
 
-    // Add colliders between opposing team's players
-    // this.physics.add.collider(this.playerTeam.courtPlayerGroup, this.cpuTeam.courtPlayerGroup)
-
     this.tipOff()
   }
 
   tipOff() {
-    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
+    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_LEFT)
     // const zoneToTipTo =
     //   Phaser.Math.Between(0, 1) === 0
     //     ? this.getZoneForZoneId(Constants.TIPOFF_RIGHT)

@@ -5,6 +5,7 @@ import { Cursor } from '../Cursor'
 import { Hoop } from '../Hoop'
 import { PassCursor } from '../PassCursor'
 import { ShotMeter } from '../ShotMeter'
+import { SprintMeter } from '../SprintMeter'
 import { PlayerStates, TeamStates } from '../states/StateTypes'
 import { DriveDirection, Side, Team } from './Team'
 
@@ -12,7 +13,9 @@ export class PlayerTeam extends Team {
   private cursor: Cursor
   private passCursor: PassCursor
   private shotMeter: ShotMeter
+  private sprintMeter: SprintMeter
   public selectedCourtPlayer: CourtPlayer | null = null
+  public isSprinting: boolean = false
 
   constructor(game: Game) {
     super(game, {
@@ -29,7 +32,8 @@ export class PlayerTeam extends Team {
       this.game
     )
     this.passCursor = new PassCursor(this.game)
-    this.shotMeter = new ShotMeter(this.game, this)
+    this.shotMeter = new ShotMeter(this, this.game)
+    this.sprintMeter = new SprintMeter(this, this.game)
   }
 
   selectCourtPlayer(courtPlayer: CourtPlayer) {
@@ -57,8 +61,7 @@ export class PlayerTeam extends Team {
     if (!currentPlayer || currentPlayer.getCurrentState() == PlayerStates.WAIT) {
       return
     }
-
-    const speed = Constants.COURT_PLAYER_SPEED
+    const speed = this.sprintMeter.getSpeed()
     if (leftDown || rightDown) {
       let velocityX = leftDown ? -speed : speed
       if (leftDown && rightDown) {
@@ -94,6 +97,15 @@ export class PlayerTeam extends Team {
             }
           } else {
             this.switchPlayer()
+          }
+          break
+        }
+        case 'KeyQ': {
+          const randomPlayer = this.courtPlayers.find((courtPlayer: CourtPlayer) => {
+            return courtPlayer !== this.selectedCourtPlayer
+          })
+          if (randomPlayer) {
+            randomPlayer.setState(PlayerStates.SET_SCREEN, this.selectedCourtPlayer)
           }
           break
         }

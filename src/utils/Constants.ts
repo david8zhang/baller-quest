@@ -15,6 +15,9 @@ export class Constants {
 
   // Court Player attributes
   public static COURT_PLAYER_SPEED = 200
+  public static COURT_PLAYER_SPRINT_SPEED = 300
+  public static COURT_PLAYER_TIRED_SPEED = 150
+
   public static PASS_SPEED = 1000
   public static HOOP_LEFT = {
     position: {
