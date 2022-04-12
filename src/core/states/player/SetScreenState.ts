@@ -9,8 +9,6 @@ export class SetScreenState extends State {
   enter(courtPlayer: CourtPlayer, team: Team, playerToScreenFor: CourtPlayer) {
     const defender = playerToScreenFor.currDefender
     if (defender) {
-      courtPlayer.turnOnColliderForOtherPlayer(defender)
-
       const graphics = team.game.add.graphics()
       graphics.lineStyle(1, 0x00ff00)
       const screenLine = new Phaser.Geom.Line(

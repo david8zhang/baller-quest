@@ -7,6 +7,8 @@ import { PlayerStates } from '../StateTypes'
 
 export class DriveToBasketState extends State {
   public zoneToDriveToId: number = -1
+  public timeStartedDriving: number = -1
+
   enter(player: CourtPlayer, team: Team) {
     const layupZones =
       team.driveDirection === DriveDirection.LEFT
@@ -23,13 +25,20 @@ export class DriveToBasketState extends State {
     const randomZone = Game.instance.court.getZoneForZoneId(this.zoneToDriveToId)
     if (randomZone) {
       if (Constants.IsAtPosition(player, randomZone.centerPosition)) {
-        if (Constants.IsAtPosition(player, randomZone.centerPosition)) {
-          if (team.getBall().isInPossessionOf(player)) {
-            team.shoot(player, team)
-          } else {
-            team.game.time.delayedCall(1000, () => {
-              player.setState(PlayerStates.MOVE_TO_SPOT)
-            })
+        if (team.getBall().isInPossessionOf(player)) {
+          team.shoot(player, team)
+        } else {
+          team.game.time.delayedCall(1000, () => {
+            player.setState(PlayerStates.MOVE_TO_SPOT)
+          })
+        }
+      } else {
+        if (this.timeStartedDriving === -1) {
+          this.timeStartedDriving = Date.now()
+        } else {
+          if (Date.now() - this.timeStartedDriving >= 5000) {
+            this.timeStartedDriving = -1
+            player.setState(PlayerStates.MOVE_TO_SPOT)
           }
         }
       }

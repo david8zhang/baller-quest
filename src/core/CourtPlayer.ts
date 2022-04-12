@@ -15,6 +15,7 @@ import { ShootingBallState } from './states/player/ShootingBallState'
 import { DriveToBasketState } from './states/player/DriveToBasketState'
 import { Ball, BallState } from './Ball'
 import { SetScreenState } from './states/player/SetScreenState'
+import { SwitchDefense } from './states/player/SwitchDefenseState'
 
 export enum Role {
   PG = 'PG',
@@ -75,6 +76,7 @@ export class CourtPlayer {
     this.stateMachine = new StateMachine(
       PlayerStates.WAIT,
       {
+        [PlayerStates.SWITCH_DEFENSE]: new SwitchDefense(),
         [PlayerStates.RECEIVE_INBOUND]: new ReceiveInboundState(),
         [PlayerStates.INBOUND_BALL]: new PlayerInboundBallState(),
         [PlayerStates.DEFEND_MAN]: new DefendManState(),
@@ -89,17 +91,7 @@ export class CourtPlayer {
       [this, this.team]
     )
     this.setupPlayerStateText()
-  }
-
-  turnOnColliderForOtherPlayer(otherPlayer: CourtPlayer) {
-    if (this.otherPlayerToCollideWith == otherPlayer) {
-      return
-    }
-    if (this.otherPlayerCollider) {
-      this.otherPlayerCollider.destroy()
-    }
-    this.otherPlayerToCollideWith = otherPlayer
-    this.otherPlayerCollider = this.game.physics.add.collider(otherPlayer.sprite, this.sprite)
+    this.sprite.setData('ref', this)
   }
 
   get currDefender() {
@@ -108,6 +100,19 @@ export class CourtPlayer {
 
   get defensiveAssignment() {
     return this.playerToDefend
+  }
+
+  defend(defenderPosition: { x: number; y: number }, spacingAmount: number) {
+    // Onball defense
+    const currHoop = this.team.getHoop()
+    const line = new Phaser.Geom.Line(
+      defenderPosition.x,
+      defenderPosition.y,
+      currHoop.sprite.x,
+      currHoop.sprite.y
+    )
+    const defensiveSpacing = line.getPoint(spacingAmount)
+    this.setMoveTarget(defensiveSpacing)
   }
 
   setDefensiveAssignment(courtPlayer: CourtPlayer) {
@@ -240,16 +245,6 @@ export class CourtPlayer {
       this.game.physics.velocityFromRotation(angle, Constants.COURT_PLAYER_SPEED, velocityVector)
       this.setVelocity(velocityVector.x, velocityVector.y)
     }
-  }
-
-  playIntenseDefense() {
-    if (this.defensiveAssignment) {
-      this.turnOnColliderForOtherPlayer(this.defensiveAssignment)
-    }
-  }
-
-  stopPlayingIntenseDefense() {
-    this.clearOtherPlayerCollider()
   }
 
   shootBall(isSuccess: boolean, shotType: ShotType, missType?: MissType) {

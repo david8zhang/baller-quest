@@ -53,13 +53,7 @@ export class Hoop {
     this.successShotRange = successShotRange
     this.rimRange = rimRange
     this.game.physics.add.collider(this.sprite, this.game.ball.sprite, () => {
-      if (!this.hasBallCollidedWithRim) {
-        this.hasBallCollidedWithRim = true
-        this.sprite.body.enable = false
-        this.game.ball.setRandomRebound(this, () => {
-          this.hasBallCollidedWithRim = false
-        })
-      }
+      this.handleOnCollideWithRim()
     })
 
     const backboard = this.game.physics.add
@@ -67,7 +61,19 @@ export class Hoop {
       .setVisible(false)
       .setPushable(false)
     backboard.body.setSize(10, 75)
-    this.game.physics.add.collider(backboard, this.game.ball.sprite, () => {})
+    this.game.physics.add.collider(backboard, this.game.ball.sprite, () => {
+      this.handleOnCollideWithRim()
+    })
+  }
+
+  handleOnCollideWithRim() {
+    if (!this.hasBallCollidedWithRim) {
+      this.hasBallCollidedWithRim = true
+      this.sprite.body.enable = false
+      this.game.ball.setRandomRebound(this, () => {
+        this.hasBallCollidedWithRim = false
+      })
+    }
   }
 
   setOnCollideRimHandler(onCollideRimHandler: Function) {

@@ -92,8 +92,6 @@ export class Ball {
   launchArcTowards(posToLand: Phaser.Math.Vector2, timeInFlight: number) {
     this.sprite.setGravityY(980)
     this.sprite.body.enable = true
-    this.arcDestination.setVisible(true)
-    this.arcDestination.setPosition(posToLand.x, posToLand.y)
     const xVelocity = (posToLand.x - this.sprite.x) / timeInFlight
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(timeInFlight, 2)) / timeInFlight
     this.sprite.setVelocity(xVelocity, yVelocity)
@@ -131,10 +129,6 @@ export class Ball {
       posToLand.y = hoopSprite.y - 50
     }
     this.sprite.setGravityY(980)
-
-    // Tweak shot arc based on distance to the basket
-    this.arcDestination.setPosition(posToLand.x, posToLand.y)
-    this.arcDestination.setVisible(true)
     const time = Constants.SHOT_ARC_CONFIG[shotType]
     const xVelocity = (posToLand.x - this.sprite.x) / time
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(time, 2)) / time

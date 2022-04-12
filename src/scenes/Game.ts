@@ -75,6 +75,9 @@ export default class Game extends Phaser.Scene {
       opposingTeam.setState(TeamStates.INBOUND_BALL)
     })
 
+    // Add colliders
+    this.physics.add.collider(this.cpuTeam.courtPlayerGroup, this.playerTeam.courtPlayerGroup)
+
     this.tipOff()
   }
 
