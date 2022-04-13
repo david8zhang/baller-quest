@@ -9,7 +9,7 @@ export enum PlayerStates {
   SHOOTING_BALL = 'ShootingBall',
   DRIVE_TO_BASKET = 'DriveToBasket',
   SET_SCREEN = 'SetScreen',
-  SWITCH_DEFENSE = 'SwitchDefense',
+  DEFEND_BALL_HANDLER = 'DefendBallHandler',
 }
 
 export enum TeamStates {

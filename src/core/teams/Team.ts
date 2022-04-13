@@ -1,6 +1,6 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { CourtPlayer } from '../CourtPlayer'
+import { CourtPlayer, Role } from '../CourtPlayer'
 import { Hoop } from '../Hoop'
 import { StateMachine } from '../states/StateMachine'
 import { TeamStates } from '../states/StateTypes'
@@ -109,6 +109,22 @@ export abstract class Team {
     return this.driveDirection === DriveDirection.LEFT
       ? Constants.OFFENSE_FROM_LEFT
       : Constants.OFFENSE_FROM_RIGHT
+  }
+
+  public getDefensiveAssignments() {
+    return {
+      [Role.PG]: Role.PG,
+      [Role.PF]: Role.PF,
+      [Role.SG]: Role.SG,
+      [Role.SF]: Role.SF,
+      [Role.C]: Role.C,
+    }
+  }
+
+  public getPlayerForRole(role: Role): CourtPlayer {
+    return this.courtPlayers.find((player: CourtPlayer) => {
+      return player.role === role
+    }) as CourtPlayer
   }
 
   public update() {

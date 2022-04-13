@@ -13,9 +13,10 @@ import { ChaseReboundState } from './states/player/ChaseReboundState'
 import { MissType, ShotType } from './ShotMeter'
 import { ShootingBallState } from './states/player/ShootingBallState'
 import { DriveToBasketState } from './states/player/DriveToBasketState'
-import { Ball, BallState } from './Ball'
+import { BallState } from './Ball'
 import { SetScreenState } from './states/player/SetScreenState'
-import { SwitchDefense } from './states/player/SwitchDefenseState'
+import { DefendBallHandlerState } from './states/player/DefendBallHandlerState'
+import { Court } from './Court'
 
 export enum Role {
   PG = 'PG',
@@ -49,14 +50,7 @@ export class CourtPlayer {
   public stateText!: Phaser.GameObjects.Text
   public markerRectangle!: Phaser.Geom.Rectangle
   public speed: number = Constants.COURT_PLAYER_SPEED
-
-  // Other player collider
-  public otherPlayerToCollideWith: CourtPlayer | null = null
-  public otherPlayerCollider: Phaser.Physics.Arcade.Collider | null = null
-
-  // Defensive assignments / defender
-  public playerToDefend: CourtPlayer | null = null
-  public defender: CourtPlayer | null = null
+  public currDefender: CourtPlayer | null = null
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -76,7 +70,7 @@ export class CourtPlayer {
     this.stateMachine = new StateMachine(
       PlayerStates.WAIT,
       {
-        [PlayerStates.SWITCH_DEFENSE]: new SwitchDefense(),
+        [PlayerStates.DEFEND_BALL_HANDLER]: new DefendBallHandlerState(),
         [PlayerStates.RECEIVE_INBOUND]: new ReceiveInboundState(),
         [PlayerStates.INBOUND_BALL]: new PlayerInboundBallState(),
         [PlayerStates.DEFEND_MAN]: new DefendManState(),
@@ -94,12 +88,10 @@ export class CourtPlayer {
     this.sprite.setData('ref', this)
   }
 
-  get currDefender() {
-    return this.defender
-  }
-
-  get defensiveAssignment() {
-    return this.playerToDefend
+  public getDefaultDefender(): CourtPlayer {
+    const defensiveAssignments = this.team.getDefensiveAssignments()
+    const posToDefend = defensiveAssignments[this.role]
+    return this.team.getOpposingTeam().getPlayerForRole(posToDefend)
   }
 
   defend(defenderPosition: { x: number; y: number }, spacingAmount: number) {
@@ -113,22 +105,6 @@ export class CourtPlayer {
     )
     const defensiveSpacing = line.getPoint(spacingAmount)
     this.setMoveTarget(defensiveSpacing)
-  }
-
-  setDefensiveAssignment(courtPlayer: CourtPlayer) {
-    this.playerToDefend = courtPlayer
-  }
-
-  setDefender(courtPlayer: CourtPlayer) {
-    this.defender = courtPlayer
-  }
-
-  clearOtherPlayerCollider() {
-    if (this.otherPlayerCollider) {
-      this.otherPlayerCollider.destroy()
-      this.otherPlayerCollider = null
-      this.otherPlayerToCollideWith = null
-    }
   }
 
   setupMarkerRectangle() {

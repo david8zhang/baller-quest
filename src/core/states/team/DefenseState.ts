@@ -11,13 +11,9 @@ export class DefenseState extends State {
         if (team.getBall().currState === BallState.LOOSE) {
           player.setState(PlayerStates.CHASE_REBOUND)
         } else {
-          if (player.defensiveAssignment) {
-            if (
-              player.defensiveAssignment.getCurrentState() === PlayerStates.SET_SCREEN &&
-              player.getCurrentState() !== PlayerStates.SWITCH_DEFENSE
-            ) {
-              player.setState(PlayerStates.SWITCH_DEFENSE)
-            }
+          const defensiveAssignment = player.getDefaultDefender()
+          if (defensiveAssignment.getCurrentState() == PlayerStates.SET_SCREEN) {
+            player.setState(PlayerStates.DEFEND_BALL_HANDLER)
           } else {
             player.setState(PlayerStates.DEFEND_MAN)
           }
