@@ -26,6 +26,11 @@ export class DefendManState extends State {
       }
     }
     const isOnBall = defensiveAssignment && team.getBall().isInPossessionOf(defensiveAssignment)
-    player.defend(defenderPosition, isOnBall ? 0.1 : 0.2)
+    player.defend(defenderPosition, isOnBall ? 0.15 : 0.25)
+    if (isOnBall) {
+      player.toggleColliderWithOtherPlayer(defensiveAssignment)
+    } else {
+      player.clearColliders()
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { State } from '../StateMachine'
-import { PlayerStates } from '../StateTypes'
+import { PlayerStates, TeamStates } from '../StateTypes'
 
 export class PlayerControlState extends State {
   public prevState: PlayerStates | null = null
@@ -9,5 +9,12 @@ export class PlayerControlState extends State {
     this.prevState = prevState
     player.setMoveTarget(null)
     player.setVelocity(0, 0)
+  }
+
+  execute(player: CourtPlayer) {
+    if (player.team.getCurrentState() == TeamStates.DEFENSE) {
+      const playerToDefend = player.getDefaultDefender()
+      player.toggleColliderWithOtherPlayer(playerToDefend)
+    }
   }
 }

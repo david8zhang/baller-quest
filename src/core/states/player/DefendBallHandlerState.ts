@@ -7,6 +7,7 @@ export class DefendBallHandlerState extends State {
   execute(player: CourtPlayer, team: Team) {
     const playerToDefend = team.getBall().getPlayer()
     if (playerToDefend) {
+      player.toggleColliderWithOtherPlayer(playerToDefend)
       player.defend(
         {
           x: playerToDefend.sprite.x,

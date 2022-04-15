@@ -25,6 +25,7 @@ export class SetScreenState extends State {
         x: screenPos.x,
         y: screenPos.y,
       })
+      courtPlayer.toggleColliderWithOtherPlayer(defender)
     }
     if (this.nextActionEvent) {
       this.nextActionEvent.destroy()
@@ -32,6 +33,7 @@ export class SetScreenState extends State {
     this.nextActionEvent = team.game.time.addEvent({
       delay: 2500,
       callback: () => {
+        courtPlayer.clearColliders()
         courtPlayer.setState(PlayerStates.DRIVE_TO_BASKET)
       },
     })

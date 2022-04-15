@@ -51,6 +51,8 @@ export class CourtPlayer {
   public speed: number = Constants.COURT_PLAYER_SPEED
   public currDefender: CourtPlayer | null = null
 
+  public otherPlayerCollider!: Phaser.Physics.Arcade.Collider
+
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
     const { position, texture, role, team, name } = config
@@ -85,6 +87,20 @@ export class CourtPlayer {
     )
     this.setupPlayerStateText()
     this.sprite.setData('ref', this)
+  }
+
+  public toggleColliderWithOtherPlayer(otherPlayer: CourtPlayer) {
+    if (this.otherPlayerCollider) {
+      this.otherPlayerCollider.destroy()
+    }
+    this.otherPlayerCollider = this.game.physics.add.collider(otherPlayer.sprite, this.sprite)
+    this.otherPlayerCollider.active = true
+  }
+
+  public clearColliders() {
+    if (this.otherPlayerCollider) {
+      this.otherPlayerCollider.active = false
+    }
   }
 
   public getDefaultDefender(): CourtPlayer {

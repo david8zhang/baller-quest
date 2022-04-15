@@ -109,6 +109,11 @@ export class PlayerTeam extends Team {
           }
           break
         }
+        default:
+          const currentlySelectedPlayer = this.selectedCourtPlayer
+          if (currentlySelectedPlayer) {
+            currentlySelectedPlayer.clearColliders()
+          }
       }
     })
   }
