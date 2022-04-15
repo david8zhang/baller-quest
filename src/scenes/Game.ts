@@ -130,9 +130,21 @@ export default class Game extends Phaser.Scene {
     })
   }
 
+  depthSort() {
+    const allCourtPlayers = this.playerTeam.courtPlayers.concat(this.cpuTeam.courtPlayers)
+    const sortedByY = allCourtPlayers.sort((a, b) => {
+      return a.sprite.y - b.sprite.y
+    })
+    let baseDepth = 1
+    sortedByY.forEach((courtPlayer: CourtPlayer, index: number) => {
+      courtPlayer.sprite.setDepth(baseDepth + index)
+    })
+  }
+
   update() {
     this.playerTeam.update()
     this.cpuTeam.update()
     this.ball.update()
+    this.depthSort()
   }
 }

@@ -16,7 +16,6 @@ import { DriveToBasketState } from './states/player/DriveToBasketState'
 import { BallState } from './Ball'
 import { SetScreenState } from './states/player/SetScreenState'
 import { DefendBallHandlerState } from './states/player/DefendBallHandlerState'
-import { Court } from './Court'
 
 export enum Role {
   PG = 'PG',
