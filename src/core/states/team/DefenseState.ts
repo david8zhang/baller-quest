@@ -40,7 +40,7 @@ export class DefenseState extends State {
           y: hoop.sprite.y,
         }
       )
-      return distanceToHoop <= 250
+      return distanceToHoop <= 200
     }
     return false
   }
@@ -74,7 +74,7 @@ export class DefenseState extends State {
       })
 
       let distFromMid = 0
-      playersWithinRange.slice(0, 4).forEach((player: CourtPlayer, index) => {
+      playersWithinRange.forEach((player: CourtPlayer, index) => {
         playerStateMapping[player.role] = {
           state: PlayerStates.CUT_OFF_DRIVE_STATE,
           args: [index % 2 === 0 ? 0.5 + distFromMid : 0.5 - distFromMid],
