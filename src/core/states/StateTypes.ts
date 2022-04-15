@@ -10,6 +10,7 @@ export enum PlayerStates {
   DRIVE_TO_BASKET = 'DriveToBasket',
   SET_SCREEN = 'SetScreen',
   DEFEND_BALL_HANDLER = 'DefendBallHandler',
+  CUT_OFF_DRIVE_STATE = 'CutOffDriveState',
 }
 
 export enum TeamStates {

@@ -16,6 +16,7 @@ import { DriveToBasketState } from './states/player/DriveToBasketState'
 import { BallState } from './Ball'
 import { SetScreenState } from './states/player/SetScreenState'
 import { DefendBallHandlerState } from './states/player/DefendBallHandlerState'
+import { CutOffDriveState } from './states/player/CutOffDriveState'
 
 export enum Role {
   PG = 'PG',
@@ -82,6 +83,7 @@ export class CourtPlayer {
         [PlayerStates.SHOOTING_BALL]: new ShootingBallState(),
         [PlayerStates.DRIVE_TO_BASKET]: new DriveToBasketState(),
         [PlayerStates.SET_SCREEN]: new SetScreenState(),
+        [PlayerStates.CUT_OFF_DRIVE_STATE]: new CutOffDriveState(),
       },
       [this, this.team]
     )
