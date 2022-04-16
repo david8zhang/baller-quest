@@ -1,12 +1,18 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/teams/Team'
-import { State } from '../StateMachine'
-import { PlayerStates } from '../StateTypes'
+import { State } from '../../StateMachine'
+import { PlayerStates } from '../../StateTypes'
 
 export class DefendManState extends State {
+  private customDefensiveAssignment: CourtPlayer | undefined
+  enter(player: CourtPlayer, team: Team, customDefensiveAssignment?: CourtPlayer) {
+    this.customDefensiveAssignment = customDefensiveAssignment
+  }
+
   execute(player: CourtPlayer, team: Team) {
-    const defensiveAssignment = player.getDefaultDefender()
-    defensiveAssignment.currDefender = player
+    const defensiveAssignment = this.customDefensiveAssignment
+      ? this.customDefensiveAssignment
+      : player.getPlayerToDefend()
 
     // If the defensive assignment is inbounding, go to where the defensive assignment will eventually be
     let defenderPosition = {

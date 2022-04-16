@@ -1,7 +1,7 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
-import { State } from '../StateMachine'
+import { State } from '../../StateMachine'
 
 export class PlayerInboundBallState extends State {
   private positionToInboundFrom: Phaser.Math.Vector2 | null = null

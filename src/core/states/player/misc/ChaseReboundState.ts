@@ -1,5 +1,5 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { State } from '../StateMachine'
+import { State } from '../../StateMachine'
 
 export class ChaseReboundState extends State {
   execute(courtPlayer: CourtPlayer) {

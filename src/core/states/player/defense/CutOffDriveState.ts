@@ -1,6 +1,6 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/teams/Team'
-import { State } from '../StateMachine'
+import { State } from '../../StateMachine'
 
 export class CutOffDriveState extends State {
   private positionOnWall!: number

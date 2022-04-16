@@ -2,8 +2,8 @@ import { CourtPlayer } from '~/core/CourtPlayer'
 import { PlayerTeam } from '~/core/teams/PlayerTeam'
 import { Side, Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
-import { State } from '../StateMachine'
-import { PlayerStates, TeamStates } from '../StateTypes'
+import { State } from '../../StateMachine'
+import { PlayerStates, TeamStates } from '../../StateTypes'
 
 export class ReceiveInboundState extends State {
   public receiveInboundPosition: Phaser.Math.Vector2 | null = null

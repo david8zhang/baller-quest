@@ -1,4 +1,3 @@
-import { BallState } from '~/core/Ball'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
@@ -6,6 +5,8 @@ import { State } from '../StateMachine'
 import { PlayerStates } from '../StateTypes'
 
 export class DefenseState extends State {
+  public didSwitchScreen: boolean = false
+
   enter(team: Team) {
     team.courtPlayers.forEach((player: CourtPlayer) => {
       if (team.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
@@ -21,7 +22,7 @@ export class DefenseState extends State {
       if (stateUpdates[player.role]) {
         const stateUpdate = stateUpdates[player.role]
         const args = stateUpdate.args ? stateUpdate.args : []
-        player.setState(stateUpdate.state, args)
+        player.setState(stateUpdate.state, ...args)
       }
     })
   }
@@ -40,7 +41,7 @@ export class DefenseState extends State {
           y: hoop.sprite.y,
         }
       )
-      return distanceToHoop <= 200
+      return distanceToHoop <= 250
     }
     return false
   }
@@ -55,9 +56,19 @@ export class DefenseState extends State {
     return null
   }
 
+  getDefenderForPlayer(player: CourtPlayer, team: Team) {
+    for (let i = 0; i < team.courtPlayers.length; i++) {
+      const playerToDefend = team.courtPlayers[i].getPlayerToDefend()
+      if (playerToDefend === player) {
+        return team.courtPlayers[i]
+      }
+    }
+    return null
+  }
+
   getStateUpdates(team: Team): any {
     const hoop = team.getHoop()
-    const ballHandler = team.getBall().getPlayer()
+    const ballHandler = team.getBall().getPlayer() as CourtPlayer
     const opposingPlayers = team.getOpposingTeam().courtPlayers
     const playerStateMapping = {}
     team.courtPlayers.forEach((player: CourtPlayer) => {
@@ -93,17 +104,18 @@ export class DefenseState extends State {
       })
     }
 
-    // If a screen is being called
+    // If a screen is being called, switch defender
     const screenSetter = this.getScreenSetter(team)
     if (screenSetter) {
-      const defender = screenSetter.currDefender
-      if (defender) {
-        playerStateMapping[defender.role] = {
+      // Switch the screen defenders
+      const screenSetterDefender = this.getDefenderForPlayer(screenSetter, team)
+      if (screenSetterDefender) {
+        playerStateMapping[screenSetterDefender.role] = {
           state: PlayerStates.DEFEND_BALL_HANDLER,
+          args: [ballHandler],
         }
       }
     }
-
     return playerStateMapping
   }
 }

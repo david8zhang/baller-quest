@@ -1,22 +1,21 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { DefendManState } from './states/player/DefendManState'
-import { PlayerInboundBallState } from './states/player/PlayerInboundBallState'
-import { MoveToSpotState } from './states/player/MoveToSpotState'
-import { PlayerControlState } from './states/player/PlayerControlState'
-import { ReceiveInboundState } from './states/player/ReceiveInboundState'
+import { DefendManState } from './states/player/defense/DefendManState'
+import { PlayerInboundBallState } from './states/player/misc/PlayerInboundBallState'
+import { MoveToSpotState } from './states/player/offense/MoveToSpotState'
+import { PlayerControlState } from './states/player/misc/PlayerControlState'
+import { ReceiveInboundState } from './states/player/misc/ReceiveInboundState'
 import { WaitState } from './states/player/WaitState'
-import { StateMachine } from './states/StateMachine'
+import { State, StateMachine } from './states/StateMachine'
 import { PlayerStates } from './states/StateTypes'
 import { Team } from './teams/Team'
-import { ChaseReboundState } from './states/player/ChaseReboundState'
+import { ChaseReboundState } from './states/player/misc/ChaseReboundState'
 import { MissType, ShotType } from './ShotMeter'
-import { ShootingBallState } from './states/player/ShootingBallState'
-import { DriveToBasketState } from './states/player/DriveToBasketState'
+import { DriveToBasketState } from './states/player/offense/DriveToBasketState'
 import { BallState } from './Ball'
-import { SetScreenState } from './states/player/SetScreenState'
-import { DefendBallHandlerState } from './states/player/DefendBallHandlerState'
-import { CutOffDriveState } from './states/player/CutOffDriveState'
+import { SetScreenState } from './states/player/offense/SetScreenState'
+import { DefendBallHandlerState } from './states/player/defense/DefendBallHandlerState'
+import { CutOffDriveState } from './states/player/defense/CutOffDriveState'
 
 export enum Role {
   PG = 'PG',
@@ -50,8 +49,10 @@ export class CourtPlayer {
   public stateText!: Phaser.GameObjects.Text
   public markerRectangle!: Phaser.Geom.Rectangle
   public speed: number = Constants.COURT_PLAYER_SPEED
-  public currDefender: CourtPlayer | null = null
+  public graphics: Phaser.GameObjects.Graphics
 
+  // Defense
+  public currDefender: CourtPlayer | null = null
   public otherPlayerCollider!: Phaser.Physics.Arcade.Collider
 
   constructor(game: Game, config: CourtPlayerConfig) {
@@ -80,7 +81,6 @@ export class CourtPlayer {
         [PlayerStates.MOVE_TO_SPOT]: new MoveToSpotState(),
         [PlayerStates.PLAYER_CONTROL]: new PlayerControlState(),
         [PlayerStates.CHASE_REBOUND]: new ChaseReboundState(),
-        [PlayerStates.SHOOTING_BALL]: new ShootingBallState(),
         [PlayerStates.DRIVE_TO_BASKET]: new DriveToBasketState(),
         [PlayerStates.SET_SCREEN]: new SetScreenState(),
         [PlayerStates.CUT_OFF_DRIVE_STATE]: new CutOffDriveState(),
@@ -89,6 +89,7 @@ export class CourtPlayer {
     )
     this.setupPlayerStateText()
     this.sprite.setData('ref', this)
+    this.graphics = this.game.add.graphics()
   }
 
   public toggleColliderWithOtherPlayer(otherPlayer: CourtPlayer) {
@@ -105,7 +106,46 @@ export class CourtPlayer {
     }
   }
 
-  public getDefaultDefender(): CourtPlayer {
+  // Get the closest defender
+  public getDefender(): CourtPlayer {
+    const opposingTeam = this.team.getOpposingTeam()
+    const opposingHoop = opposingTeam.getHoop()
+    const rayToHoop = new Phaser.Geom.Line(
+      this.sprite.x,
+      this.sprite.y,
+      opposingHoop.sprite.x,
+      opposingHoop.sprite.y
+    )
+
+    let shortestDistance = Number.MAX_SAFE_INTEGER
+    let defender: any
+    opposingTeam.courtPlayers.forEach((player: CourtPlayer) => {
+      if (Phaser.Geom.Intersects.LineToRectangle(rayToHoop, player.markerRectangle)) {
+        const distanceToPlayer = Constants.getDistanceBetween(
+          {
+            x: this.sprite.x,
+            y: this.sprite.y,
+          },
+          {
+            x: player.sprite.x,
+            y: player.sprite.y,
+          }
+        )
+        if (!defender) {
+          defender = player
+          shortestDistance = distanceToPlayer
+        } else {
+          if (distanceToPlayer < shortestDistance) {
+            defender = player
+            shortestDistance = distanceToPlayer
+          }
+        }
+      }
+    })
+    return defender
+  }
+
+  public getPlayerToDefend(): CourtPlayer {
     const defensiveAssignments = this.team.getDefensiveAssignments()
     const posToDefend = defensiveAssignments[this.role]
     return this.team.getOpposingTeam().getPlayerForRole(posToDefend)
@@ -205,6 +245,10 @@ export class CourtPlayer {
 
   getCurrentState(): string {
     return this.stateMachine.getState()
+  }
+
+  getCurrentStateFull(): State {
+    return this.stateMachine.getFullState()
   }
 
   moveTowardsTarget() {

@@ -1,6 +1,6 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/teams/Team'
-import { State } from '../StateMachine'
+import { State } from '../../StateMachine'
 
 // Switch screen defense
 export class DefendBallHandlerState extends State {

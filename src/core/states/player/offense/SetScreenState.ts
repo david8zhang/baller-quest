@@ -1,13 +1,14 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/teams/Team'
-import { State } from '../StateMachine'
-import { PlayerStates } from '../StateTypes'
+import { Constants } from '~/utils/Constants'
+import { State } from '../../StateMachine'
+import { PlayerStates } from '../../StateTypes'
 
 export class SetScreenState extends State {
   private nextActionEvent: Phaser.Time.TimerEvent | null = null
 
   enter(courtPlayer: CourtPlayer, team: Team, playerToScreenFor: CourtPlayer) {
-    const defender = playerToScreenFor.currDefender
+    const defender = playerToScreenFor.getDefender()
     if (defender) {
       const graphics = team.game.add.graphics()
       graphics.lineStyle(1, 0x00ff00)
@@ -34,7 +35,7 @@ export class SetScreenState extends State {
       delay: 2500,
       callback: () => {
         courtPlayer.clearColliders()
-        courtPlayer.setState(PlayerStates.DRIVE_TO_BASKET)
+        courtPlayer.setState(PlayerStates.MOVE_TO_SPOT)
       },
     })
   }

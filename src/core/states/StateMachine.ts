@@ -27,6 +27,10 @@ export class StateMachine {
     return this.state
   }
 
+  getFullState() {
+    return this.possibleStates[this.state]
+  }
+
   step() {
     if (!this.state) {
       this.state = this.initialState
