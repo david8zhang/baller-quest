@@ -45,6 +45,16 @@ export class DefenseState extends State {
     return false
   }
 
+  getScreenSetter(team: Team): CourtPlayer | null {
+    const opposingPlayers = team.getOpposingTeam().courtPlayers
+    for (let i = 0; i < opposingPlayers.length; i++) {
+      if (opposingPlayers[i].getCurrentState() === PlayerStates.SET_SCREEN) {
+        return opposingPlayers[i]
+      }
+    }
+    return null
+  }
+
   getStateUpdates(team: Team): any {
     const hoop = team.getHoop()
     const ballHandler = team.getBall().getPlayer()
@@ -74,7 +84,7 @@ export class DefenseState extends State {
       })
 
       let distFromMid = 0
-      playersWithinRange.forEach((player: CourtPlayer, index) => {
+      playersWithinRange.slice(0, 3).forEach((player: CourtPlayer, index) => {
         playerStateMapping[player.role] = {
           state: PlayerStates.CUT_OFF_DRIVE_STATE,
           args: [index % 2 === 0 ? 0.5 + distFromMid : 0.5 - distFromMid],
@@ -82,6 +92,18 @@ export class DefenseState extends State {
         distFromMid += 0.1
       })
     }
+
+    // If a screen is being called
+    const screenSetter = this.getScreenSetter(team)
+    if (screenSetter) {
+      const defender = screenSetter.currDefender
+      if (defender) {
+        playerStateMapping[defender.role] = {
+          state: PlayerStates.DEFEND_BALL_HANDLER,
+        }
+      }
+    }
+
     return playerStateMapping
   }
 }
