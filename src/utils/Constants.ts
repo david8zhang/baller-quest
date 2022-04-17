@@ -16,6 +16,7 @@ export class Constants {
 
   // Court Player attributes
   public static COURT_PLAYER_SPEED = 200
+  public static COURT_PLAYER_DEFENSE_SPEED = 250
   public static COURT_PLAYER_SPRINT_SPEED = 300
   public static COURT_PLAYER_TIRED_SPEED = 150
 
@@ -152,7 +153,7 @@ export class Constants {
     },
     [ShotOpenness.OPEN]: {
       [ShotType.LAYUP]: {
-        percentage: 80,
+        percentage: 60,
       },
       [ShotType.MID_RANGE]: {
         threshold: {
@@ -181,7 +182,7 @@ export class Constants {
     },
     [ShotOpenness.CONTESTED]: {
       [ShotType.LAYUP]: {
-        percentage: 65,
+        percentage: 35,
       },
       [ShotType.MID_RANGE]: {
         threshold: {
@@ -189,7 +190,7 @@ export class Constants {
           perfectReleaseValue: 32,
           lowerBound: 24,
         },
-        percentage: 45,
+        percentage: 25,
       },
       [ShotType.THREE_POINTER]: {
         threshold: {
@@ -197,7 +198,7 @@ export class Constants {
           perfectReleaseValue: 35,
           lowerBound: 30,
         },
-        percentage: 35,
+        percentage: 20,
       },
       [ShotType.HALF_COURT_PRAYER]: {
         threshold: {
@@ -211,7 +212,7 @@ export class Constants {
 
     [ShotOpenness.SMOTHERED]: {
       [ShotType.LAYUP]: {
-        percentage: 50,
+        percentage: 20,
       },
       [ShotType.MID_RANGE]: {
         threshold: {
@@ -219,7 +220,7 @@ export class Constants {
           perfectReleaseValue: 35,
           lowerBound: 30,
         },
-        percentage: 40,
+        percentage: 15,
       },
       [ShotType.THREE_POINTER]: {
         threshold: {
@@ -227,7 +228,7 @@ export class Constants {
           perfectReleaseValue: 37,
           lowerBound: 34,
         },
-        percentage: 25,
+        percentage: 10,
       },
       [ShotType.HALF_COURT_PRAYER]: {
         threshold: {
@@ -346,23 +347,32 @@ export class Constants {
     return distanceToDefender > distanceThreshold
   }
 
-  public static playerHasOpenLane(
-    playerToDefend: CourtPlayer,
-    hoop: Hoop,
-    opposingPlayers: CourtPlayer[]
-  ) {
-    const rayToHoop = new Phaser.Geom.Line(
-      playerToDefend.sprite.x,
-      playerToDefend.sprite.y,
-      hoop.sprite.x,
-      hoop.sprite.y
-    )
-    let hasOpenLane: boolean = true
-    opposingPlayers.forEach((player: CourtPlayer) => {
-      if (Phaser.Geom.Intersects.LineToRectangle(rayToHoop, player.markerRectangle)) {
-        hasOpenLane = false
+  public static getZoneToDriveTo(player: CourtPlayer): number {
+    const driveDirection = player.team.driveDirection
+    const layupZones =
+      driveDirection === DriveDirection.LEFT ? this.LAYUP_RANGE_RIGHT : this.LAYUP_RANGE_LEFT
+    const opposingPlayers = player.team.getOpposingTeam().courtPlayers
+    let zoneToDriveTowards: number = -1
+    layupZones.forEach((zoneId: number) => {
+      const zone = player.game.court.getZoneForZoneId(zoneId)
+      if (zone) {
+        const rayToZone = new Phaser.Geom.Line(
+          player.sprite.x,
+          player.sprite.y,
+          zone.centerPosition.x,
+          zone.centerPosition.y
+        )
+        let isLaneOpen = true
+        opposingPlayers.forEach((courtPlayer: CourtPlayer) => {
+          if (Phaser.Geom.Intersects.LineToRectangle(rayToZone, courtPlayer)) {
+            isLaneOpen = false
+          }
+        })
+        if (isLaneOpen) {
+          zoneToDriveTowards = zoneId
+        }
       }
     })
-    return hasOpenLane
+    return zoneToDriveTowards
   }
 }

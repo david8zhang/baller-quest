@@ -18,24 +18,5 @@ export class CPUTeam extends Team {
     return this.game.playerTeam
   }
 
-  shoot(courtPlayer: CourtPlayer, team: Team, timeout?: number) {
-    if (team.getBall().isInPossessionOf(courtPlayer)) {
-      const openness = ShotMeter.getOpenness(courtPlayer, team)
-      const shotType = ShotMeter.getShotType(
-        {
-          x: courtPlayer.sprite.x,
-          y: courtPlayer.sprite.y,
-        },
-        team.driveDirection,
-        team.game.court
-      )
-      console.log('Shot openness: ', openness)
-      console.log('Shot type: ', shotType)
-      const { percentage } = Constants.SHOT_PERCENTAGES[openness][shotType]
-      const isSuccess = Constants.getSuccessBasedOnPercentage(percentage)
-      this.game.time.delayedCall(timeout || 200, () => {
-        courtPlayer.shootBall(isSuccess, shotType)
-      })
-    }
-  }
+  shoot(courtPlayer: CourtPlayer, team: Team, timeout?: number) {}
 }

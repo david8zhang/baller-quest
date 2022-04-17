@@ -17,6 +17,8 @@ import { SetScreenState } from './states/player/offense/SetScreenState'
 import { DefendBallHandlerState } from './states/player/defense/DefendBallHandlerState'
 import { CutOffDriveState } from './states/player/defense/CutOffDriveState'
 import { SmartOffenseState } from './states/player/offense/SmartOffenseState'
+import { ShootingState } from './states/player/offense/ShootingState'
+import { PassState } from './states/player/offense/PassState'
 
 export enum Role {
   PG = 'PG',
@@ -46,11 +48,13 @@ export class CourtPlayer {
   public team: Team
   public currVelocityVector: Phaser.Math.Vector2
   public name: string
-  public nameText!: Phaser.GameObjects.Text
-  public stateText!: Phaser.GameObjects.Text
   public markerRectangle!: Phaser.Geom.Rectangle
   public speed: number = Constants.COURT_PLAYER_SPEED
+
+  // Debug stuff
   public graphics: Phaser.GameObjects.Graphics
+  public nameText!: Phaser.GameObjects.Text
+  public stateText!: Phaser.GameObjects.Text
 
   // Defense
   public currDefender: CourtPlayer | null = null
@@ -86,6 +90,8 @@ export class CourtPlayer {
         [PlayerStates.SET_SCREEN]: new SetScreenState(),
         [PlayerStates.CUT_OFF_DRIVE_STATE]: new CutOffDriveState(),
         [PlayerStates.SMART_OFFENSE]: new SmartOffenseState(),
+        [PlayerStates.SHOOT]: new ShootingState(),
+        [PlayerStates.PASS]: new PassState(),
       },
       [this, this.team]
     )

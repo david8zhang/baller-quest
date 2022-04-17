@@ -10,6 +10,8 @@ export enum PlayerStates {
   DRIVE_TO_BASKET = 'DriveToBasket',
   SET_SCREEN = 'SetScreen',
   SMART_OFFENSE = 'SmartOffense',
+  SHOOT = 'Shoot',
+  PASS = 'Pass',
 
   // Defensive states
   DEFEND_MAN = 'DefendMan',

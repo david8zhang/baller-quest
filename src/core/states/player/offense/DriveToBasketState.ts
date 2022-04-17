@@ -9,28 +9,32 @@ export class DriveToBasketState extends State {
   public zoneToDriveToId: number = -1
   public timeStartedDriving: number = -1
 
-  enter(player: CourtPlayer, team: Team) {
+  enter(player: CourtPlayer, team: Team, zoneToDriveToId?: number) {
     player.speed = Constants.COURT_PLAYER_SPRINT_SPEED
     player.game.time.delayedCall(200, () => {
       player.speed = Constants.COURT_PLAYER_TIRED_SPEED
     })
-    const layupZones =
-      team.driveDirection === DriveDirection.LEFT
-        ? Constants.LAYUP_RANGE_RIGHT
-        : Constants.LAYUP_RANGE_LEFT
-    this.zoneToDriveToId = layupZones[Phaser.Math.Between(0, layupZones.length - 1)]
-    const randomZone = Game.instance.court.getZoneForZoneId(this.zoneToDriveToId)
-    if (randomZone) {
-      player.setMoveTarget(randomZone.centerPosition)
+    if (!zoneToDriveToId || zoneToDriveToId === -1) {
+      const layupZones =
+        team.driveDirection === DriveDirection.LEFT
+          ? Constants.LAYUP_RANGE_RIGHT
+          : Constants.LAYUP_RANGE_LEFT
+      this.zoneToDriveToId = layupZones[Phaser.Math.Between(0, layupZones.length - 1)]
+    } else {
+      this.zoneToDriveToId = zoneToDriveToId
+    }
+    const zoneToDriveTo = Game.instance.court.getZoneForZoneId(this.zoneToDriveToId)
+    if (zoneToDriveTo) {
+      player.setMoveTarget(zoneToDriveTo.centerPosition)
     }
   }
 
   execute(player: CourtPlayer, team: Team) {
     const randomZone = Game.instance.court.getZoneForZoneId(this.zoneToDriveToId)
     if (randomZone) {
-      if (Constants.IsAtPosition(player, randomZone.centerPosition, 25)) {
+      if (Constants.IsAtPosition(player, randomZone.centerPosition, 15)) {
         if (team.getBall().isInPossessionOf(player)) {
-          team.shoot(player, team, 100)
+          player.setState(PlayerStates.SHOOT)
         } else {
           team.game.time.delayedCall(1000, () => {
             player.setState(PlayerStates.MOVE_TO_SPOT)
@@ -40,7 +44,7 @@ export class DriveToBasketState extends State {
         if (this.timeStartedDriving === -1) {
           this.timeStartedDriving = Date.now()
         } else {
-          if (Date.now() - this.timeStartedDriving >= 5000) {
+          if (Date.now() - this.timeStartedDriving >= 3500) {
             this.timeStartedDriving = -1
             player.setState(PlayerStates.MOVE_TO_SPOT)
           }

@@ -38,10 +38,10 @@ export class DefendManState extends State {
     player.defend(defenderPosition, isOnBall ? 0.15 : 0.25)
     if (isOnBall) {
       if (
-        Constants.playerHasOpenLane(defensiveAssignment, team.getHoop(), team.courtPlayers) ||
+        Constants.getZoneToDriveTo(defensiveAssignment) !== -1 ||
         this.hasSpaceToShoot(player, defensiveAssignment, team)
       ) {
-        player.speed = Constants.COURT_PLAYER_SPRINT_SPEED
+        player.speed = Constants.COURT_PLAYER_DEFENSE_SPEED
       }
       player.toggleColliderWithOtherPlayer(defensiveAssignment)
     } else {
