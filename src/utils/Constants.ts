@@ -114,6 +114,12 @@ export class Constants {
     114, 115, 116, 128, 129, 130, 131, 132, 133, 134,
   ]
 
+  public static SHOT_OPENNESS_THRESHOLDS = {
+    [ShotType.LAYUP]: 50,
+    [ShotType.MID_RANGE]: 75,
+    [ShotType.THREE_POINTER]: 120,
+  }
+
   public static SHOT_PERCENTAGES = {
     [ShotOpenness.WIDE_OPEN]: {
       [ShotType.LAYUP]: {
@@ -318,7 +324,11 @@ export class Constants {
     return Phaser.Math.Between(0, 1) == 0 ? MissType.UNDERSHOT : MissType.OVERSHOT
   }
 
-  public static playerHasOpenShot(currPlayer: CourtPlayer, playerToDefend?: CourtPlayer) {
+  public static playerHasOpenShot(
+    currPlayer: CourtPlayer,
+    playerToDefend?: CourtPlayer,
+    threshold?: number
+  ) {
     if (!playerToDefend) {
       return true
     }
@@ -332,7 +342,8 @@ export class Constants {
         y: playerToDefend.sprite.y,
       }
     )
-    return distanceToDefender > 100
+    const distanceThreshold = threshold ? threshold : 100
+    return distanceToDefender > distanceThreshold
   }
 
   public static playerHasOpenLane(

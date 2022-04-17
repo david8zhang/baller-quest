@@ -1,4 +1,5 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
+import { ShotMeter, ShotType } from '~/core/ShotMeter'
 import { Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
 import { State } from '../../StateMachine'
@@ -38,7 +39,7 @@ export class DefendManState extends State {
     if (isOnBall) {
       if (
         Constants.playerHasOpenLane(defensiveAssignment, team.getHoop(), team.courtPlayers) ||
-        Constants.playerHasOpenShot(player, defensiveAssignment)
+        this.hasSpaceToShoot(player, defensiveAssignment, team)
       ) {
         player.speed = Constants.COURT_PLAYER_SPRINT_SPEED
       }
@@ -47,5 +48,21 @@ export class DefendManState extends State {
       player.speed = Constants.COURT_PLAYER_SPEED
       player.clearColliders()
     }
+  }
+
+  hasSpaceToShoot(thisPlayer: CourtPlayer, playerToDefend: CourtPlayer, team: Team) {
+    const driveDirection = team.getOpposingTeam().driveDirection
+    const shotType = ShotMeter.getShotType(
+      {
+        x: playerToDefend.sprite.x,
+        y: playerToDefend.sprite.y,
+      },
+      driveDirection,
+      team.game.court
+    )
+    if (shotType === ShotType.HALF_COURT_PRAYER) {
+      return false
+    }
+    return Constants.playerHasOpenShot(thisPlayer, playerToDefend, 120)
   }
 }

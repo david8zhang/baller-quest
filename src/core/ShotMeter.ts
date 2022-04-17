@@ -2,6 +2,7 @@ import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Court } from './Court'
 import { CourtPlayer } from './CourtPlayer'
+import { Hoop } from './Hoop'
 import { PlayerTeam } from './teams/PlayerTeam'
 import { DriveDirection, Team } from './teams/Team'
 
@@ -129,21 +130,52 @@ export class ShotMeter {
     console.log(openness, shotType)
   }
 
-  public static getOpenness(selectedCourtPlayer: CourtPlayer, team: Team) {
+  public static getGuardingPlayers(selectedCourtPlayer: CourtPlayer, team: Team) {
+    const linesToHoop: Phaser.Geom.Line[] = []
     const hoop = team.getOpposingTeam().getHoop()
-    const lineToHoop = new Phaser.Geom.Line(
-      selectedCourtPlayer.sprite.x,
-      selectedCourtPlayer.sprite.y,
-      hoop.sprite.x,
-      hoop.sprite.y
-    )
+    for (let i = 50; i >= -50; i -= 10) {
+      const line = new Phaser.Geom.Line(
+        selectedCourtPlayer.sprite.x,
+        selectedCourtPlayer.sprite.y,
+        hoop.sprite.x,
+        hoop.sprite.y - i
+      )
+      linesToHoop.push(line)
+    }
     const enemyPlayers = team.getOpposingTeam().courtPlayers
+
     let guardingPlayer: any = null
+    let minDistance = Number.MAX_SAFE_INTEGER
     enemyPlayers.forEach((enemyPlayer: CourtPlayer) => {
-      if (Phaser.Geom.Intersects.LineToRectangle(lineToHoop, enemyPlayer.markerRectangle)) {
-        guardingPlayer = enemyPlayer
-      }
+      linesToHoop.forEach((lineToHoop: Phaser.Geom.Line) => {
+        if (Phaser.Geom.Intersects.LineToRectangle(lineToHoop, enemyPlayer.markerRectangle)) {
+          const distToPlayer = Constants.getDistanceBetween(
+            {
+              x: selectedCourtPlayer.sprite.x,
+              y: selectedCourtPlayer.sprite.y,
+            },
+            {
+              x: enemyPlayer.sprite.x,
+              y: enemyPlayer.sprite.y,
+            }
+          )
+          if (!guardingPlayer) {
+            minDistance = distToPlayer
+            guardingPlayer = enemyPlayer
+          } else {
+            if (distToPlayer < minDistance) {
+              minDistance = distToPlayer
+              guardingPlayer = enemyPlayer
+            }
+          }
+        }
+      })
     })
+    return guardingPlayer
+  }
+
+  public static getOpenness(selectedCourtPlayer: CourtPlayer, team: Team) {
+    const guardingPlayer = this.getGuardingPlayers(selectedCourtPlayer, team)
     if (!guardingPlayer) {
       return ShotOpenness.WIDE_OPEN
     } else {

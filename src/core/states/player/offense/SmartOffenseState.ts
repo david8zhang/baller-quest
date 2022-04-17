@@ -46,12 +46,13 @@ export class SmartOffenseState extends State {
   }
 
   getRandomBehavior(thisPlayer: CourtPlayer, team: Team) {
-    const randNum = Phaser.Math.Between(0, 2)
-    if (randNum === 0) {
-      this.passBehavior(thisPlayer, team)
-    } else if (randNum === 1) {
-      thisPlayer.setState(PlayerStates.DRIVE_TO_BASKET)
-    }
+    // const randNum = Phaser.Math.Between(0, 1)
+    // if (randNum === 0) {
+    //   this.passBehavior(thisPlayer, team)
+    // } else if (randNum === 1) {
+    //   thisPlayer.setState(PlayerStates.DRIVE_TO_BASKET)
+    // }
+    thisPlayer.setState(PlayerStates.DRIVE_TO_BASKET)
   }
 
   passBehavior(thisPlayer: CourtPlayer, team: Team) {

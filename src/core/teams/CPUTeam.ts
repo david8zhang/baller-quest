@@ -29,6 +29,8 @@ export class CPUTeam extends Team {
         team.driveDirection,
         team.game.court
       )
+      console.log('Shot openness: ', openness)
+      console.log('Shot type: ', shotType)
       const { percentage } = Constants.SHOT_PERCENTAGES[openness][shotType]
       const isSuccess = Constants.getSuccessBasedOnPercentage(percentage)
       this.game.time.delayedCall(timeout || 200, () => {

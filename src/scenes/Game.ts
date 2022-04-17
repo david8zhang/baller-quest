@@ -79,7 +79,7 @@ export default class Game extends Phaser.Scene {
   }
 
   tipOff() {
-    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_LEFT)
+    const zoneToTipTo = this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
     // const zoneToTipTo =
     //   Phaser.Math.Between(0, 1) === 0
     //     ? this.getZoneForZoneId(Constants.TIPOFF_RIGHT)
