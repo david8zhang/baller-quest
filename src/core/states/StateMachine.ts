@@ -40,6 +40,9 @@ export class StateMachine {
   }
 
   transition(newState: string, ...enterArgs: any[]) {
+    if (this.possibleStates[this.state]) {
+      this.possibleStates[this.state].exit(...this.stateArgs, ...enterArgs)
+    }
     this.state = newState
     this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs)
   }

@@ -16,6 +16,7 @@ import { BallState } from './Ball'
 import { SetScreenState } from './states/player/offense/SetScreenState'
 import { DefendBallHandlerState } from './states/player/defense/DefendBallHandlerState'
 import { CutOffDriveState } from './states/player/defense/CutOffDriveState'
+import { SmartOffenseState } from './states/player/offense/SmartOffenseState'
 
 export enum Role {
   PG = 'PG',
@@ -84,6 +85,7 @@ export class CourtPlayer {
         [PlayerStates.DRIVE_TO_BASKET]: new DriveToBasketState(),
         [PlayerStates.SET_SCREEN]: new SetScreenState(),
         [PlayerStates.CUT_OFF_DRIVE_STATE]: new CutOffDriveState(),
+        [PlayerStates.SMART_OFFENSE]: new SmartOffenseState(),
       },
       [this, this.team]
     )
@@ -279,7 +281,7 @@ export class CourtPlayer {
         }
       )
       const velocityVector = new Phaser.Math.Vector2()
-      this.game.physics.velocityFromRotation(angle, Constants.COURT_PLAYER_SPEED, velocityVector)
+      this.game.physics.velocityFromRotation(angle, this.speed, velocityVector)
       this.setVelocity(velocityVector.x, velocityVector.y)
     }
   }

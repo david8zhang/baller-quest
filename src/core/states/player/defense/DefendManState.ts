@@ -1,5 +1,6 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/teams/Team'
+import { Constants } from '~/utils/Constants'
 import { State } from '../../StateMachine'
 import { PlayerStates } from '../../StateTypes'
 
@@ -32,10 +33,18 @@ export class DefendManState extends State {
       }
     }
     const isOnBall = defensiveAssignment && team.getBall().isInPossessionOf(defensiveAssignment)
+
     player.defend(defenderPosition, isOnBall ? 0.15 : 0.25)
     if (isOnBall) {
+      if (
+        Constants.playerHasOpenLane(defensiveAssignment, team.getHoop(), team.courtPlayers) ||
+        Constants.playerHasOpenShot(player, defensiveAssignment)
+      ) {
+        player.speed = Constants.COURT_PLAYER_SPRINT_SPEED
+      }
       player.toggleColliderWithOtherPlayer(defensiveAssignment)
     } else {
+      player.speed = Constants.COURT_PLAYER_SPEED
       player.clearColliders()
     }
   }

@@ -1,7 +1,8 @@
 import { Ball } from '~/core/Ball'
 import { CourtPlayer, Role } from '~/core/CourtPlayer'
+import { Hoop } from '~/core/Hoop'
 import { MissType, ShotOpenness, ShotType } from '~/core/ShotMeter'
-import { DriveDirection } from '~/core/teams/Team'
+import { DriveDirection, Team } from '~/core/teams/Team'
 import { LAST_NAMES, MALE_FIRST_NAMES } from './names'
 
 export class Constants {
@@ -315,5 +316,42 @@ export class Constants {
 
   public static getRandomMissType(): MissType {
     return Phaser.Math.Between(0, 1) == 0 ? MissType.UNDERSHOT : MissType.OVERSHOT
+  }
+
+  public static playerHasOpenShot(currPlayer: CourtPlayer, playerToDefend?: CourtPlayer) {
+    if (!playerToDefend) {
+      return true
+    }
+    const distanceToDefender = Constants.getDistanceBetween(
+      {
+        x: currPlayer.sprite.x,
+        y: currPlayer.sprite.y,
+      },
+      {
+        x: playerToDefend.sprite.x,
+        y: playerToDefend.sprite.y,
+      }
+    )
+    return distanceToDefender > 100
+  }
+
+  public static playerHasOpenLane(
+    playerToDefend: CourtPlayer,
+    hoop: Hoop,
+    opposingPlayers: CourtPlayer[]
+  ) {
+    const rayToHoop = new Phaser.Geom.Line(
+      playerToDefend.sprite.x,
+      playerToDefend.sprite.y,
+      hoop.sprite.x,
+      hoop.sprite.y
+    )
+    let hasOpenLane: boolean = true
+    opposingPlayers.forEach((player: CourtPlayer) => {
+      if (Phaser.Geom.Intersects.LineToRectangle(rayToHoop, player.markerRectangle)) {
+        hasOpenLane = false
+      }
+    })
+    return hasOpenLane
   }
 }

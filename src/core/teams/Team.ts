@@ -58,7 +58,7 @@ export abstract class Team {
       return this.game.rightHoop
     }
   }
-  public abstract shoot(player: CourtPlayer, team: Team): void
+  public abstract shoot(player: CourtPlayer, team: Team, timeout?: number): void
 
   getBall() {
     return this.game.ball

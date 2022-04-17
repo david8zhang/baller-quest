@@ -1,17 +1,33 @@
+import { FieldZone } from '~/core/Court'
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { Team } from '~/core/teams/Team'
+import { Side, Team } from '~/core/teams/Team'
+import { Constants } from '~/utils/Constants'
 import { State } from '../../StateMachine'
+import { PlayerStates } from '../../StateTypes'
 
 export class MoveToSpotState extends State {
-  execute(player: CourtPlayer, team: Team) {
+  private zoneToMoveTo: FieldZone | null = null
+
+  enter(player: CourtPlayer, team: Team) {
     const offensiveFormation = team.getOffensiveFormation()
     const spotZoneId = offensiveFormation[player.role]
-    const zone = team.game.getZoneForZoneId(spotZoneId)
-    if (zone) {
+    this.zoneToMoveTo = team.game.getZoneForZoneId(spotZoneId)
+    if (this.zoneToMoveTo) {
       player.setMoveTarget({
-        x: zone.centerPosition.x,
-        y: zone.centerPosition.y,
+        x: this.zoneToMoveTo.centerPosition.x,
+        y: this.zoneToMoveTo.centerPosition.y,
       })
+    }
+  }
+
+  execute(player: CourtPlayer, team: Team) {
+    if (this.zoneToMoveTo) {
+      if (
+        Constants.IsAtPosition(player, this.zoneToMoveTo.centerPosition) &&
+        team.side === Side.CPU
+      ) {
+        player.setState(PlayerStates.SMART_OFFENSE)
+      }
     }
   }
 }

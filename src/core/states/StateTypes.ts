@@ -1,13 +1,15 @@
 export enum PlayerStates {
   PLAYER_CONTROL = 'PlayerControl',
-  MOVE_TO_SPOT = 'MoveToSpot',
   WAIT = 'Wait',
   INBOUND_BALL = 'InboundBall',
   RECEIVE_INBOUND = 'ReceiveInbound',
   CHASE_REBOUND = 'ChaseRebound',
-  SHOOTING_BALL = 'ShootingBall',
+
+  // Offensive States
+  MOVE_TO_SPOT = 'MoveToSpot',
   DRIVE_TO_BASKET = 'DriveToBasket',
   SET_SCREEN = 'SetScreen',
+  SMART_OFFENSE = 'SmartOffense',
 
   // Defensive states
   DEFEND_MAN = 'DefendMan',

@@ -10,6 +10,10 @@ export class DriveToBasketState extends State {
   public timeStartedDriving: number = -1
 
   enter(player: CourtPlayer, team: Team) {
+    player.speed = Constants.COURT_PLAYER_SPRINT_SPEED
+    player.game.time.delayedCall(200, () => {
+      player.speed = Constants.COURT_PLAYER_TIRED_SPEED
+    })
     const layupZones =
       team.driveDirection === DriveDirection.LEFT
         ? Constants.LAYUP_RANGE_RIGHT
@@ -24,9 +28,9 @@ export class DriveToBasketState extends State {
   execute(player: CourtPlayer, team: Team) {
     const randomZone = Game.instance.court.getZoneForZoneId(this.zoneToDriveToId)
     if (randomZone) {
-      if (Constants.IsAtPosition(player, randomZone.centerPosition)) {
+      if (Constants.IsAtPosition(player, randomZone.centerPosition, 25)) {
         if (team.getBall().isInPossessionOf(player)) {
-          team.shoot(player, team)
+          team.shoot(player, team, 100)
         } else {
           team.game.time.delayedCall(1000, () => {
             player.setState(PlayerStates.MOVE_TO_SPOT)

@@ -1,5 +1,5 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { Team } from '~/core/teams/Team'
+import { Side, Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
 import { State } from '../StateMachine'
 import { PlayerStates } from '../StateTypes'
@@ -17,14 +17,22 @@ export class DefenseState extends State {
 
   execute(team: Team) {
     // apply new states based on changes on the court
-    const stateUpdates = this.getStateUpdates(team)
-    team.courtPlayers.forEach((player: CourtPlayer) => {
-      if (stateUpdates[player.role]) {
-        const stateUpdate = stateUpdates[player.role]
-        const args = stateUpdate.args ? stateUpdate.args : []
-        player.setState(stateUpdate.state, ...args)
-      }
-    })
+    if (team.side === Side.CPU) {
+      const stateUpdates = this.getStateUpdates(team)
+      team.courtPlayers.forEach((player: CourtPlayer) => {
+        if (stateUpdates[player.role]) {
+          const stateUpdate = stateUpdates[player.role]
+          const args = stateUpdate.args ? stateUpdate.args : []
+          player.setState(stateUpdate.state, ...args)
+        }
+      })
+    } else {
+      team.courtPlayers.forEach((player: CourtPlayer) => {
+        if (team.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
+          player.setState(PlayerStates.DEFEND_MAN)
+        }
+      })
+    }
   }
 
   ballHandlerInLane(team: Team) {
