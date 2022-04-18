@@ -48,7 +48,6 @@ export class Ball {
     this.sprite.setData('ref', this)
     this.arcDestination = this.game.add.circle(0, 0, 5, 0x00ff00).setVisible(false).setDepth(1000)
     this.setupFloor()
-    this.setupOutOfBoundsLogic()
   }
 
   setupFloor() {
@@ -64,12 +63,6 @@ export class Ball {
     this.game.physics.add.collider(this.floor, this.sprite, () => {
       this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.75)
     })
-  }
-
-  setupOutOfBoundsLogic() {
-    const spriteBody = this.sprite.body as Phaser.Physics.Arcade.Body
-    spriteBody.setCollideWorldBounds(true)
-    spriteBody.onWorldBounds = true
   }
 
   tipOff(zoneToTipTo: FieldZone) {
@@ -244,7 +237,21 @@ export class Ball {
     if (this.player && this.currState == BallState.DRIBBLE) {
       this.sprite.x = this.player.sprite.x
       this.sprite.y = this.player.sprite.y
+
+      if (this.isOutOfBounds() && (this.prevPlayer || this.player)) {
+        const lastTouchedSide = this.player ? this.player.getSide() : this.prevPlayer!.getSide()
+        this.game.handleOutOfBounds({ x: this.sprite.x, y: this.sprite.y }, lastTouchedSide)
+      }
     }
+  }
+
+  isOutOfBounds() {
+    return (
+      this.sprite.x > Constants.COURT_WIDTH ||
+      this.sprite.x < 0 ||
+      this.sprite.y > Constants.COURT_HEIGHT ||
+      this.sprite.y < 0
+    )
   }
 
   canUpdatePlayerWithBall(currPlayer: CourtPlayer | null, newPlayer: CourtPlayer) {

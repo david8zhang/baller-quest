@@ -4,6 +4,7 @@ export enum PlayerStates {
   INBOUND_BALL = 'InboundBall',
   RECEIVE_INBOUND = 'ReceiveInbound',
   CHASE_REBOUND = 'ChaseRebound',
+  SIDE_OUT_STATE = 'SideOutState',
 
   // Offensive States
   MOVE_TO_SPOT = 'MoveToSpot',
@@ -20,6 +21,7 @@ export enum PlayerStates {
 }
 
 export enum TeamStates {
+  SIDE_OUT_STATE = 'SideOut',
   INBOUND_BALL = 'InboundBall',
   OFFENSE = 'Offense',
   DEFENSE = 'Defense',

@@ -7,6 +7,7 @@ import { TeamStates } from '../states/StateTypes'
 import { DefenseState } from '../states/team/DefenseState'
 import { InboundBallState } from '../states/team/InboundBallState'
 import { OffenseState } from '../states/team/OffenseState'
+import { SideOutState } from '../states/team/SideOutState'
 import { TipOffState } from '../states/team/TipoffState'
 
 export enum DriveDirection {
@@ -45,6 +46,7 @@ export abstract class Team {
         [TeamStates.TIPOFF]: new TipOffState(),
         [TeamStates.DEFENSE]: new DefenseState(),
         [TeamStates.OFFENSE]: new OffenseState(),
+        [TeamStates.SIDE_OUT_STATE]: new SideOutState(),
       },
       [this]
     )

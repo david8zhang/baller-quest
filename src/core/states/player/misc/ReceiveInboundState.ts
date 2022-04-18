@@ -17,6 +17,7 @@ export class ReceiveInboundState extends State {
       const ball = team.getBall()
       if (ball.isInPossessionOf(player)) {
         player.team.setState(TeamStates.OFFENSE)
+        player.team.getOpposingTeam().setState(TeamStates.DEFENSE)
       }
     } else {
       player.setMoveTarget(this.receiveInboundPosition!)

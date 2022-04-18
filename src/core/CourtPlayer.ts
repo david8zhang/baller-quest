@@ -19,6 +19,7 @@ import { CutOffDriveState } from './states/player/defense/CutOffDriveState'
 import { SmartOffenseState } from './states/player/offense/SmartOffenseState'
 import { ShootingState } from './states/player/offense/ShootingState'
 import { PassState } from './states/player/offense/PassState'
+import { SideOutState } from './states/player/misc/SideOutState'
 
 export enum Role {
   PG = 'PG',
@@ -92,6 +93,7 @@ export class CourtPlayer {
         [PlayerStates.SMART_OFFENSE]: new SmartOffenseState(),
         [PlayerStates.SHOOT]: new ShootingState(),
         [PlayerStates.PASS]: new PassState(),
+        [PlayerStates.SIDE_OUT_STATE]: new SideOutState(),
       },
       [this, this.team]
     )
@@ -301,6 +303,10 @@ export class CourtPlayer {
         shotType,
       })
     }
+  }
+
+  setPosition(x: number, y: number) {
+    this.sprite.setPosition(x, y)
   }
 
   passBall(receiver: CourtPlayer, isInbound?: boolean) {
