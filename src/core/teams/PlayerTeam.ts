@@ -82,45 +82,71 @@ export class PlayerTeam extends Team {
     }
   }
 
+  handleDigitPress(code: string) {
+    const digits = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5']
+    const roleIndex = digits.indexOf(code)
+    const selectedRole = Constants.DIGIT_TO_ROLE_MAPPING[roleIndex]
+    const selectedPlayer = this.getPlayerForRole(selectedRole)
+    if (this.getCurrentState() === TeamStates.OFFENSE) {
+      if (this.selectedCourtPlayer !== selectedPlayer) {
+        this.selectedCourtPlayer?.passBall(selectedPlayer)
+      }
+    } else if (this.getCurrentState() === TeamStates.DEFENSE) {
+      this.switchPlayer(selectedPlayer)
+    }
+  }
+
   handleBallInput() {
+    const digits = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5']
     this.game.input.keyboard.on('keydown', (e) => {
       const selectedCourtPlayer = this.getSelectedCourtPlayer()
       if (!selectedCourtPlayer) {
         return
       }
-      switch (e.code) {
-        case 'Space': {
-          if (this.canPassBall()) {
-            const playerToPassTo = this.passCursor.getHighlightedCourtPlayer()
-            if (playerToPassTo) {
-              selectedCourtPlayer.passBall(playerToPassTo)
+      if (digits.includes(e.code)) {
+        this.handleDigitPress(e.code)
+      } else {
+        switch (e.code) {
+          case 'Space': {
+            if (this.canPassBall()) {
+              const playerToPassTo = this.passCursor.getHighlightedCourtPlayer()
+              if (playerToPassTo) {
+                selectedCourtPlayer.passBall(playerToPassTo)
+              }
+            } else {
+              this.switchPlayer()
             }
-          } else {
-            this.switchPlayer()
+            break
           }
-          break
+          case 'KeyQ': {
+            const randomPlayer = this.courtPlayers.find((courtPlayer: CourtPlayer) => {
+              return courtPlayer !== this.selectedCourtPlayer
+            })
+            if (randomPlayer) {
+              randomPlayer.setState(PlayerStates.SET_SCREEN, this.selectedCourtPlayer)
+            }
+            break
+          }
+          default:
+            const currentlySelectedPlayer = this.selectedCourtPlayer
+            if (currentlySelectedPlayer) {
+              currentlySelectedPlayer.clearColliders()
+            }
         }
-        case 'KeyQ': {
-          const randomPlayer = this.courtPlayers.find((courtPlayer: CourtPlayer) => {
-            return courtPlayer !== this.selectedCourtPlayer
-          })
-          if (randomPlayer) {
-            randomPlayer.setState(PlayerStates.SET_SCREEN, this.selectedCourtPlayer)
-          }
-          break
-        }
-        default:
-          const currentlySelectedPlayer = this.selectedCourtPlayer
-          if (currentlySelectedPlayer) {
-            currentlySelectedPlayer.clearColliders()
-          }
       }
     })
   }
 
-  switchPlayer() {
-    const playerClosestToBall = Constants.getClosestPlayerToBall(this.game.ball, this.courtPlayers)
-    this.selectCourtPlayer(playerClosestToBall)
+  switchPlayer(playerToSwitchTo?: CourtPlayer) {
+    if (!playerToSwitchTo) {
+      const playerClosestToBall = Constants.getClosestPlayerToBall(
+        this.game.ball,
+        this.courtPlayers
+      )
+      this.selectCourtPlayer(playerClosestToBall)
+    } else {
+      this.selectCourtPlayer(playerToSwitchTo)
+    }
   }
 
   canPassBall(): boolean {

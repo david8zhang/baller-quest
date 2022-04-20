@@ -4,6 +4,4 @@ A basketball game that takes place in a medieval fantasy world.
 
 ## To do list
 
-- Icon switching
-- Icon pass
-- Side out of bounds
+- Basic art for hoop, court (Rework colliders)

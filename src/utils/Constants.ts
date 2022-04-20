@@ -248,6 +248,8 @@ export class Constants {
     [ShotType.LAYUP]: 0.8,
   }
 
+  public static DIGIT_TO_ROLE_MAPPING = [Role.PG, Role.SG, Role.SF, Role.PF, Role.C]
+
   public static getClosestPlayerToBall(ball: Ball, courtPlayers: CourtPlayer[]) {
     let closestPlayer: any = null
     let shortestDistance = Number.MAX_SAFE_INTEGER

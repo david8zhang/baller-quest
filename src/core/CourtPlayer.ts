@@ -56,6 +56,7 @@ export class CourtPlayer {
   public graphics: Phaser.GameObjects.Graphics
   public nameText!: Phaser.GameObjects.Text
   public stateText!: Phaser.GameObjects.Text
+  public digitIndexText!: Phaser.GameObjects.Text
 
   // Defense
   public currDefender: CourtPlayer | null = null
@@ -98,6 +99,7 @@ export class CourtPlayer {
       [this, this.team]
     )
     this.setupPlayerStateText()
+    this.setupPlayerDigitIndex()
     this.sprite.setData('ref', this)
     this.graphics = this.game.add.graphics()
   }
@@ -198,6 +200,20 @@ export class CourtPlayer {
     })
     this.stateText.setPosition(this.sprite.x - this.stateText.displayWidth / 2, this.sprite.y - 40)
     this.stateText.setDepth(100)
+    this.stateText.setVisible(false)
+  }
+
+  setupPlayerDigitIndex() {
+    const roleMapping = Constants.DIGIT_TO_ROLE_MAPPING.indexOf(this.role) + 1
+    this.digitIndexText = this.game.add.text(0, 0, roleMapping.toString(), {
+      color: 'black',
+      fontSize: '12px',
+    })
+    this.digitIndexText.setPosition(
+      this.sprite.x - this.digitIndexText.displayWidth / 2,
+      this.sprite.y - 40
+    )
+    this.digitIndexText.setDepth(100)
   }
 
   updatePlayerStateText() {
@@ -350,11 +366,19 @@ export class CourtPlayer {
     this.nameText.setVisible(isVisible)
   }
 
+  updatePlayerDigitIndex() {
+    this.digitIndexText.setPosition(
+      this.sprite.x - this.digitIndexText.displayWidth / 2,
+      this.sprite.y - 40
+    )
+  }
+
   update() {
     this.stateMachine.step()
     this.moveTowardsTarget()
     this.nameText.setPosition(this.sprite.x - this.nameText.displayWidth / 2, this.sprite.y + 40)
     this.updatePlayerStateText()
+    this.updatePlayerDigitIndex()
     this.updateMarkerRectPosition()
   }
 }
