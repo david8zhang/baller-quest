@@ -200,7 +200,6 @@ export class CourtPlayer {
     })
     this.stateText.setPosition(this.sprite.x - this.stateText.displayWidth / 2, this.sprite.y - 40)
     this.stateText.setDepth(100)
-    this.stateText.setVisible(false)
   }
 
   setupPlayerDigitIndex() {
@@ -218,7 +217,7 @@ export class CourtPlayer {
 
   updatePlayerStateText() {
     this.stateText.setText(this.getCurrentState())
-    this.stateText.setPosition(this.sprite.x - this.stateText.displayWidth / 2, this.sprite.y - 40)
+    this.stateText.setPosition(this.sprite.x - this.stateText.displayWidth / 2, this.sprite.y + 40)
   }
 
   setupPlayerName() {

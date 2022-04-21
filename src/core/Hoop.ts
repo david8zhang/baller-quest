@@ -1,4 +1,5 @@
 import Game from '~/scenes/Game'
+import { BallState } from './Ball'
 import { DriveDirection, Side } from './teams/Team'
 
 export interface HoopConfig {
@@ -44,7 +45,7 @@ export class Hoop {
     this.driveDirection = driveDirection
     this.sprite = this.game.physics.add.sprite(position.x, position.y, 'hoop').setScale(0.25)
     this.sprite.flipX = isFlipX
-    this.sprite.body.setSize(0.4 * this.sprite.body.width, 0.25 * this.sprite.body.width)
+    this.sprite.body.setSize(0.3 * this.sprite.body.width, 0.05 * this.sprite.body.width)
 
     this.sprite.body.offset.x = this.sprite.displayWidth + body.offsetX
     this.sprite.body.offset.y = this.sprite.displayHeight + body.offsetY
@@ -53,7 +54,12 @@ export class Hoop {
     this.successShotRange = successShotRange
     this.rimRange = rimRange
     this.game.physics.add.collider(this.sprite, this.game.ball.sprite, () => {
-      this.handleOnCollideWithRim()
+      if (
+        this.game.ball.currState !== BallState.PASS &&
+        this.game.ball.currState !== BallState.INBOUND
+      ) {
+        this.handleOnCollideWithRim()
+      }
     })
 
     const backboard = this.game.physics.add
@@ -62,7 +68,12 @@ export class Hoop {
       .setPushable(false)
     backboard.body.setSize(10, 75)
     this.game.physics.add.collider(backboard, this.game.ball.sprite, () => {
-      this.handleOnCollideWithRim()
+      if (
+        this.game.ball.currState !== BallState.PASS &&
+        this.game.ball.currState !== BallState.INBOUND
+      ) {
+        this.handleOnCollideWithRim()
+      }
     })
   }
 

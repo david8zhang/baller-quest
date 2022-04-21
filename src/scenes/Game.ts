@@ -73,6 +73,11 @@ export default class Game extends Phaser.Scene {
           this.cpuTeam.setState(TeamStates.OFFENSE)
           this.playerTeam.setState(TeamStates.DEFENSE)
         }
+        if (sideWithPosession !== newPlayer.getSide()) {
+          if (UI.instance.shotClock) {
+            UI.instance.shotClock.resetShotClock()
+          }
+        }
       }
     })
 
@@ -95,6 +100,19 @@ export default class Game extends Phaser.Scene {
     if (zoneToTipTo) {
       this.ball.tipOff(zoneToTipTo)
     }
+  }
+
+  public onHandleShotClockExpiration() {
+    const currentSideWithPossession = this.ball.getPossessionSide()
+    const hoop =
+      currentSideWithPossession === Side.CPU ? this.playerTeam.getHoop() : this.cpuTeam.getHoop()
+    this.handleOutOfBounds(
+      {
+        x: hoop.sprite.x,
+        y: hoop.sprite.y,
+      },
+      currentSideWithPossession
+    )
   }
 
   get fieldGrid() {

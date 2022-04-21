@@ -82,6 +82,10 @@ export class Ball {
     })
   }
 
+  setPosition(x: number, y: number) {
+    this.sprite.setPosition(x, y)
+  }
+
   launchArcTowards(posToLand: Phaser.Math.Vector2, timeInFlight: number) {
     this.sprite.setGravityY(980)
     this.sprite.body.enable = true
@@ -169,6 +173,7 @@ export class Ball {
       const { centerPosition } = randomZone
       this.launchArcTowards(new Phaser.Math.Vector2(centerPosition.x, centerPosition.y), flightTime)
       this.game.time.delayedCall(flightTime * 500, () => {
+        console.log('Went here!')
         this.setLoose()
       })
       this.game.time.delayedCall(flightTime * 1000, () => {

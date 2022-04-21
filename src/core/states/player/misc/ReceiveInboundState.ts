@@ -1,6 +1,7 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { PlayerTeam } from '~/core/teams/PlayerTeam'
 import { Side, Team } from '~/core/teams/Team'
+import { UI } from '~/scenes/UI'
 import { Constants } from '~/utils/Constants'
 import { State } from '../../StateMachine'
 import { PlayerStates, TeamStates } from '../../StateTypes'
@@ -18,6 +19,9 @@ export class ReceiveInboundState extends State {
       if (ball.isInPossessionOf(player)) {
         player.team.setState(TeamStates.OFFENSE)
         player.team.getOpposingTeam().setState(TeamStates.DEFENSE)
+        if (UI.instance.shotClock) {
+          UI.instance.shotClock.startClock()
+        }
       }
     } else {
       player.setMoveTarget(this.receiveInboundPosition!)

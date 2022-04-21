@@ -1,6 +1,7 @@
 import { BallState } from '~/core/Ball'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Side, Team } from '~/core/teams/Team'
+import { UI } from '~/scenes/UI'
 import { Constants } from '~/utils/Constants'
 import { State } from '../StateMachine'
 import { PlayerStates } from '../StateTypes'
@@ -10,6 +11,10 @@ export class InboundBallState extends State {
   public playerToReceiveInbound: CourtPlayer | null = null
 
   enter(team: Team, outOfBoundsLocation?: Phaser.Math.Vector2) {
+    if (UI.instance.shotClock) {
+      UI.instance.shotClock.resetShotClock()
+      UI.instance.shotClock.stopClock()
+    }
     team.getBall().setBallState(BallState.RETRIEVE_AFTER_SCORE)
     const hoopSprite = team.getHoop().sprite
     const inboundLocation = outOfBoundsLocation

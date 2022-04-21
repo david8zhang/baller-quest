@@ -1,5 +1,6 @@
 import { Team } from '~/core/teams/Team'
 import Game from '~/scenes/Game'
+import { UI } from '~/scenes/UI'
 import { State } from '../StateMachine'
 import { PlayerStates } from '../StateTypes'
 
@@ -12,11 +13,16 @@ export class SideOutState extends State {
       y: number
     }
   ) {
+    if (UI.instance.shotClock) {
+      UI.instance.shotClock.resetShotClock()
+      UI.instance.shotClock.stopClock()
+    }
     if (!isDefending) {
       const inboundPlayer = team.courtPlayers[0]
       const receiveInboundPlayer = team.courtPlayers[1]
       const opposingHoop = team.getOpposingTeam().getHoop()
       team.getBall().updatePlayerWithBall(inboundPlayer)
+      team.getBall().setPosition(inboundPlayer.sprite.x, inboundPlayer.sprite.y)
       const lineToOpposingHoop = new Phaser.Geom.Line(
         posToInboundFrom.x,
         posToInboundFrom.y,
