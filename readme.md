@@ -7,4 +7,7 @@ A basketball game that takes place in a medieval fantasy world.
 - Basic art for hoop, court (Rework colliders)
 - Blocking, stealing
 - Intense defense (stick to offensive player)
-- Shot clock
+
+## Minor bugs
+
+- Shot clock after rebound starts at 23 instead of 24

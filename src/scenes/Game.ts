@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { Ball } from '~/core/Ball'
+import { Ball, BallState } from '~/core/Ball'
 import { Hoop } from '~/core/Hoop'
 import { PlayerTeam } from '~/core/teams/PlayerTeam'
 import { CPUTeam } from '~/core/teams/CPUTeam'
@@ -57,13 +57,19 @@ export default class Game extends Phaser.Scene {
     this.cameras.main.startFollow(this.ball.sprite)
 
     // Register ball handlers
-    this.ball.registerOnPlayerChangedHandler((oldPlayer: CourtPlayer, newPlayer: CourtPlayer) => {
+    this.ball.registerOnPlayerChangedHandler(({ oldPlayer, newPlayer, oldState, newState }) => {
       const isInbounding = () => {
         return (
           this.ignorePossessionChangeStates.includes(this.cpuTeam.getCurrentState()) ||
           this.ignorePossessionChangeStates.includes(this.playerTeam.getCurrentState())
         )
       }
+      if (oldState === BallState.REBOUND && newState === BallState.DRIBBLE) {
+        if (UI.instance.shotClock) {
+          UI.instance.shotClock.resetShotClock()
+        }
+      }
+
       if (!isInbounding()) {
         const sideWithPosession = newPlayer.getSide()
         if (sideWithPosession == Side.PLAYER) {
@@ -72,11 +78,6 @@ export default class Game extends Phaser.Scene {
         } else {
           this.cpuTeam.setState(TeamStates.OFFENSE)
           this.playerTeam.setState(TeamStates.DEFENSE)
-        }
-        if (sideWithPosession !== newPlayer.getSide()) {
-          if (UI.instance.shotClock) {
-            UI.instance.shotClock.resetShotClock()
-          }
         }
       }
     })
@@ -103,16 +104,23 @@ export default class Game extends Phaser.Scene {
   }
 
   public onHandleShotClockExpiration() {
-    const currentSideWithPossession = this.ball.getPossessionSide()
-    const hoop =
-      currentSideWithPossession === Side.CPU ? this.playerTeam.getHoop() : this.cpuTeam.getHoop()
-    this.handleOutOfBounds(
-      {
-        x: hoop.sprite.x,
-        y: hoop.sprite.y,
-      },
-      currentSideWithPossession
-    )
+    console.log(this.ball.currState)
+    if (
+      this.ball.currState !== BallState.MID_SHOT &&
+      this.ball.currState !== BallState.REBOUND &&
+      this.ball.currState !== BallState.WIND_UP_SHOT
+    ) {
+      const currentSideWithPossession = this.ball.getPossessionSide()
+      const hoop =
+        currentSideWithPossession === Side.CPU ? this.playerTeam.getHoop() : this.cpuTeam.getHoop()
+      this.handleOutOfBounds(
+        {
+          x: hoop.sprite.x,
+          y: hoop.sprite.y,
+        },
+        currentSideWithPossession
+      )
+    }
   }
 
   get fieldGrid() {

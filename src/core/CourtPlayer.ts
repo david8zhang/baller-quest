@@ -356,7 +356,7 @@ export class CourtPlayer {
       // Apply velocity to ball
       ball.sprite.setGravity(0)
       ball.sprite.body.enable = true
-      ball.currState = isInbound ? BallState.INBOUND : BallState.PASS
+      ball.setBallState(isInbound ? BallState.INBOUND : BallState.PASS)
       ball.setVelocity(velocityVector.x, velocityVector.y)
     }
   }

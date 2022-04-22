@@ -185,7 +185,7 @@ export class PlayerTeam extends Team {
       if (playerClosestToBall) {
         this.selectCourtPlayer(playerClosestToBall)
       }
-    } else if (state === TeamStates.INBOUND_BALL) {
+    } else if (state === TeamStates.INBOUND_BALL || state === TeamStates.SIDE_OUT_STATE) {
       this.deselectPlayer()
     }
     super.setState(state, ...args)

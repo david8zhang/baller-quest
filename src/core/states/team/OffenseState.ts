@@ -17,7 +17,7 @@ export class OffenseState extends State {
 
   execute(team: Team) {
     const ball = team.getBall()
-    if (ball.currState === BallState.LOOSE) {
+    if (ball.currState === BallState.REBOUND) {
       this.chaseRebound(team)
     }
   }

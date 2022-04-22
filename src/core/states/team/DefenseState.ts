@@ -1,3 +1,4 @@
+import { BallState } from '~/core/Ball'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Side, Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
@@ -15,23 +16,47 @@ export class DefenseState extends State {
     })
   }
 
+  chaseRebound(team: Team) {
+    const reboundRadius = 375
+    const ball = team.getBall()
+    team.courtPlayers.forEach((player: CourtPlayer) => {
+      const distance = Constants.getDistanceBetween(
+        {
+          x: player.sprite.x,
+          y: player.sprite.y,
+        },
+        {
+          x: ball.sprite.x,
+          y: ball.sprite.y,
+        }
+      )
+      if (distance <= reboundRadius) {
+        player.setState(PlayerStates.CHASE_REBOUND)
+      }
+    })
+  }
+
   execute(team: Team) {
-    // apply new states based on changes on the court
-    if (team.side === Side.CPU) {
-      const stateUpdates = this.getStateUpdates(team)
-      team.courtPlayers.forEach((player: CourtPlayer) => {
-        if (stateUpdates[player.role]) {
-          const stateUpdate = stateUpdates[player.role]
-          const args = stateUpdate.args ? stateUpdate.args : []
-          player.setState(stateUpdate.state, ...args)
-        }
-      })
+    if (team.getBall().currState === BallState.REBOUND) {
+      this.chaseRebound(team)
     } else {
-      team.courtPlayers.forEach((player: CourtPlayer) => {
-        if (team.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
-          player.setState(PlayerStates.DEFEND_MAN)
-        }
-      })
+      // apply new states based on changes on the court
+      if (team.side === Side.CPU) {
+        const stateUpdates = this.getStateUpdates(team)
+        team.courtPlayers.forEach((player: CourtPlayer) => {
+          if (stateUpdates[player.role]) {
+            const stateUpdate = stateUpdates[player.role]
+            const args = stateUpdate.args ? stateUpdate.args : []
+            player.setState(stateUpdate.state, ...args)
+          }
+        })
+      } else {
+        team.courtPlayers.forEach((player: CourtPlayer) => {
+          if (team.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
+            player.setState(PlayerStates.DEFEND_MAN)
+          }
+        })
+      }
     }
   }
 

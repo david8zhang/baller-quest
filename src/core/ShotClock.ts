@@ -5,7 +5,7 @@ import { Constants } from '~/utils/Constants'
 export class ShotClock {
   private ui: UI
   private shotClockText!: Phaser.GameObjects.Text
-  public secondsOnClock: number = 5
+  public secondsOnClock: number = 24
   public shotClockTickEvent: Phaser.Time.TimerEvent
 
   constructor(ui: UI) {
@@ -33,7 +33,7 @@ export class ShotClock {
     this.shotClockTickEvent.paused = false
   }
 
-  resetShotClock(numToResetTo: number = 5) {
+  resetShotClock(numToResetTo: number = 24) {
     this.secondsOnClock = numToResetTo
     this.updateShotClockText()
   }

@@ -1,5 +1,6 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
+import { BallState } from './Ball'
 import { Court } from './Court'
 import { CourtPlayer } from './CourtPlayer'
 import { Hoop } from './Hoop'
@@ -200,6 +201,7 @@ export class ShotMeter {
   }
 
   private windUpShot() {
+    this.game.ball.setBallState(BallState.WIND_UP_SHOT)
     this.currValue += 2
     this.draw()
   }

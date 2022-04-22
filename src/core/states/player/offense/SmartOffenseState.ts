@@ -21,21 +21,22 @@ export class SmartOffenseState extends State {
     // if currently have the ball
     if (team.getBall().isInPossessionOf(thisPlayer)) {
       const shootFirst = Phaser.Math.Between(0, 1) === 0
-      if (shootFirst) {
-        const hasOpenShot = Constants.playerHasOpenShot(thisPlayer, thisPlayer.getDefender())
-        if (hasOpenShot) {
-          thisPlayer.setState(PlayerStates.SHOOT)
-        } else {
-          this.getRandomBehavior(thisPlayer, team)
-        }
-      } else {
-        const zoneToDriveToId = Constants.getZoneToDriveTo(thisPlayer)
-        if (zoneToDriveToId !== -1) {
-          thisPlayer.setState(PlayerStates.DRIVE_TO_BASKET, zoneToDriveToId)
-        } else {
-          this.getRandomBehavior(thisPlayer, team)
-        }
-      }
+      thisPlayer.setState(PlayerStates.SHOOT)
+      // if (shootFirst) {
+      //   const hasOpenShot = Constants.playerHasOpenShot(thisPlayer, thisPlayer.getDefender())
+      //   if (hasOpenShot) {
+      //     thisPlayer.setState(PlayerStates.SHOOT)
+      //   } else {
+      //     this.getRandomBehavior(thisPlayer, team)
+      //   }
+      // } else {
+      //   const zoneToDriveToId = Constants.getZoneToDriveTo(thisPlayer)
+      //   if (zoneToDriveToId !== -1) {
+      //     thisPlayer.setState(PlayerStates.DRIVE_TO_BASKET, zoneToDriveToId)
+      //   } else {
+      //     this.getRandomBehavior(thisPlayer, team)
+      //   }
+      // }
     }
   }
 

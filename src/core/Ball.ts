@@ -9,6 +9,7 @@ import { DriveDirection, Side, Team } from './teams/Team'
 export enum BallState {
   DRIBBLE = 'DRIBBLE',
   LOOSE = 'LOOSE',
+  WIND_UP_SHOT = 'WIND_UP_SHOT',
   MID_SHOT = 'MID_SHOT',
   PASS = 'PASS',
   INBOUND = 'INBOUND',
@@ -35,6 +36,7 @@ export class Ball {
   public onScoreHandlers: Function[] = []
   public arcDestination: Phaser.GameObjects.Arc
   public shotType!: ShotType
+  public ballStateText!: Phaser.GameObjects.Text
 
   constructor(game: Game, config: BallConfig) {
     this.game = game
@@ -48,6 +50,25 @@ export class Ball {
     this.sprite.setData('ref', this)
     this.arcDestination = this.game.add.circle(0, 0, 5, 0x00ff00).setVisible(false).setDepth(1000)
     this.setupFloor()
+    this.setupBallStateText()
+  }
+
+  setupBallStateText() {
+    this.ballStateText = this.game.add.text(0, 0, '', {
+      fontSize: '12px',
+      color: 'black',
+    })
+    this.ballStateText
+      .setPosition(this.sprite.x - this.ballStateText.displayWidth / 2, this.sprite.y - 25)
+      .setDepth(100)
+  }
+
+  updateBallStateText() {
+    this.ballStateText.setPosition(
+      this.sprite.x - this.ballStateText.displayWidth / 2,
+      this.sprite.y - 25
+    )
+    this.ballStateText.setText(this.currState)
   }
 
   setupFloor() {
@@ -154,6 +175,7 @@ export class Ball {
   }
 
   setRandomRebound(hoop: Hoop, onHitFloorCallback: Function) {
+    this.currState = BallState.REBOUND
     let reboundZones =
       hoop.driveDirection === DriveDirection.RIGHT
         ? Constants.MID_RANGE_RIGHT
@@ -172,10 +194,6 @@ export class Ball {
     if (randomZone) {
       const { centerPosition } = randomZone
       this.launchArcTowards(new Phaser.Math.Vector2(centerPosition.x, centerPosition.y), flightTime)
-      this.game.time.delayedCall(flightTime * 500, () => {
-        console.log('Went here!')
-        this.setLoose()
-      })
       this.game.time.delayedCall(flightTime * 1000, () => {
         this.handleFloorCollision()
         onHitFloorCallback()
@@ -222,11 +240,17 @@ export class Ball {
       return
     }
     this.player = player
+    const oldState = this.currState
     this.currState = BallState.DRIBBLE
     this.sprite.body.enable = false
     this.floor.body.enable = false
     this.onPlayerChangedHandlers.forEach((fn) => {
-      fn(this.prevPlayer, player)
+      fn({
+        oldState,
+        newState: this.currState,
+        oldPlayer: this.prevPlayer,
+        newPlayer: this.player,
+      })
     })
   }
 
@@ -242,12 +266,18 @@ export class Ball {
     if (this.player && this.currState == BallState.DRIBBLE) {
       this.sprite.x = this.player.sprite.x
       this.sprite.y = this.player.sprite.y
-
-      if (this.isOutOfBounds() && (this.prevPlayer || this.player)) {
-        const lastTouchedSide = this.player ? this.player.getSide() : this.prevPlayer!.getSide()
-        this.game.handleOutOfBounds({ x: this.sprite.x, y: this.sprite.y }, lastTouchedSide)
-      }
     }
+
+    if (
+      this.isOutOfBounds() &&
+      (this.prevPlayer || this.player) &&
+      this.currState !== BallState.MID_SHOT
+    ) {
+      const lastTouchedSide = this.player ? this.player.getSide() : this.prevPlayer!.getSide()
+      this.game.handleOutOfBounds({ x: this.sprite.x, y: this.sprite.y }, lastTouchedSide)
+    }
+
+    this.updateBallStateText()
   }
 
   isOutOfBounds() {
@@ -286,6 +316,9 @@ export class Ball {
           return false
         }
         return false
+      }
+      case BallState.REBOUND: {
+        return true
       }
       default:
         return true
