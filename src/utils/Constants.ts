@@ -23,38 +23,38 @@ export class Constants {
   public static PASS_SPEED = 1000
   public static HOOP_LEFT = {
     position: {
-      x: 50,
-      y: Constants.COURT_HEIGHT / 2 - 50,
+      x: 125,
+      y: Constants.COURT_HEIGHT / 2 - 125,
     },
-    body: {
-      offsetX: 250,
-      offsetY: 75,
+    rimPosition: {
+      x: 180,
+      y: Constants.COURT_HEIGHT / 2 - 125,
     },
     backboardPosition: {
-      x: 75,
-      y: Constants.COURT_HEIGHT / 2 - 125,
+      x: 150,
+      y: Constants.COURT_HEIGHT / 2 - 150,
     },
     rimRange: [40, 60],
     successShotRange: [50, 50],
-    isFlipX: true,
+    isFlipX: false,
     driveDirection: DriveDirection.LEFT,
   }
   public static HOOP_RIGHT = {
     position: {
-      x: Constants.COURT_WIDTH - 50,
-      y: Constants.COURT_HEIGHT / 2 - 50,
+      x: Constants.COURT_WIDTH - 125,
+      y: Constants.COURT_HEIGHT / 2 - 125,
     },
-    body: {
-      offsetX: -150,
-      offsetY: 75,
+    rimPosition: {
+      x: Constants.COURT_WIDTH - 180,
+      y: Constants.COURT_HEIGHT / 2 - 125,
     },
     backboardPosition: {
-      x: Constants.COURT_WIDTH - 75,
+      x: Constants.COURT_WIDTH - 150,
       y: Constants.COURT_HEIGHT / 2 - 125,
     },
     rimRange: [-60, -40],
     successShotRange: [-52, -52],
-    isFlipX: false,
+    isFlipX: true,
     driveDirection: DriveDirection.RIGHT,
   }
 
@@ -94,25 +94,18 @@ export class Constants {
   public static TIPOFF_RIGHT = 70
   public static TIPOFF_LEFT = 64
 
-  // Zones for shot types left side
-  public static MID_RANGE_LEFT = [
-    15, 16, 17, 30, 31, 32, 33, 47, 48, 49, 62, 63, 64, 77, 78, 79, 90, 91, 92, 93, 105, 106, 107,
-  ]
-  public static LAYUP_RANGE_LEFT = [46, 61, 76]
-  public static THREE_POINT_RANGE_LEFT = [
-    0, 1, 2, 3, 4, 5, 6, 18, 19, 20, 21, 34, 35, 36, 50, 51, 65, 66, 80, 81, 94, 95, 96, 108, 109,
-    110, 11, 120, 121, 122, 123, 124, 125, 126, 45, 60, 75,
+  // Zones for shot types right side
+  public static MID_RANGE_RIGHT = [56, 57, 71, 86, 87, 88, 103, 102, 55, 70, 85]
+  public static LAYUP_RANGE_RIGHT = [72, 73]
+  public static THREE_POINT_RANGE_RIGHT = [
+    38, 39, 40, 41, 42, 53, 54, 68, 69, 83, 84, 98, 99, 100, 101, 113, 114, 115, 116, 117, 118, 119,
   ]
 
-  // Zone for shot types right side
-  public static MID_RANGE_RIGHT = [
-    27, 28, 29, 41, 42, 43, 44, 55, 56, 57, 70, 71, 72, 85, 86, 87, 101, 102, 103, 104, 117, 118,
-    119,
-  ]
-  public static LAYUP_RANGE_RIGHT = [58, 73, 88]
-  public static THREE_POINT_RANGE_RIGHT = [
-    8, 9, 10, 11, 12, 13, 14, 23, 24, 25, 26, 38, 39, 40, 53, 54, 68, 69, 83, 84, 98, 99, 100, 113,
-    114, 115, 116, 128, 129, 130, 131, 132, 133, 134,
+  // Zone for shot types left side
+  public static MID_RANGE_LEFT = [47, 48, 49, 63, 64, 76, 77, 78, 79, 91, 92]
+  public static LAYUP_RANGE_LEFT = [61, 62]
+  public static THREE_POINT_RANGE_LEFT = [
+    32, 33, 34, 35, 36, 50, 65, 80, 95, 94, 93, 107, 106, 105, 109, 110, 111, 96, 81, 66, 51, 36,
   ]
 
   public static SHOT_OPENNESS_THRESHOLDS = {

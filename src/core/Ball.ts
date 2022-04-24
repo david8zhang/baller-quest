@@ -151,13 +151,13 @@ export class Ball {
     const xVelocity = (posToLand.x - this.sprite.x) / time
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(time, 2)) / time
     this.sprite.setVelocity(xVelocity, yVelocity)
-    hoopSprite.body.enable = false
+    hoop.toggleRimCollider(false)
     this.prevPlayer = this.player
     this.player = null
 
     if (!isSuccess) {
       this.game.time.delayedCall(time * 500, () => {
-        hoopSprite.body.enable = true
+        hoop.toggleRimCollider(true)
       })
     } else {
       this.game.time.delayedCall(time * 1000, () => {

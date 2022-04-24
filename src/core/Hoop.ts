@@ -8,9 +8,9 @@ export interface HoopConfig {
     y: number
   }
   isFlipX: boolean
-  body: {
-    offsetX: number
-    offsetY: number
+  rimPosition: {
+    x: number
+    y: number
   }
   backboardPosition: {
     x: number
@@ -23,37 +23,41 @@ export interface HoopConfig {
 
 export class Hoop {
   private game: Game
-  public sprite: Phaser.Physics.Arcade.Sprite
+  public sprite: Phaser.GameObjects.Sprite
   public onCollideRimHandler!: Function
   public setFloorEvent?: Phaser.Time.TimerEvent
   public successShotRange: number[] = []
   public rimRange: number[] = []
   public hasBallCollidedWithRim: boolean = false
   public driveDirection: DriveDirection
+  public rim: Phaser.Physics.Arcade.Sprite
+  public backboard: Phaser.Physics.Arcade.Sprite
 
   constructor(game: Game, config: HoopConfig) {
     this.game = game
     const {
       position,
       isFlipX,
-      body,
+      rimPosition,
       backboardPosition,
       successShotRange,
       rimRange,
       driveDirection,
     } = config
     this.driveDirection = driveDirection
-    this.sprite = this.game.physics.add.sprite(position.x, position.y, 'hoop').setScale(0.25)
+    this.sprite = this.game.add.sprite(position.x, position.y, 'hoop').setScale(1.5)
     this.sprite.flipX = isFlipX
-    this.sprite.body.setSize(0.3 * this.sprite.body.width, 0.05 * this.sprite.body.width)
-
-    this.sprite.body.offset.x = this.sprite.displayWidth + body.offsetX
-    this.sprite.body.offset.y = this.sprite.displayHeight + body.offsetY
-
-    this.sprite.setPushable(false)
     this.successShotRange = successShotRange
     this.rimRange = rimRange
-    this.game.physics.add.collider(this.sprite, this.game.ball.sprite, () => {
+
+    this.rim = this.game.physics.add
+      .sprite(rimPosition.x, rimPosition.y, '')
+      .setVisible(false)
+      .setPushable(false)
+
+    this.rim.body.setSize(50, 5)
+
+    this.game.physics.add.collider(this.rim, this.game.ball.sprite, () => {
       if (
         this.game.ball.currState !== BallState.PASS &&
         this.game.ball.currState !== BallState.INBOUND
@@ -62,12 +66,12 @@ export class Hoop {
       }
     })
 
-    const backboard = this.game.physics.add
+    this.backboard = this.game.physics.add
       .sprite(backboardPosition.x, backboardPosition.y, '')
       .setVisible(false)
       .setPushable(false)
-    backboard.body.setSize(10, 75)
-    this.game.physics.add.collider(backboard, this.game.ball.sprite, () => {
+    this.backboard.body.setSize(10, 90)
+    this.game.physics.add.collider(this.backboard, this.game.ball.sprite, () => {
       if (
         this.game.ball.currState !== BallState.PASS &&
         this.game.ball.currState !== BallState.INBOUND
@@ -77,10 +81,15 @@ export class Hoop {
     })
   }
 
+  toggleRimCollider(state: boolean) {
+    this.rim.body.enable = state
+    this.backboard.body.enable = state
+  }
+
   handleOnCollideWithRim() {
     if (!this.hasBallCollidedWithRim) {
       this.hasBallCollidedWithRim = true
-      this.sprite.body.enable = false
+      this.rim.body.enable = false
       this.game.ball.setRandomRebound(this, () => {
         this.hasBallCollidedWithRim = false
       })

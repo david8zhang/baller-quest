@@ -15,6 +15,9 @@ export class InboundBallState extends State {
       UI.instance.shotClock.resetShotClock()
       UI.instance.shotClock.stopClock()
     }
+    team.getHoop().toggleRimCollider(false)
+    team.getOpposingTeam().getHoop().toggleRimCollider(false)
+
     team.getBall().setBallState(BallState.RETRIEVE_AFTER_SCORE)
     const hoopSprite = team.getHoop().sprite
     const inboundLocation = outOfBoundsLocation

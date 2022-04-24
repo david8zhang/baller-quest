@@ -17,6 +17,10 @@ export class SideOutState extends State {
       UI.instance.shotClock.resetShotClock()
       UI.instance.shotClock.stopClock()
     }
+
+    team.getHoop().toggleRimCollider(false)
+    team.getOpposingTeam().getHoop().toggleRimCollider(false)
+
     if (!isDefending) {
       const inboundPlayer = team.courtPlayers[0]
       const receiveInboundPlayer = team.courtPlayers[1]

@@ -54,6 +54,7 @@ export default class Game extends Phaser.Scene {
     this.playerTeam = new PlayerTeam(this)
     this.cpuTeam = new CPUTeam(this)
 
+    this.cameras.main.setBackgroundColor()
     this.cameras.main.startFollow(this.ball.sprite)
 
     // Register ball handlers
@@ -104,7 +105,6 @@ export default class Game extends Phaser.Scene {
   }
 
   public onHandleShotClockExpiration() {
-    console.log(this.ball.currState)
     if (
       this.ball.currState !== BallState.MID_SHOT &&
       this.ball.currState !== BallState.REBOUND &&
@@ -148,13 +148,21 @@ export default class Game extends Phaser.Scene {
   }
 
   depthSort() {
-    const allCourtPlayers = this.playerTeam.courtPlayers.concat(this.cpuTeam.courtPlayers)
-    const sortedByY = allCourtPlayers.sort((a, b) => {
-      return a.sprite.y - b.sprite.y
+    const allSprites: any = []
+    this.playerTeam.courtPlayers.forEach((courtPlayer) => {
+      allSprites.push(courtPlayer.sprite)
+    })
+    this.cpuTeam.courtPlayers.forEach((courtPlayer) => {
+      allSprites.push(courtPlayer.sprite)
+    })
+    if (this.leftHoop) allSprites.push(this.leftHoop.sprite)
+    if (this.rightHoop) allSprites.push(this.rightHoop.sprite)
+    const sortedByY = allSprites.sort((a, b) => {
+      return a.y - b.y
     })
     let baseDepth = 1
-    sortedByY.forEach((courtPlayer: CourtPlayer, index: number) => {
-      courtPlayer.sprite.setDepth(baseDepth + index)
+    sortedByY.forEach((sprite: any, index: number) => {
+      sprite.setDepth(baseDepth + index)
     })
   }
 
