@@ -98,15 +98,15 @@ export class Constants {
   public static TIPOFF_LEFT = 64
 
   // Zones for shot types right side
-  public static MID_RANGE_RIGHT = [56, 57, 71, 86, 87, 88, 103, 102, 55, 70, 85]
-  public static LAYUP_RANGE_RIGHT = [72, 73]
+  public static MID_RANGE_RIGHT = [56, 71, 86, 87, 103, 102, 55, 70, 85]
+  public static LAYUP_RANGE_RIGHT = [57, 72, 73, 88]
   public static THREE_POINT_RANGE_RIGHT = [
     38, 39, 40, 41, 42, 53, 54, 68, 69, 83, 84, 98, 99, 100, 101, 113, 114, 115, 116, 117, 118, 119,
   ]
 
   // Zone for shot types left side
-  public static MID_RANGE_LEFT = [47, 48, 49, 63, 64, 76, 77, 78, 79, 91, 92]
-  public static LAYUP_RANGE_LEFT = [61, 62]
+  public static MID_RANGE_LEFT = [48, 49, 63, 64, 76, 77, 78, 79, 91, 92]
+  public static LAYUP_RANGE_LEFT = [75, 61, 62, 47]
   public static THREE_POINT_RANGE_LEFT = [
     32, 33, 34, 35, 36, 50, 65, 80, 95, 94, 93, 107, 106, 105, 109, 110, 111, 96, 81, 66, 51, 36,
   ]
