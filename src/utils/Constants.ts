@@ -111,6 +111,11 @@ export class Constants {
     32, 33, 34, 35, 36, 50, 65, 80, 95, 94, 93, 107, 106, 105, 109, 110, 111, 96, 81, 66, 51, 36,
   ]
 
+  public static ALL_INBOUND_ZONES = [
+    47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 77, 78,
+    79, 80, 81, 82, 83, 84, 85, 86, 87, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102,
+  ]
+
   public static SHOT_OPENNESS_THRESHOLDS = {
     [ShotType.LAYUP]: 50,
     [ShotType.MID_RANGE]: 75,

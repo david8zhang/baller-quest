@@ -61,6 +61,35 @@ export class Court {
     }
   }
 
+  static checkOutOfBounds(x: number, y: number) {
+    const leftBorder = new Phaser.Geom.Line(0, Constants.COURT_HEIGHT - 100, 200, 150)
+    const rightBorder = new Phaser.Geom.Line(
+      Constants.COURT_WIDTH,
+      Constants.COURT_HEIGHT - 100,
+      Constants.COURT_WIDTH - 200,
+      150
+    )
+    const getCrossProduct = (
+      point1: { x: number; y: number },
+      point2: { x: number; y: number },
+      pointToCheck: { x: number; y: number }
+    ) => {
+      return (
+        (point2.x - point1.x) * (pointToCheck.y - point1.y) -
+        (point2.y - point1.y) * (pointToCheck.x - point1.x)
+      )
+    }
+    const isOutOfBoundsVert =
+      y > Constants.COURT_BOTTOM_SIDE_BORDER || y < Constants.COURT_TOP_SIDE_BORDER
+
+    const isLeftOOB = getCrossProduct(leftBorder.getPointA(), leftBorder.getPointB(), { x, y }) < 0
+    const isRightOOB =
+      getCrossProduct(rightBorder.getPointA(), rightBorder.getPointB(), { x, y }) > 0
+
+    const isOutOfBoundsHoriz = isLeftOOB || isRightOOB
+    return isOutOfBoundsVert || isOutOfBoundsHoriz
+  }
+
   getZoneForZoneId(zoneId: number) {
     for (let i = 0; i < this.fieldGrid.length; i++) {
       for (let j = 0; j < this.fieldGrid[0].length; j++) {

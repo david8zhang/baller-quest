@@ -132,7 +132,13 @@ export default class Game extends Phaser.Scene {
   }
 
   handleOutOfBounds(outOfBoundsLocation: { x: number; y: number }, lastTouchedSide: Side) {
-    if (!this.isHandlingOutOfBounds) {
+    if (
+      !this.isHandlingOutOfBounds &&
+      this.playerTeam.getCurrentState() !== TeamStates.INBOUND_BALL &&
+      this.cpuTeam.getCurrentState() !== TeamStates.INBOUND_BALL &&
+      this.playerTeam.getCurrentState() !== TeamStates.SIDE_OUT_STATE &&
+      this.cpuTeam.getCurrentState() !== TeamStates.SIDE_OUT_STATE
+    ) {
       this.isHandlingOutOfBounds = true
       this.playerTeam.setState(
         TeamStates.SIDE_OUT_STATE,

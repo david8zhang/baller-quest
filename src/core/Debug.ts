@@ -62,6 +62,20 @@ export class Debug {
     }
   }
 
+  showBorders() {
+    const leftBorder = new Phaser.Geom.Line(0, Constants.COURT_HEIGHT - 100, 200, 150)
+    const rightBorder = new Phaser.Geom.Line(
+      Constants.COURT_WIDTH,
+      Constants.COURT_HEIGHT - 100,
+      Constants.COURT_WIDTH - 200,
+      150
+    )
+    const graphics = this.game.add.graphics()
+    graphics.lineStyle(1, 0x00ff00)
+    graphics.strokeLineShape(leftBorder)
+    graphics.strokeLineShape(rightBorder)
+  }
+
   setVisible(isVisible: boolean) {
     this.isVisible = isVisible
     this.objects.setVisible(isVisible)

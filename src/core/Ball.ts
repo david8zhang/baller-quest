@@ -1,6 +1,6 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { FieldZone } from './Court'
+import { Court, FieldZone } from './Court'
 import { CourtPlayer } from './CourtPlayer'
 import { Hoop } from './Hoop'
 import { MissType, ShotConfig, ShotType } from './ShotMeter'
@@ -271,7 +271,8 @@ export class Ball {
     if (
       this.isOutOfBounds() &&
       (this.prevPlayer || this.player) &&
-      this.currState !== BallState.MID_SHOT
+      this.currState !== BallState.MID_SHOT &&
+      this.currState !== BallState.REBOUND
     ) {
       const lastTouchedSide = this.player ? this.player.getSide() : this.prevPlayer!.getSide()
       this.game.handleOutOfBounds({ x: this.sprite.x, y: this.sprite.y }, lastTouchedSide)
@@ -281,12 +282,7 @@ export class Ball {
   }
 
   isOutOfBounds() {
-    return (
-      this.sprite.x > Constants.COURT_WIDTH ||
-      this.sprite.x < 0 ||
-      this.sprite.y > Constants.COURT_BOTTOM_SIDE_BORDER ||
-      this.sprite.y < Constants.COURT_TOP_SIDE_BORDER
-    )
+    return Court.checkOutOfBounds(this.sprite.x, this.sprite.y)
   }
 
   canUpdatePlayerWithBall(currPlayer: CourtPlayer | null, newPlayer: CourtPlayer) {
