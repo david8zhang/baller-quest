@@ -79,6 +79,8 @@ export class Hoop {
         this.handleOnCollideWithRim()
       }
     })
+
+    this.game.add.circle(this.sprite.x + successShotRange[0], this.sprite.y, 5, 0xff0000)
   }
 
   toggleRimCollider(state: boolean) {

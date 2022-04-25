@@ -160,7 +160,7 @@ export class Ball {
         hoop.toggleRimCollider(true)
       })
     } else {
-      this.game.time.delayedCall(time * 1000, () => {
+      this.game.time.delayedCall(time * 1100, () => {
         this.sprite.setVelocityX(0)
         this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)
         this.game.time.delayedCall(400, () => {
@@ -284,8 +284,8 @@ export class Ball {
     return (
       this.sprite.x > Constants.COURT_WIDTH ||
       this.sprite.x < 0 ||
-      this.sprite.y > Constants.COURT_HEIGHT ||
-      this.sprite.y < 0
+      this.sprite.y > Constants.COURT_BOTTOM_SIDE_BORDER ||
+      this.sprite.y < Constants.COURT_TOP_SIDE_BORDER
     )
   }
 

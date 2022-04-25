@@ -14,6 +14,9 @@ export class Constants {
   public static COURT_WIDTH = Constants.GAME_WIDTH * 1.5
   public static COURT_HEIGHT = Constants.GAME_HEIGHT
 
+  public static COURT_TOP_SIDE_BORDER = 125
+  public static COURT_BOTTOM_SIDE_BORDER = Constants.COURT_HEIGHT - 80
+
   // Court Player attributes
   public static COURT_PLAYER_SPEED = 200
   public static COURT_PLAYER_DEFENSE_SPEED = 250
@@ -35,7 +38,7 @@ export class Constants {
       y: Constants.COURT_HEIGHT / 2 - 150,
     },
     rimRange: [40, 60],
-    successShotRange: [50, 50],
+    successShotRange: [65, 65],
     isFlipX: false,
     driveDirection: DriveDirection.LEFT,
   }
@@ -53,7 +56,7 @@ export class Constants {
       y: Constants.COURT_HEIGHT / 2 - 125,
     },
     rimRange: [-60, -40],
-    successShotRange: [-52, -52],
+    successShotRange: [-67, -67],
     isFlipX: true,
     driveDirection: DriveDirection.RIGHT,
   }
@@ -77,15 +80,15 @@ export class Constants {
   // Offensive positions
   public static OFFENSE_FROM_LEFT = {
     [Role.PG]: 69,
-    [Role.SG]: 26,
-    [Role.SF]: 116,
+    [Role.SG]: 41,
+    [Role.SF]: 101,
     [Role.PF]: 87,
     [Role.C]: 57,
   }
   public static OFFENSE_FROM_RIGHT = {
     [Role.PG]: 65,
-    [Role.SG]: 18,
-    [Role.SF]: 108,
+    [Role.SG]: 33,
+    [Role.SF]: 93,
     [Role.PF]: 77,
     [Role.C]: 47,
   }

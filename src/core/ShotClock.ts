@@ -1,11 +1,10 @@
 import Game from '~/scenes/Game'
 import { UI } from '~/scenes/UI'
-import { Constants } from '~/utils/Constants'
 
 export class ShotClock {
   private ui: UI
   private shotClockText!: Phaser.GameObjects.Text
-  public secondsOnClock: number = 100000
+  public secondsOnClock: number = 24
   public shotClockTickEvent: Phaser.Time.TimerEvent
 
   constructor(ui: UI) {
