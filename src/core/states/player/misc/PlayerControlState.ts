@@ -5,8 +5,7 @@ import { PlayerStates, TeamStates } from '../../StateTypes'
 export class PlayerControlState extends State {
   public prevState: PlayerStates | null = null
 
-  enter(player: CourtPlayer, prevState: PlayerStates) {
-    this.prevState = prevState
+  enter(player: CourtPlayer) {
     player.setMoveTarget(null)
     player.setVelocity(0, 0)
   }

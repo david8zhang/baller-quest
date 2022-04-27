@@ -1,7 +1,7 @@
 import { Ball } from '~/core/Ball'
 import { CourtPlayer, Role } from '~/core/CourtPlayer'
 import { Hoop } from '~/core/Hoop'
-import { MissType, ShotOpenness, ShotType } from '~/core/ShotMeter'
+import { MissType, ShotOpenness, ShotType } from '~/core/meters/ShotMeter'
 import { DriveDirection, Team } from '~/core/teams/Team'
 import { LAST_NAMES, MALE_FIRST_NAMES } from './names'
 

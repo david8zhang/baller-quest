@@ -3,7 +3,7 @@ import { Constants } from '~/utils/Constants'
 import { Court, FieldZone } from './Court'
 import { CourtPlayer } from './CourtPlayer'
 import { Hoop } from './Hoop'
-import { MissType, ShotConfig, ShotType } from './ShotMeter'
+import { MissType, ShotConfig, ShotType } from './meters/ShotMeter'
 import { DriveDirection, Side, Team } from './teams/Team'
 
 export enum BallState {
@@ -160,7 +160,7 @@ export class Ball {
         hoop.toggleRimCollider(true)
       })
     } else {
-      this.game.time.delayedCall(time * 1100, () => {
+      this.game.time.delayedCall(time * 1000, () => {
         this.sprite.setVelocityX(0)
         this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)
         this.game.time.delayedCall(400, () => {

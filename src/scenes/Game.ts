@@ -4,14 +4,12 @@ import { Hoop } from '~/core/Hoop'
 import { PlayerTeam } from '~/core/teams/PlayerTeam'
 import { CPUTeam } from '~/core/teams/CPUTeam'
 import { Constants } from '~/utils/Constants'
-import { Debug } from '~/core/Debug'
-import { CourtPlayer } from '~/core/CourtPlayer'
 import { Side, Team } from '~/core/teams/Team'
 import { TeamStates } from '~/core/states/StateTypes'
 import { Score } from '~/core/Score'
 import { Court } from '~/core/Court'
 import { UI } from './UI'
-import { ShotType } from '~/core/ShotMeter'
+import { ShotType } from '~/core/meters/ShotMeter'
 
 export default class Game extends Phaser.Scene {
   public playerTeam!: PlayerTeam

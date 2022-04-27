@@ -10,7 +10,7 @@ import { State, StateMachine } from './states/StateMachine'
 import { PlayerStates } from './states/StateTypes'
 import { Team } from './teams/Team'
 import { ChaseReboundState } from './states/player/misc/ChaseReboundState'
-import { MissType, ShotType } from './ShotMeter'
+import { MissType, ShotType } from './meters/ShotMeter'
 import { DriveToBasketState } from './states/player/offense/DriveToBasketState'
 import { BallState } from './Ball'
 import { SetScreenState } from './states/player/offense/SetScreenState'
@@ -61,6 +61,7 @@ export class CourtPlayer {
   // Defense
   public currDefender: CourtPlayer | null = null
   public otherPlayerCollider!: Phaser.Physics.Arcade.Collider
+  public isPlayingIntenseDefense: boolean = false
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -174,6 +175,7 @@ export class CourtPlayer {
     )
     const defensiveSpacing = line.getPoint(spacingAmount)
     this.setMoveTarget(defensiveSpacing)
+    return defensiveSpacing
   }
 
   setupMarkerRectangle() {
@@ -276,18 +278,15 @@ export class CourtPlayer {
     return this.stateMachine.getFullState()
   }
 
-  moveTowardsTarget() {
-    if (!this.moveTarget) {
-      return
-    }
+  moveTowards(target: { x: number; y: number }) {
     const distance = Constants.getDistanceBetween(
       {
         x: this.sprite.x,
         y: this.sprite.y,
       },
       {
-        x: this.moveTarget.x,
-        y: this.moveTarget.y,
+        x: target.x,
+        y: target.y,
       }
     )
     if (Math.abs(distance) < 5) {
@@ -299,8 +298,8 @@ export class CourtPlayer {
           y: this.sprite.y,
         },
         {
-          x: this.moveTarget.x,
-          y: this.moveTarget.y,
+          x: target.x,
+          y: target.y,
         }
       )
       const velocityVector = new Phaser.Math.Vector2()
@@ -374,7 +373,9 @@ export class CourtPlayer {
 
   update() {
     this.stateMachine.step()
-    this.moveTowardsTarget()
+    if (this.moveTarget) {
+      this.moveTowards(this.moveTarget)
+    }
     this.nameText.setPosition(this.sprite.x - this.nameText.displayWidth / 2, this.sprite.y + 40)
     this.updatePlayerStateText()
     this.updatePlayerDigitIndex()

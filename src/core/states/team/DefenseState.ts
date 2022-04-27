@@ -10,7 +10,7 @@ export class DefenseState extends State {
 
   enter(team: Team) {
     team.courtPlayers.forEach((player: CourtPlayer) => {
-      if (team.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
+      if (player.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
         player.setState(PlayerStates.DEFEND_MAN)
       }
     })
@@ -52,7 +52,7 @@ export class DefenseState extends State {
         })
       } else {
         team.courtPlayers.forEach((player: CourtPlayer) => {
-          if (team.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
+          if (player.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
             player.setState(PlayerStates.DEFEND_MAN)
           }
         })

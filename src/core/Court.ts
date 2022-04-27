@@ -1,7 +1,7 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Debug } from './Debug'
-import { ShotType } from './ShotMeter'
+import { ShotType } from './meters/ShotMeter'
 import { DriveDirection, Side } from './teams/Team'
 
 export type FieldZone = {

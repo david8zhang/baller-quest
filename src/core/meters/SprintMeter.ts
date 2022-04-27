@@ -1,7 +1,6 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { CourtPlayer } from './CourtPlayer'
-import { PlayerTeam } from './teams/PlayerTeam'
+import { PlayerTeam } from '../teams/PlayerTeam'
 
 export class SprintMeter {
   private team: PlayerTeam

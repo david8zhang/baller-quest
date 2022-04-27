@@ -1,7 +1,6 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { CourtPlayer } from '../CourtPlayer'
-import { ShotMeter } from '../ShotMeter'
 import { TeamStates } from '../states/StateTypes'
 import { DriveDirection, Side, Team } from './Team'
 

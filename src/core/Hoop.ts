@@ -32,6 +32,8 @@ export class Hoop {
   public driveDirection: DriveDirection
   public rim: Phaser.Physics.Arcade.Sprite
   public backboard: Phaser.Physics.Arcade.Sprite
+  public isShotSuccess: boolean = false
+  public onOverlapHandler: Function | null = null
 
   constructor(game: Game, config: HoopConfig) {
     this.game = game

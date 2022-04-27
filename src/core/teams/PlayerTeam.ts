@@ -4,16 +4,18 @@ import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
 import { Hoop } from '../Hoop'
 import { PassCursor } from '../PassCursor'
-import { ShotMeter } from '../ShotMeter'
-import { SprintMeter } from '../SprintMeter'
+import { ShotMeter } from '../meters/ShotMeter'
+import { SprintMeter } from '../meters/SprintMeter'
 import { PlayerStates, TeamStates } from '../states/StateTypes'
 import { DriveDirection, Side, Team } from './Team'
+import { DefenseMeter } from '../meters/DefenseMeter'
 
 export class PlayerTeam extends Team {
   private cursor: Cursor
   private passCursor: PassCursor
   private shotMeter: ShotMeter
   private sprintMeter: SprintMeter
+  private defenseMeter: DefenseMeter
   public selectedCourtPlayer: CourtPlayer | null = null
   public isSprinting: boolean = false
 
@@ -34,6 +36,7 @@ export class PlayerTeam extends Team {
     this.passCursor = new PassCursor(this.game)
     this.shotMeter = new ShotMeter(this, this.game)
     this.sprintMeter = new SprintMeter(this, this.game)
+    this.defenseMeter = new DefenseMeter(this, this.game)
   }
 
   selectCourtPlayer(courtPlayer: CourtPlayer) {
@@ -42,7 +45,7 @@ export class PlayerTeam extends Team {
       oldPlayer.setState(PlayerStates.WAIT)
     }
     this.selectedCourtPlayer = courtPlayer
-    this.selectedCourtPlayer.setState(PlayerStates.PLAYER_CONTROL, courtPlayer.getCurrentState())
+    this.selectedCourtPlayer.setState(PlayerStates.PLAYER_CONTROL)
     this.cursor.selectCourtPlayer(courtPlayer)
   }
 

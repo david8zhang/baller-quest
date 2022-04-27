@@ -1,5 +1,5 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { ShotMeter, ShotType } from '~/core/ShotMeter'
+import { ShotMeter, ShotType } from '~/core/meters/ShotMeter'
 import { Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
 import { State } from '../../StateMachine'

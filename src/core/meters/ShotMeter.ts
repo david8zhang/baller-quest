@@ -1,11 +1,11 @@
 import Game from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
-import { BallState } from './Ball'
-import { Court } from './Court'
-import { CourtPlayer } from './CourtPlayer'
-import { Hoop } from './Hoop'
-import { PlayerTeam } from './teams/PlayerTeam'
-import { DriveDirection, Team } from './teams/Team'
+import { BallState } from '../Ball'
+import { Court } from '../Court'
+import { CourtPlayer } from '../CourtPlayer'
+import { Hoop } from '../Hoop'
+import { PlayerTeam } from '../teams/PlayerTeam'
+import { DriveDirection, Team } from '../teams/Team'
 
 export interface ShotThreshold {
   lowerBound: number
