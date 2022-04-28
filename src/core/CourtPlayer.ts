@@ -20,6 +20,7 @@ import { SmartOffenseState } from './states/player/offense/SmartOffenseState'
 import { ShootingState } from './states/player/offense/ShootingState'
 import { PassState } from './states/player/offense/PassState'
 import { SideOutState } from './states/player/misc/SideOutState'
+import { GoToOpenSpot } from './states/player/offense/GoToOpenSpot'
 
 export enum Role {
   PG = 'PG',
@@ -96,6 +97,7 @@ export class CourtPlayer {
         [PlayerStates.SHOOT]: new ShootingState(),
         [PlayerStates.PASS]: new PassState(),
         [PlayerStates.SIDE_OUT_STATE]: new SideOutState(),
+        [PlayerStates.GO_TO_SPOT]: new GoToOpenSpot(),
       },
       [this, this.team]
     )

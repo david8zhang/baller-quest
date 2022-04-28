@@ -2,7 +2,7 @@ import { Ball } from '~/core/Ball'
 import { CourtPlayer, Role } from '~/core/CourtPlayer'
 import { Hoop } from '~/core/Hoop'
 import { MissType, ShotOpenness, ShotType } from '~/core/meters/ShotMeter'
-import { DriveDirection, Team } from '~/core/teams/Team'
+import { DriveDirection, Side, Team } from '~/core/teams/Team'
 import { LAST_NAMES, MALE_FIRST_NAMES } from './names'
 
 export class Constants {
@@ -348,6 +348,16 @@ export class Constants {
     )
     const distanceThreshold = threshold ? threshold : 100
     return distanceToDefender > distanceThreshold
+  }
+
+  public static getZonesForDriveDirection(driveDirection: DriveDirection) {
+    const allRightZones = Constants.LAYUP_RANGE_LEFT.concat(
+      Constants.THREE_POINT_RANGE_LEFT
+    ).concat(Constants.MID_RANGE_LEFT)
+    const allLeftZones = Constants.LAYUP_RANGE_RIGHT.concat(
+      Constants.THREE_POINT_RANGE_RIGHT
+    ).concat(Constants.MID_RANGE_RIGHT)
+    return driveDirection === DriveDirection.LEFT ? allLeftZones : allRightZones
   }
 
   public static getZoneToDriveTo(player: CourtPlayer): number {

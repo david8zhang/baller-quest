@@ -1,6 +1,6 @@
 import { BallState } from '~/core/Ball'
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { ShotMeter, ShotOpenness } from '~/core/ShotMeter'
+import { ShotMeter, ShotOpenness } from '~/core/meters/ShotMeter'
 import { Side, Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
 import { State } from '../StateMachine'

@@ -19,24 +19,28 @@ export class SmartOffenseState extends State {
 
   handleTick(thisPlayer: CourtPlayer, team: Team) {
     // if currently have the ball
-    if (team.getBall().isInPossessionOf(thisPlayer)) {
-      const shootFirst = Phaser.Math.Between(0, 1) === 0
-      if (shootFirst) {
-        const hasOpenShot = Constants.playerHasOpenShot(thisPlayer, thisPlayer.getDefender())
-        if (hasOpenShot) {
-          thisPlayer.setState(PlayerStates.SHOOT)
-        } else {
-          this.getRandomBehavior(thisPlayer, team)
-        }
-      } else {
-        const zoneToDriveToId = Constants.getZoneToDriveTo(thisPlayer)
-        if (zoneToDriveToId !== -1) {
-          thisPlayer.setState(PlayerStates.DRIVE_TO_BASKET, zoneToDriveToId)
-        } else {
-          this.getRandomBehavior(thisPlayer, team)
-        }
-      }
+    if (thisPlayer.getCurrentState() !== PlayerStates.GO_TO_SPOT) {
+      thisPlayer.setState(PlayerStates.GO_TO_SPOT)
     }
+
+    // if (team.getBall().isInPossessionOf(thisPlayer)) {
+    //   const shootFirst = Phaser.Math.Between(0, 1) === 0
+    //   if (shootFirst) {
+    //     const hasOpenShot = Constants.playerHasOpenShot(thisPlayer, thisPlayer.getDefender())
+    //     if (hasOpenShot) {
+    //       thisPlayer.setState(PlayerStates.SHOOT)
+    //     } else {
+    //       this.getRandomBehavior(thisPlayer, team)
+    //     }
+    //   } else {
+    //     const zoneToDriveToId = Constants.getZoneToDriveTo(thisPlayer)
+    //     if (zoneToDriveToId !== -1) {
+    //       thisPlayer.setState(PlayerStates.DRIVE_TO_BASKET, zoneToDriveToId)
+    //     } else {
+    //       this.getRandomBehavior(thisPlayer, team)
+    //     }
+    //   }
+    // }
   }
 
   getRandomBehavior(thisPlayer: CourtPlayer, team: Team) {
