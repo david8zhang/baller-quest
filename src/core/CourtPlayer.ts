@@ -53,6 +53,11 @@ export class CourtPlayer {
   public markerRectangle!: Phaser.Geom.Rectangle
   public speed: number = Constants.COURT_PLAYER_SPEED
 
+  // Jumping logic
+  public isJumping: boolean = false
+  public floor: Phaser.Physics.Arcade.Sprite
+  public floorCollider: Phaser.Physics.Arcade.Collider
+
   // Debug stuff
   public graphics: Phaser.GameObjects.Graphics
   public nameText!: Phaser.GameObjects.Text
@@ -105,6 +110,20 @@ export class CourtPlayer {
     this.setupPlayerDigitIndex()
     this.sprite.setData('ref', this)
     this.graphics = this.game.add.graphics()
+
+    // Set up floor for jumping
+    this.floor = this.game.physics.add
+      .sprite(this.sprite.x, this.sprite.y + this.sprite.displayHeight / 2 + 5, '')
+      .setVisible(false)
+      .setPushable(false)
+    this.floor.body.setSize(50, 10)
+    this.game.physics.world.enable(this.floor, Phaser.Physics.Arcade.DYNAMIC_BODY)
+    this.floorCollider = this.game.physics.add.collider(this.sprite, this.floor, () => {
+      this.sprite.setGravity(0)
+      this.isJumping = false
+      this.floorCollider.active = false
+    })
+    this.floorCollider.active = false
   }
 
   public toggleColliderWithOtherPlayer(otherPlayer: CourtPlayer) {
@@ -264,6 +283,21 @@ export class CourtPlayer {
     return this.team.side
   }
 
+  jump() {
+    this.floor.setPosition(this.sprite.x, this.sprite.y + this.sprite.displayHeight / 2 + 5)
+    this.floorCollider.active = true
+    this.isJumping = true
+    const timeInFlight = 0.75
+    const posToLand = {
+      x: this.sprite.x,
+      y: this.sprite.y,
+    }
+    this.sprite.setGravityY(980)
+    const xVelocity = (posToLand.x - this.sprite.x) / timeInFlight
+    const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(timeInFlight, 2)) / timeInFlight
+    this.setVelocity(xVelocity, yVelocity)
+  }
+
   getDriveDirection() {
     return this.team.driveDirection
   }
@@ -375,7 +409,7 @@ export class CourtPlayer {
 
   update() {
     this.stateMachine.step()
-    if (this.moveTarget) {
+    if (this.moveTarget && this.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
       this.moveTowards(this.moveTarget)
     }
     this.nameText.setPosition(this.sprite.x - this.nameText.displayWidth / 2, this.sprite.y + 40)

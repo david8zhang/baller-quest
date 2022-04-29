@@ -61,7 +61,11 @@ export class PlayerTeam extends Team {
     const downDown = keyboard.down.isDown
 
     const currentPlayer = this.selectedCourtPlayer
-    if (!currentPlayer || currentPlayer.getCurrentState() == PlayerStates.WAIT) {
+    if (
+      !currentPlayer ||
+      currentPlayer.getCurrentState() == PlayerStates.WAIT ||
+      currentPlayer.isJumping
+    ) {
       return
     }
     const speed = this.sprintMeter.getSpeed()
@@ -118,6 +122,13 @@ export class PlayerTeam extends Team {
               }
             } else {
               this.switchPlayer()
+            }
+            break
+          }
+          case 'KeyA': {
+            const selectedPlayer = this.selectedCourtPlayer
+            if (selectedPlayer) {
+              selectedPlayer.jump()
             }
             break
           }
