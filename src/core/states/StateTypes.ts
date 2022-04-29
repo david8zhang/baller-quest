@@ -13,7 +13,7 @@ export enum PlayerStates {
   SMART_OFFENSE = 'SmartOffense',
   SHOOT = 'Shoot',
   PASS = 'Pass',
-  GO_TO_SPOT = 'GoToSpot',
+  GO_TO_OPEN_SPOT = 'GoToOpenSpot',
 
   // Defensive states
   DEFEND_MAN = 'DefendMan',

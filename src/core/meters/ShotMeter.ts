@@ -190,13 +190,7 @@ export class ShotMeter {
           y: guardingPlayer.sprite.y,
         }
       )
-      if (distanceToGuardingPlayer >= 150) {
-        return ShotOpenness.OPEN
-      } else if (distanceToGuardingPlayer < 150 && distanceToGuardingPlayer >= 50) {
-        return ShotOpenness.CONTESTED
-      } else {
-        return ShotOpenness.SMOTHERED
-      }
+      return Constants.getOpennessBasedOnDistance(distanceToGuardingPlayer)
     }
   }
 

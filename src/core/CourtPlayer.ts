@@ -97,7 +97,7 @@ export class CourtPlayer {
         [PlayerStates.SHOOT]: new ShootingState(),
         [PlayerStates.PASS]: new PassState(),
         [PlayerStates.SIDE_OUT_STATE]: new SideOutState(),
-        [PlayerStates.GO_TO_SPOT]: new GoToOpenSpot(),
+        [PlayerStates.GO_TO_OPEN_SPOT]: new GoToOpenSpot(),
       },
       [this, this.team]
     )

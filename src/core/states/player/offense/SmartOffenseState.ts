@@ -19,39 +19,30 @@ export class SmartOffenseState extends State {
 
   handleTick(thisPlayer: CourtPlayer, team: Team) {
     // if currently have the ball
-    if (thisPlayer.getCurrentState() !== PlayerStates.GO_TO_SPOT) {
-      thisPlayer.setState(PlayerStates.GO_TO_SPOT)
-    }
+    const randomOnBallBehaviors = [
+      PlayerStates.DRIVE_TO_BASKET,
+      PlayerStates.PASS,
+      PlayerStates.SHOOT,
+      PlayerStates.GO_TO_OPEN_SPOT,
+    ]
 
-    // if (team.getBall().isInPossessionOf(thisPlayer)) {
-    //   const shootFirst = Phaser.Math.Between(0, 1) === 0
-    //   if (shootFirst) {
-    //     const hasOpenShot = Constants.playerHasOpenShot(thisPlayer, thisPlayer.getDefender())
-    //     if (hasOpenShot) {
-    //       thisPlayer.setState(PlayerStates.SHOOT)
-    //     } else {
-    //       this.getRandomBehavior(thisPlayer, team)
-    //     }
-    //   } else {
-    //     const zoneToDriveToId = Constants.getZoneToDriveTo(thisPlayer)
-    //     if (zoneToDriveToId !== -1) {
-    //       thisPlayer.setState(PlayerStates.DRIVE_TO_BASKET, zoneToDriveToId)
-    //     } else {
-    //       this.getRandomBehavior(thisPlayer, team)
-    //     }
-    //   }
-    // }
+    const randomOffBallBehaviors = [PlayerStates.GO_TO_OPEN_SPOT, PlayerStates.WAIT]
+
+    if (team.getBall().isInPossessionOf(thisPlayer)) {
+      const hasOpenShot = Constants.playerHasOpenShot(thisPlayer, thisPlayer.getDefender())
+      if (hasOpenShot) {
+        thisPlayer.setState(PlayerStates.SHOOT)
+      } else {
+        this.setRandomBehavior(thisPlayer, randomOnBallBehaviors)
+      }
+    } else {
+      this.setRandomBehavior(thisPlayer, randomOffBallBehaviors)
+    }
   }
 
-  getRandomBehavior(thisPlayer: CourtPlayer, team: Team) {
-    const randNum = Phaser.Math.Between(0, 2)
-    if (randNum === 0) {
-      thisPlayer.setState(PlayerStates.PASS)
-    } else if (randNum === 1) {
-      thisPlayer.setState(PlayerStates.DRIVE_TO_BASKET)
-    } else if (randNum === 2) {
-      thisPlayer.setState(PlayerStates.SHOOT)
-    }
+  setRandomBehavior(thisPlayer: CourtPlayer, behaviors: PlayerStates[]) {
+    const randBehavior = behaviors[Phaser.Math.Between(0, behaviors.length - 1)]
+    thisPlayer.setState(randBehavior)
   }
 
   exit() {

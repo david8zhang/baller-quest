@@ -14,7 +14,7 @@ export class Constants {
   public static COURT_WIDTH = Constants.GAME_WIDTH * 1.5
   public static COURT_HEIGHT = Constants.GAME_HEIGHT
 
-  public static COURT_TOP_SIDE_BORDER = 125
+  public static COURT_TOP_SIDE_BORDER = 100
   public static COURT_BOTTOM_SIDE_BORDER = Constants.COURT_HEIGHT - 80
 
   // Court Player attributes
@@ -351,12 +351,8 @@ export class Constants {
   }
 
   public static getZonesForDriveDirection(driveDirection: DriveDirection) {
-    const allRightZones = Constants.LAYUP_RANGE_LEFT.concat(
-      Constants.THREE_POINT_RANGE_LEFT
-    ).concat(Constants.MID_RANGE_LEFT)
-    const allLeftZones = Constants.LAYUP_RANGE_RIGHT.concat(
-      Constants.THREE_POINT_RANGE_RIGHT
-    ).concat(Constants.MID_RANGE_RIGHT)
+    const allRightZones = Constants.MID_RANGE_LEFT
+    const allLeftZones = Constants.MID_RANGE_RIGHT
     return driveDirection === DriveDirection.LEFT ? allLeftZones : allRightZones
   }
 
@@ -387,5 +383,15 @@ export class Constants {
       }
     })
     return zoneToDriveTowards
+  }
+
+  static getOpennessBasedOnDistance(distance: number) {
+    if (distance >= 150) {
+      return ShotOpenness.OPEN
+    } else if (distance < 150 && distance >= 50) {
+      return ShotOpenness.CONTESTED
+    } else {
+      return ShotOpenness.SMOTHERED
+    }
   }
 }

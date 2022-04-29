@@ -18,10 +18,7 @@ export class GoToOpenSpot extends State {
     const zone = team.game.court.getZoneForZoneId(this.destinationZoneId)
     if (zone) {
       if (Constants.IsAtPosition(player, zone.centerPosition)) {
-        const openSpots = Constants.getZonesForDriveDirection(team.driveDirection)
-        this.destinationZoneId = this.getOpenSpot(player, team, openSpots)
-        const zone = team.game.court.getZoneForZoneId(this.destinationZoneId)
-        player.setMoveTarget(zone!.centerPosition)
+        player.setState(PlayerStates.SMART_OFFENSE)
       }
     }
   }
@@ -33,15 +30,17 @@ export class GoToOpenSpot extends State {
     return openSpots[Phaser.Math.Between(0, openSpots.length - 1)]
   }
 
-  getScoreForSpot(spot: number, team: CourtPlayer) {}
-
   isOtherTeammateMovingToSpot(spot: number, team: Team) {
     return team.courtPlayers.find((player: CourtPlayer) => {
-      if (player.getCurrentState() === PlayerStates.GO_TO_SPOT) {
+      if (player.getCurrentState() === PlayerStates.GO_TO_OPEN_SPOT) {
         const state = player.getCurrentStateFull() as GoToOpenSpot
         return state.destinationZoneId === spot
       }
-      return false
+      const zoneId = team.game.court.getNearestZoneForPosition({
+        x: player.sprite.x,
+        y: player.sprite.y,
+      })
+      return spot === zoneId
     })
   }
 }
