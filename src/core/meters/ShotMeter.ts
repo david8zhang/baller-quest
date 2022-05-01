@@ -65,6 +65,10 @@ export class ShotMeter {
         if (this.game.ball.getPossessionSide() === team.side) {
           if (this.keyE.isDown) {
             this.windUpShot()
+            const timeForShot = this.shotThreshold.perfectReleaseValue / 40
+            if (team.selectedCourtPlayer) {
+              team.selectedCourtPlayer.jump(timeForShot)
+            }
             this.isShooting = true
           }
           if (this.keyE.isUp && this.isShooting) {

@@ -13,7 +13,11 @@ export class PlayerControlState extends State {
   execute(player: CourtPlayer) {
     if (player.team.getCurrentState() == TeamStates.DEFENSE) {
       const playerToDefend = player.getPlayerToDefend()
-      player.toggleColliderWithOtherPlayer(playerToDefend)
+      if (!playerToDefend.isJumping) {
+        player.toggleColliderWithOtherPlayer(playerToDefend)
+      } else {
+        player.clearColliders()
+      }
     }
   }
 }

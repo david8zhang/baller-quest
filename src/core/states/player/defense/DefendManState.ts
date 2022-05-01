@@ -1,6 +1,6 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { ShotMeter, ShotType } from '~/core/meters/ShotMeter'
-import { Team } from '~/core/teams/Team'
+import { Side, Team } from '~/core/teams/Team'
 import { Constants } from '~/utils/Constants'
 import { State } from '../../StateMachine'
 import { PlayerStates } from '../../StateTypes'
@@ -35,17 +35,24 @@ export class DefendManState extends State {
     }
     const isOnBall = defensiveAssignment && team.getBall().isInPossessionOf(defensiveAssignment)
 
-    player.defend(defenderPosition, isOnBall ? 0.15 : 0.25)
-    if (isOnBall) {
-      if (
-        Constants.getZoneToDriveTo(defensiveAssignment) !== -1 ||
-        this.hasSpaceToShoot(player, defensiveAssignment, team)
-      ) {
-        player.speed = Constants.COURT_PLAYER_DEFENSE_SPEED
+    if (!defensiveAssignment.isJumping) {
+      player.defend(defenderPosition, isOnBall ? 0.15 : 0.25)
+      if (isOnBall) {
+        if (
+          Constants.getZoneToDriveTo(defensiveAssignment) !== -1 ||
+          this.hasSpaceToShoot(player, defensiveAssignment, team)
+        ) {
+          player.speed = Constants.COURT_PLAYER_DEFENSE_SPEED
+        }
+        player.toggleColliderWithOtherPlayer(defensiveAssignment)
+      } else {
+        player.speed = Constants.COURT_PLAYER_SPEED
+        player.clearColliders()
       }
-      player.toggleColliderWithOtherPlayer(defensiveAssignment)
     } else {
-      player.speed = Constants.COURT_PLAYER_SPEED
+      if (team.side === Side.PLAYER) {
+        console.log('went here')
+      }
       player.clearColliders()
     }
   }

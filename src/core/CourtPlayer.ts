@@ -283,19 +283,31 @@ export class CourtPlayer {
     return this.team.side
   }
 
-  jump() {
-    this.floor.setPosition(this.sprite.x, this.sprite.y + this.sprite.displayHeight / 2 + 5)
-    this.floorCollider.active = true
-    this.isJumping = true
-    const timeInFlight = 0.75
-    const posToLand = {
-      x: this.sprite.x,
-      y: this.sprite.y,
+  jump(timeInFlight: number = 0.75) {
+    if (!this.isJumping) {
+      this.setVelocity(0, 0)
+      this.floor.setPosition(this.sprite.x, this.sprite.y + this.sprite.displayHeight / 2 + 5)
+      this.floorCollider.active = true
+      this.isJumping = true
+      const posToLand = {
+        x: this.sprite.x,
+        y: this.sprite.y,
+      }
+      this.sprite.setGravityY(980)
+      const xVelocity = (posToLand.x - this.sprite.x) / timeInFlight
+      const yVelocity =
+        (posToLand.y - this.sprite.y - 490 * Math.pow(timeInFlight, 2)) / timeInFlight
+
+      // If we're still jumping after some time, break it off
+      this.game.time.delayedCall(timeInFlight * 1250, () => {
+        if (this.isJumping) {
+          this.sprite.setGravityY(0)
+          this.isJumping = false
+          this.floorCollider.active = false
+        }
+      })
+      this.setVelocity(xVelocity, yVelocity)
     }
-    this.sprite.setGravityY(980)
-    const xVelocity = (posToLand.x - this.sprite.x) / timeInFlight
-    const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(timeInFlight, 2)) / timeInFlight
-    this.setVelocity(xVelocity, yVelocity)
   }
 
   getDriveDirection() {
@@ -409,7 +421,11 @@ export class CourtPlayer {
 
   update() {
     this.stateMachine.step()
-    if (this.moveTarget && this.getCurrentState() !== PlayerStates.PLAYER_CONTROL) {
+    if (
+      this.moveTarget &&
+      this.getCurrentState() !== PlayerStates.PLAYER_CONTROL &&
+      !this.isJumping
+    ) {
       this.moveTowards(this.moveTarget)
     }
     this.nameText.setPosition(this.sprite.x - this.nameText.displayWidth / 2, this.sprite.y + 40)

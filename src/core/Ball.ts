@@ -263,7 +263,10 @@ export class Ball {
   }
 
   update() {
-    if (this.player && this.currState == BallState.DRIBBLE) {
+    if (
+      this.player &&
+      (this.currState == BallState.DRIBBLE || this.currState === BallState.WIND_UP_SHOT)
+    ) {
       this.sprite.x = this.player.sprite.x
       this.sprite.y = this.player.sprite.y
     }
@@ -275,7 +278,10 @@ export class Ball {
       this.currState !== BallState.REBOUND
     ) {
       const lastTouchedSide = this.player ? this.player.getSide() : this.prevPlayer!.getSide()
-      this.game.handleOutOfBounds({ x: this.sprite.x, y: this.sprite.y }, lastTouchedSide)
+      const isJumping = this.player ? this.player.isJumping : false
+      if (!isJumping) {
+        this.game.handleOutOfBounds({ x: this.sprite.x, y: this.sprite.y }, lastTouchedSide)
+      }
     }
 
     this.updateBallStateText()

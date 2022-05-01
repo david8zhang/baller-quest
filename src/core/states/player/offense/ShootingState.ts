@@ -9,16 +9,12 @@ export class ShootingState extends State {
     const team = courtPlayer.team
     if (team.getBall().isInPossessionOf(courtPlayer)) {
       team.getBall().setBallState(BallState.WIND_UP_SHOT)
-      courtPlayer.game.time.delayedCall(200, () => {
+      const posToShootFrom = { x: courtPlayer.sprite.x, y: courtPlayer.sprite.y }
+      const shotTime = 0.8
+      courtPlayer.jump(shotTime)
+      courtPlayer.game.time.delayedCall((shotTime / 2) * 1000, () => {
         const openness = ShotMeter.getOpenness(courtPlayer, team)
-        const shotType = ShotMeter.getShotType(
-          {
-            x: courtPlayer.sprite.x,
-            y: courtPlayer.sprite.y,
-          },
-          team.driveDirection,
-          team.game.court
-        )
+        const shotType = ShotMeter.getShotType(posToShootFrom, team.driveDirection, team.game.court)
         console.log('Shot openness: ', openness)
         console.log('Shot type: ', shotType)
         const { percentage } = Constants.SHOT_PERCENTAGES[openness][shotType]
