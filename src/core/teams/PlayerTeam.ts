@@ -126,16 +126,19 @@ export class PlayerTeam extends Team {
             break
           }
           case 'KeyA': {
-            if (this.getCurrentState() === TeamStates.DEFENSE) {
-              const selectedPlayer = this.selectedCourtPlayer
-              if (selectedPlayer) {
-                const defensiveAssignment = selectedPlayer.getPlayerToDefend()
-                if (this.getBall().isInPossessionOf(defensiveAssignment)) {
-                  selectedPlayer.blockShot(defensiveAssignment)
-                }
-              }
+            const selectedPlayer = this.selectedCourtPlayer
+            if (this.isOnBallDefender(selectedPlayer)) {
+              const defensiveAssignment = selectedPlayer!.getPlayerToDefend()
+              selectedPlayer!.blockShot(defensiveAssignment)
             }
             break
+          }
+          case 'KeyS': {
+            const selectedPlayer = this.selectedCourtPlayer
+            if (this.isOnBallDefender(selectedPlayer)) {
+              const defensiveAssignment = selectedPlayer!.getPlayerToDefend()
+              selectedPlayer?.stealBallFrom(defensiveAssignment)
+            }
           }
           case 'KeyQ': {
             const randomPlayer = this.courtPlayers.find((courtPlayer: CourtPlayer) => {
@@ -154,6 +157,17 @@ export class PlayerTeam extends Team {
         }
       }
     })
+  }
+
+  isOnBallDefender(selectedPlayer: CourtPlayer | null) {
+    if (this.getCurrentState() === TeamStates.DEFENSE) {
+      if (selectedPlayer) {
+        const defensiveAssignment = selectedPlayer.getPlayerToDefend()
+        return this.getBall().isInPossessionOf(defensiveAssignment)
+      }
+      return false
+    }
+    return false
   }
 
   switchPlayer(playerToSwitchTo?: CourtPlayer) {

@@ -53,6 +53,9 @@ export class CourtPlayer {
   public markerRectangle!: Phaser.Geom.Rectangle
   public speed: number = Constants.COURT_PLAYER_SPEED
 
+  // Stealing logic
+  public stealGraceTimePassed: boolean = true
+
   // Jumping logic
   public isJumping: boolean = false
   public floor: Phaser.Physics.Arcade.Sprite
@@ -424,15 +427,39 @@ export class CourtPlayer {
   blockShot(playerToDefend: CourtPlayer) {
     this.jump(0.8)
     if (playerToDefend.isBlockable) {
-      const ball = this.team.getBall()
-      ball.setBlocked(0.8)
-      const playerPosition = new Phaser.Math.Vector2(
-        playerToDefend.team.driveDirection === DriveDirection.LEFT
-          ? playerToDefend.sprite.x + 75
-          : playerToDefend.sprite.x - 75,
-        playerToDefend.sprite.y
-      )
-      ball.launchArcTowards(playerPosition, 0.5)
+      const isBlockSuccessful = Phaser.Math.Between(1, 100) < Constants.BLOCK_SUCCESS_RATE
+      if (isBlockSuccessful) {
+        const ball = this.team.getBall()
+        ball.knockAway(0.8)
+        const playerPosition = new Phaser.Math.Vector2(
+          playerToDefend.team.driveDirection === DriveDirection.LEFT
+            ? playerToDefend.sprite.x + 75
+            : playerToDefend.sprite.x - 75,
+          playerToDefend.sprite.y
+        )
+        ball.launchArcTowards(playerPosition, 0.5)
+      }
+    }
+  }
+
+  stealBallFrom(playerToDefend: CourtPlayer) {
+    const ball = this.team.getBall()
+    if (this.stealGraceTimePassed) {
+      this.stealGraceTimePassed = false
+      const isStealSuccessful = Phaser.Math.Between(1, 100) < Constants.STEAL_SUCCESS_RATE
+      if (isStealSuccessful) {
+        ball.knockAway(0.8)
+        const knockAwayPos = new Phaser.Math.Vector2(
+          playerToDefend.team.driveDirection === DriveDirection.LEFT
+            ? playerToDefend.sprite.x + 75
+            : playerToDefend.sprite.x - 75,
+          playerToDefend.sprite.y
+        )
+        ball.launchArcTowards(knockAwayPos, 0.5)
+      }
+      this.game.time.delayedCall(200, () => {
+        this.stealGraceTimePassed = true
+      })
     }
   }
 

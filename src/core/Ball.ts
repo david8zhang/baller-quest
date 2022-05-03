@@ -9,7 +9,7 @@ import { DriveDirection, Side, Team } from './teams/Team'
 export enum BallState {
   DRIBBLE = 'DRIBBLE',
   LOOSE = 'LOOSE',
-  BLOCKED = 'BLOCKED',
+  KNOCKED_AWAY = 'KNOCKED_AWAY',
   WIND_UP_SHOT = 'WIND_UP_SHOT',
   MID_SHOT = 'MID_SHOT',
   PASS = 'PASS',
@@ -39,7 +39,7 @@ export class Ball {
   public shotType!: ShotType
   public ballStateText!: Phaser.GameObjects.Text
 
-  public static IGNORE_OOB_STATES = [BallState.MID_SHOT, BallState.REBOUND, BallState.BLOCKED]
+  public static IGNORE_OOB_STATES = [BallState.MID_SHOT, BallState.REBOUND, BallState.KNOCKED_AWAY]
 
   constructor(game: Game, config: BallConfig) {
     this.game = game
@@ -208,10 +208,10 @@ export class Ball {
     this.currState = state
   }
 
-  setBlocked(blockFlightTime: number) {
+  knockAway(knockAwayTime: number) {
     this.player = null
-    this.currState = BallState.BLOCKED
-    this.game.time.delayedCall(blockFlightTime * 1000, () => {
+    this.currState = BallState.KNOCKED_AWAY
+    this.game.time.delayedCall(knockAwayTime * 1000, () => {
       this.currState = BallState.LOOSE
       this.handleFloorCollision()
     })
@@ -333,7 +333,7 @@ export class Ball {
       case BallState.REBOUND: {
         return true
       }
-      case BallState.BLOCKED: {
+      case BallState.KNOCKED_AWAY: {
         return false
       }
       default:

@@ -22,8 +22,12 @@ export class Constants {
   public static COURT_PLAYER_DEFENSE_SPEED = 250
   public static COURT_PLAYER_SPRINT_SPEED = 300
   public static COURT_PLAYER_TIRED_SPEED = 150
-
   public static PASS_SPEED = 1000
+
+  //Block, steal percentages
+  public static BLOCK_SUCCESS_RATE = 30
+  public static STEAL_SUCCESS_RATE = 20
+
   public static HOOP_LEFT = {
     position: {
       x: 125,
