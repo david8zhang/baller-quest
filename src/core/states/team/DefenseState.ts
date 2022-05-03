@@ -37,7 +37,11 @@ export class DefenseState extends State {
   }
 
   execute(team: Team) {
-    if (team.getBall().currState === BallState.REBOUND && !team.getBall().isOutOfBounds()) {
+    const ball = team.getBall()
+    if (
+      (ball.currState === BallState.REBOUND || ball.currState === BallState.LOOSE) &&
+      !team.getBall().isOutOfBounds()
+    ) {
       this.chaseRebound(team)
     } else {
       // apply new states based on changes on the court

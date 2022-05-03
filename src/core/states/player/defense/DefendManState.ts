@@ -50,9 +50,6 @@ export class DefendManState extends State {
         player.clearColliders()
       }
     } else {
-      if (team.side === Side.PLAYER) {
-        console.log('went here')
-      }
       player.clearColliders()
     }
   }

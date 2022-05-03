@@ -1,4 +1,4 @@
-import { Ball } from '~/core/Ball'
+import { Ball, BallState } from '~/core/Ball'
 import { CourtPlayer, Role } from '~/core/CourtPlayer'
 import { Hoop } from '~/core/Hoop'
 import { MissType, ShotOpenness, ShotType } from '~/core/meters/ShotMeter'
@@ -62,14 +62,14 @@ export class Constants {
   }
 
   // Team attributes
-  public static RIGHT_SIDE = [
+  public static LEFT = [
     { zoneId: 68, role: Role.C },
     { zoneId: 36, role: Role.SG },
     { zoneId: 98, role: Role.SF },
     { zoneId: 82, role: Role.PF },
     { zoneId: 70, role: Role.PG },
   ]
-  public static LEFT_SIDE = [
+  public static RIGHT = [
     { zoneId: 66, role: Role.C },
     { zoneId: 38, role: Role.SG },
     { zoneId: 96, role: Role.SF },
@@ -78,14 +78,14 @@ export class Constants {
   ]
 
   // Offensive positions
-  public static OFFENSE_FROM_LEFT = {
+  public static OFFENSE_FROM_RIGHT = {
     [Role.PG]: 69,
     [Role.SG]: 41,
     [Role.SF]: 101,
     [Role.PF]: 87,
     [Role.C]: 57,
   }
-  public static OFFENSE_FROM_RIGHT = {
+  public static OFFENSE_FROM_LEFT = {
     [Role.PG]: 65,
     [Role.SG]: 33,
     [Role.SF]: 93,

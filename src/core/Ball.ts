@@ -9,6 +9,7 @@ import { DriveDirection, Side, Team } from './teams/Team'
 export enum BallState {
   DRIBBLE = 'DRIBBLE',
   LOOSE = 'LOOSE',
+  BLOCKED = 'BLOCKED',
   WIND_UP_SHOT = 'WIND_UP_SHOT',
   MID_SHOT = 'MID_SHOT',
   PASS = 'PASS',
@@ -37,6 +38,8 @@ export class Ball {
   public arcDestination: Phaser.GameObjects.Arc
   public shotType!: ShotType
   public ballStateText!: Phaser.GameObjects.Text
+
+  public static IGNORE_OOB_STATES = [BallState.MID_SHOT, BallState.REBOUND, BallState.BLOCKED]
 
   constructor(game: Game, config: BallConfig) {
     this.game = game
@@ -205,7 +208,17 @@ export class Ball {
     this.currState = state
   }
 
+  setBlocked(blockFlightTime: number) {
+    this.player = null
+    this.currState = BallState.BLOCKED
+    this.game.time.delayedCall(blockFlightTime * 1000, () => {
+      this.currState = BallState.LOOSE
+      this.handleFloorCollision()
+    })
+  }
+
   setLoose() {
+    this.player = null
     this.currState = BallState.LOOSE
   }
 
@@ -270,12 +283,10 @@ export class Ball {
       this.sprite.x = this.player.sprite.x
       this.sprite.y = this.player.sprite.y
     }
-
     if (
       this.isOutOfBounds() &&
       (this.prevPlayer || this.player) &&
-      this.currState !== BallState.MID_SHOT &&
-      this.currState !== BallState.REBOUND
+      !Ball.IGNORE_OOB_STATES.includes(this.currState)
     ) {
       const lastTouchedSide = this.player ? this.player.getSide() : this.prevPlayer!.getSide()
       const isJumping = this.player ? this.player.isJumping : false
@@ -321,6 +332,9 @@ export class Ball {
       }
       case BallState.REBOUND: {
         return true
+      }
+      case BallState.BLOCKED: {
+        return false
       }
       default:
         return true

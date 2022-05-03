@@ -12,6 +12,9 @@ export class ShootingState extends State {
       const posToShootFrom = { x: courtPlayer.sprite.x, y: courtPlayer.sprite.y }
       const shotTime = 0.8
       courtPlayer.jump(shotTime)
+
+      // Have shot be blockable in the first 200 milliseconds
+      courtPlayer.isBlockable = true
       courtPlayer.game.time.delayedCall((shotTime / 2) * 1000, () => {
         const openness = ShotMeter.getOpenness(courtPlayer, team)
         const shotType = ShotMeter.getShotType(posToShootFrom, team.driveDirection, team.game.court)
@@ -20,6 +23,7 @@ export class ShootingState extends State {
         const { percentage } = Constants.SHOT_PERCENTAGES[openness][shotType]
         const isSuccess = Constants.getSuccessBasedOnPercentage(percentage)
         courtPlayer.shootBall(isSuccess, shotType)
+        courtPlayer.isBlockable = false
       })
     }
   }

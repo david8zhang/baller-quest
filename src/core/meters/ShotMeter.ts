@@ -194,6 +194,7 @@ export class ShotMeter {
           y: guardingPlayer.sprite.y,
         }
       )
+      console.log(guardingPlayer.name)
       return Constants.getOpennessBasedOnDistance(distanceToGuardingPlayer)
     }
   }
@@ -322,16 +323,16 @@ export class ShotMeter {
     const allZones = {
       [ShotType.MID_RANGE]:
         driveDirection === DriveDirection.LEFT
-          ? Constants.MID_RANGE_RIGHT
-          : Constants.MID_RANGE_LEFT,
+          ? Constants.MID_RANGE_LEFT
+          : Constants.MID_RANGE_RIGHT,
       [ShotType.THREE_POINTER]:
         driveDirection === DriveDirection.LEFT
-          ? Constants.THREE_POINT_RANGE_RIGHT
-          : Constants.THREE_POINT_RANGE_LEFT,
+          ? Constants.THREE_POINT_RANGE_LEFT
+          : Constants.THREE_POINT_RANGE_RIGHT,
       [ShotType.LAYUP]:
         driveDirection === DriveDirection.LEFT
-          ? Constants.LAYUP_RANGE_RIGHT
-          : Constants.LAYUP_RANGE_LEFT,
+          ? Constants.LAYUP_RANGE_LEFT
+          : Constants.LAYUP_RANGE_RIGHT,
     }
     const playerZone = court.getNearestZoneForPosition(position)
     let shotType: ShotType = ShotType.HALF_COURT_PRAYER

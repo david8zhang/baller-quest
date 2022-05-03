@@ -8,7 +8,7 @@ import { ReceiveInboundState } from './states/player/misc/ReceiveInboundState'
 import { WaitState } from './states/player/WaitState'
 import { State, StateMachine } from './states/StateMachine'
 import { PlayerStates } from './states/StateTypes'
-import { Team } from './teams/Team'
+import { DriveDirection, Team } from './teams/Team'
 import { ChaseReboundState } from './states/player/misc/ChaseReboundState'
 import { MissType, ShotType } from './meters/ShotMeter'
 import { DriveToBasketState } from './states/player/offense/DriveToBasketState'
@@ -57,6 +57,7 @@ export class CourtPlayer {
   public isJumping: boolean = false
   public floor: Phaser.Physics.Arcade.Sprite
   public floorCollider: Phaser.Physics.Arcade.Collider
+  public isBlockable: boolean = false
 
   // Debug stuff
   public graphics: Phaser.GameObjects.Graphics
@@ -357,7 +358,8 @@ export class CourtPlayer {
   }
 
   shootBall(isSuccess: boolean, shotType: ShotType, missType?: MissType) {
-    if (this.game.ball.getPossessionSide() == this.team.side) {
+    console.log('HAS POSSESSION', this.game.ball.isInPossessionOf(this))
+    if (this.game.ball.isInPossessionOf(this)) {
       const enemyHoop = this.team.getOpposingTeam().getHoop()
       this.game.ball.shoot(enemyHoop, {
         isSuccess,
@@ -419,6 +421,21 @@ export class CourtPlayer {
     )
   }
 
+  blockShot(playerToDefend: CourtPlayer) {
+    this.jump(0.8)
+    if (playerToDefend.isBlockable) {
+      const ball = this.team.getBall()
+      ball.setBlocked(0.8)
+      const playerPosition = new Phaser.Math.Vector2(
+        playerToDefend.team.driveDirection === DriveDirection.LEFT
+          ? playerToDefend.sprite.x + 75
+          : playerToDefend.sprite.x - 75,
+        playerToDefend.sprite.y
+      )
+      ball.launchArcTowards(playerPosition, 0.5)
+    }
+  }
+
   update() {
     this.stateMachine.step()
     if (
@@ -428,7 +445,7 @@ export class CourtPlayer {
     ) {
       this.moveTowards(this.moveTarget)
     }
-    this.nameText.setPosition(this.sprite.x - this.nameText.displayWidth / 2, this.sprite.y + 40)
+    this.nameText.setPosition(this.sprite.x - this.nameText.displayWidth / 2, this.sprite.y + 60)
     this.updatePlayerStateText()
     this.updatePlayerDigitIndex()
     this.updateMarkerRectPosition()

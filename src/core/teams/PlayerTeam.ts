@@ -23,7 +23,7 @@ export class PlayerTeam extends Team {
     super(game, {
       initialState: TeamStates.TIPOFF,
       side: Side.PLAYER,
-      driveDirection: DriveDirection.LEFT,
+      driveDirection: DriveDirection.RIGHT,
     })
     this.handleBallInput()
     this.cursor = new Cursor(
@@ -126,9 +126,14 @@ export class PlayerTeam extends Team {
             break
           }
           case 'KeyA': {
-            const selectedPlayer = this.selectedCourtPlayer
-            if (selectedPlayer) {
-              selectedPlayer.jump()
+            if (this.getCurrentState() === TeamStates.DEFENSE) {
+              const selectedPlayer = this.selectedCourtPlayer
+              if (selectedPlayer) {
+                const defensiveAssignment = selectedPlayer.getPlayerToDefend()
+                if (this.getBall().isInPossessionOf(defensiveAssignment)) {
+                  selectedPlayer.blockShot(defensiveAssignment)
+                }
+              }
             }
             break
           }

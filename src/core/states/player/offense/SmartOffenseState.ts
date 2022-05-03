@@ -19,24 +19,27 @@ export class SmartOffenseState extends State {
 
   handleTick(thisPlayer: CourtPlayer, team: Team) {
     // if currently have the ball
-    const randomOnBallBehaviors = [
-      PlayerStates.DRIVE_TO_BASKET,
-      PlayerStates.PASS,
-      PlayerStates.SHOOT,
-      PlayerStates.GO_TO_OPEN_SPOT,
-    ]
+    // const randomOnBallBehaviors = [
+    //   PlayerStates.DRIVE_TO_BASKET,
+    //   PlayerStates.PASS,
+    //   PlayerStates.SHOOT,
+    //   PlayerStates.GO_TO_OPEN_SPOT,
+    // ]
 
-    const randomOffBallBehaviors = [PlayerStates.GO_TO_OPEN_SPOT, PlayerStates.WAIT]
+    // const randomOffBallBehaviors = [PlayerStates.GO_TO_OPEN_SPOT, PlayerStates.WAIT]
 
+    // if (team.getBall().isInPossessionOf(thisPlayer)) {
+    //   const hasOpenShot = Constants.playerHasOpenShot(thisPlayer, thisPlayer.getDefender())
+    //   if (hasOpenShot) {
+    //     thisPlayer.setState(PlayerStates.SHOOT)
+    //   } else {
+    //     this.setRandomBehavior(thisPlayer, randomOnBallBehaviors)
+    //   }
+    // } else {
+    //   this.setRandomBehavior(thisPlayer, randomOffBallBehaviors)
+    // }
     if (team.getBall().isInPossessionOf(thisPlayer)) {
-      const hasOpenShot = Constants.playerHasOpenShot(thisPlayer, thisPlayer.getDefender())
-      if (hasOpenShot) {
-        thisPlayer.setState(PlayerStates.SHOOT)
-      } else {
-        this.setRandomBehavior(thisPlayer, randomOnBallBehaviors)
-      }
-    } else {
-      this.setRandomBehavior(thisPlayer, randomOffBallBehaviors)
+      thisPlayer.setState(PlayerStates.SHOOT)
     }
   }
 

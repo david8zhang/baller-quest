@@ -55,9 +55,9 @@ export abstract class Team {
 
   public getHoop() {
     if (this.driveDirection === DriveDirection.LEFT) {
-      return this.game.leftHoop
-    } else {
       return this.game.rightHoop
+    } else {
+      return this.game.leftHoop
     }
   }
 
@@ -67,8 +67,7 @@ export abstract class Team {
 
   createCourtPlayers() {
     this.courtPlayerGroup = this.game.add.group()
-    const configs =
-      this.driveDirection === DriveDirection.LEFT ? Constants.LEFT_SIDE : Constants.RIGHT_SIDE
+    const configs = this.driveDirection === DriveDirection.LEFT ? Constants.LEFT : Constants.RIGHT
 
     for (let i = 0; i < configs.length; i++) {
       const configObj = configs[i]

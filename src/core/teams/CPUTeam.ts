@@ -9,7 +9,7 @@ export class CPUTeam extends Team {
     super(game, {
       initialState: TeamStates.TIPOFF,
       side: Side.CPU,
-      driveDirection: DriveDirection.RIGHT,
+      driveDirection: DriveDirection.LEFT,
     })
   }
 
