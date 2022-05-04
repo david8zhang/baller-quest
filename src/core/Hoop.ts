@@ -125,9 +125,7 @@ export class Hoop {
   }
 
   handleOnOverlapWithRim() {
-    console.log(this.hasBallCollidedWithRim)
     if (!this.hasBallCollidedWithRim) {
-      console.log('Overlapped!')
       this.hasBallCollidedWithRim = true
       this.rimOverlap.active = false
       if (this.onCollideWithRimCallback) {
@@ -146,6 +144,14 @@ export class Hoop {
     }
   }
 
+  playShotMakeAnimation() {
+    this.rimFrontSprite.setVisible(false)
+    this.rimBackSprite.anims.play('rim-animation')
+    this.rimBackSprite.on('animationcomplete', () => {
+      this.rimFrontSprite.setVisible(true)
+    })
+  }
+
   setOnCollideWithRimCallback(fn: Function) {
     this.onCollideWithRimCallback = fn
   }
@@ -154,6 +160,5 @@ export class Hoop {
     this.backboard.setDepth(ball.sprite.depth - 5)
     this.rimBackSprite.setDepth(ball.sprite.depth - 5)
     this.rimFrontSprite.setDepth(ball.sprite.depth + 5)
-    console.log(ball.sprite.depth)
   }
 }

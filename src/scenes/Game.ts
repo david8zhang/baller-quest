@@ -10,6 +10,7 @@ import { Score } from '~/core/Score'
 import { Court } from '~/core/Court'
 import { UI } from './UI'
 import { ShotType } from '~/core/meters/ShotMeter'
+import { createHoopAnims } from '~/core/animations/createHoopAnimations'
 
 export default class Game extends Phaser.Scene {
   public playerTeam!: PlayerTeam
@@ -39,6 +40,7 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
+    createHoopAnims(this.anims)
     this.court = new Court(this)
     this.ball = new Ball(this, {
       position: {

@@ -173,7 +173,20 @@ export class Ball {
         hoop.toggleRimOverlap(true)
         hoop.setRimDepth(this)
       })
+
       hoop.setOnCollideWithRimCallback((hoop: Hoop) => {
+        this.game.time.delayedCall(20, () => {
+          hoop.playShotMakeAnimation()
+        })
+
+        this.game.time.delayedCall(50, () => {
+          this.sprite.setVisible(false)
+        })
+
+        this.game.time.delayedCall(150, () => {
+          this.sprite.setVisible(true)
+        })
+
         this.sprite.setVelocityX(0.05 * this.sprite.body.velocity.x)
         this.sprite.setVelocityY(0.2 * this.sprite.body.velocity.y)
         this.game.time.delayedCall(400, () => {
