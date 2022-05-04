@@ -159,8 +159,6 @@ export default class Game extends Phaser.Scene {
     this.cpuTeam.courtPlayers.forEach((courtPlayer) => {
       allSprites.push(courtPlayer.sprite)
     })
-    if (this.leftHoop) allSprites.push(this.leftHoop.sprite)
-    if (this.rightHoop) allSprites.push(this.rightHoop.sprite)
     const sortedByY = allSprites.sort((a, b) => {
       return a.y - b.y
     })

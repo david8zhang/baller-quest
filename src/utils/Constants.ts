@@ -42,7 +42,7 @@ export class Constants {
       y: Constants.COURT_HEIGHT / 2 - 150,
     },
     rimRange: [40, 60],
-    successShotRange: [65, 65],
+    successShotRange: [73, 73],
     isFlipX: false,
     driveDirection: DriveDirection.LEFT,
   }
@@ -60,7 +60,7 @@ export class Constants {
       y: Constants.COURT_HEIGHT / 2 - 125,
     },
     rimRange: [-60, -40],
-    successShotRange: [-67, -67],
+    successShotRange: [-73, -73],
     isFlipX: true,
     driveDirection: DriveDirection.RIGHT,
   }

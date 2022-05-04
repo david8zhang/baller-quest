@@ -46,7 +46,7 @@ export class Ball {
     const { position } = config
     this.sprite = this.game.physics.add
       .sprite(position.x, position.y, 'ball')
-      .setScale(0.05)
+      .setScale(1.5)
       .setDepth(100)
       .setBounce(0.75)
     this.sprite.body.enable = false
@@ -123,7 +123,9 @@ export class Ball {
       return
     }
     this.currState = BallState.MID_SHOT
-    const { isSuccess, shotType } = shotConfig
+    // const { isSuccess, shotType } = shotConfig
+    const { shotType } = shotConfig
+    const isSuccess = true
     const playerTeam: Team = this.player!.team
     const playerPosition = new Phaser.Math.Vector2(this.player!.sprite.x, this.player!.sprite.y)
     const playerHeight = this.player!.sprite.displayHeight
@@ -155,6 +157,7 @@ export class Ball {
     const yVelocity = (posToLand.y - this.sprite.y - 490 * Math.pow(time, 2)) / time
     this.sprite.setVelocity(xVelocity, yVelocity)
     hoop.toggleRimCollider(false)
+    hoop.toggleRimOverlap(false)
     this.prevPlayer = this.player
     this.player = null
 
@@ -162,11 +165,19 @@ export class Ball {
       this.game.time.delayedCall(time * 500, () => {
         hoop.toggleRimCollider(true)
       })
+      hoop.setOnCollideWithRimCallback((hoop: Hoop) => {
+        this.setRandomRebound(hoop)
+      })
     } else {
-      this.game.time.delayedCall(time * 1000, () => {
-        this.sprite.setVelocityX(0)
-        this.sprite.setVelocityY(0.3 * this.sprite.body.velocity.y)
+      this.game.time.delayedCall(time * 500, () => {
+        hoop.toggleRimOverlap(true)
+        hoop.setRimDepth(this)
+      })
+      hoop.setOnCollideWithRimCallback((hoop: Hoop) => {
+        this.sprite.setVelocityX(0.05 * this.sprite.body.velocity.x)
+        this.sprite.setVelocityY(0.2 * this.sprite.body.velocity.y)
         this.game.time.delayedCall(400, () => {
+          hoop.hasBallCollidedWithRim = false
           this.currState = BallState.RETRIEVE_AFTER_SCORE
           this.handleFloorCollision()
           this.onScoreHandlers.forEach((handler: Function) => {
@@ -177,7 +188,7 @@ export class Ball {
     }
   }
 
-  setRandomRebound(hoop: Hoop, onHitFloorCallback: Function) {
+  setRandomRebound(hoop: Hoop) {
     this.currState = BallState.REBOUND
     let reboundZones =
       hoop.driveDirection === DriveDirection.RIGHT
@@ -199,7 +210,7 @@ export class Ball {
       this.launchArcTowards(new Phaser.Math.Vector2(centerPosition.x, centerPosition.y), flightTime)
       this.game.time.delayedCall(flightTime * 1000, () => {
         this.handleFloorCollision()
-        onHitFloorCallback()
+        hoop.hasBallCollidedWithRim = false
       })
     }
   }

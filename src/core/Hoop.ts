@@ -1,5 +1,5 @@
 import Game from '~/scenes/Game'
-import { BallState } from './Ball'
+import { Ball, BallState } from './Ball'
 import { DriveDirection, Side } from './teams/Team'
 
 export interface HoopConfig {
@@ -24,16 +24,23 @@ export interface HoopConfig {
 export class Hoop {
   private game: Game
   public sprite: Phaser.GameObjects.Sprite
-  public onCollideRimHandler!: Function
   public setFloorEvent?: Phaser.Time.TimerEvent
   public successShotRange: number[] = []
   public rimRange: number[] = []
   public hasBallCollidedWithRim: boolean = false
   public driveDirection: DriveDirection
-  public rim: Phaser.Physics.Arcade.Sprite
   public backboard: Phaser.Physics.Arcade.Sprite
   public isShotSuccess: boolean = false
   public onOverlapHandler: Function | null = null
+
+  public rimColliderSprite: Phaser.Physics.Arcade.Sprite
+  public rimFrontSprite: Phaser.Physics.Arcade.Sprite
+  public rimBackSprite: Phaser.Physics.Arcade.Sprite
+
+  public onCollideWithRimCallback: Function | null = null
+
+  public rimCollider: Phaser.Physics.Arcade.Collider
+  public rimOverlap: Phaser.Physics.Arcade.Collider
 
   constructor(game: Game, config: HoopConfig) {
     this.game = game
@@ -47,26 +54,41 @@ export class Hoop {
       driveDirection,
     } = config
     this.driveDirection = driveDirection
-    this.sprite = this.game.add.sprite(position.x, position.y, 'hoop').setScale(1.5)
+    this.sprite = this.game.add.sprite(position.x, position.y, 'backboard').setScale(1.5)
     this.sprite.flipX = isFlipX
     this.successShotRange = successShotRange
     this.rimRange = rimRange
 
-    this.rim = this.game.physics.add
+    this.rimColliderSprite = this.game.physics.add
       .sprite(rimPosition.x, rimPosition.y, '')
       .setVisible(false)
       .setPushable(false)
 
-    this.rim.body.setSize(50, 5)
-
-    this.game.physics.add.collider(this.rim, this.game.ball.sprite, () => {
-      if (
-        this.game.ball.currState !== BallState.PASS &&
-        this.game.ball.currState !== BallState.INBOUND
-      ) {
-        this.handleOnCollideWithRim()
+    this.rimColliderSprite.body.setSize(50, 5)
+    this.rimCollider = this.game.physics.add.collider(
+      this.rimColliderSprite,
+      this.game.ball.sprite,
+      () => {
+        if (
+          this.game.ball.currState !== BallState.PASS &&
+          this.game.ball.currState !== BallState.INBOUND
+        ) {
+          this.handleOnCollideWithRim()
+        }
       }
-    })
+    )
+    this.rimOverlap = this.game.physics.add.overlap(
+      this.rimColliderSprite,
+      this.game.ball.sprite,
+      () => {
+        if (
+          this.game.ball.currState !== BallState.PASS &&
+          this.game.ball.currState !== BallState.INBOUND
+        ) {
+          this.handleOnOverlapWithRim()
+        }
+      }
+    )
 
     this.backboard = this.game.physics.add
       .sprite(backboardPosition.x, backboardPosition.y, '')
@@ -81,24 +103,57 @@ export class Hoop {
         this.handleOnCollideWithRim()
       }
     })
+
+    this.rimFrontSprite = this.game.physics.add
+      .sprite(position.x, position.y, 'rim-front')
+      .setScale(1.5)
+    this.rimBackSprite = this.game.physics.add
+      .sprite(position.x, position.y, 'rim-back')
+      .setScale(1.5)
+    this.rimFrontSprite.flipX = isFlipX
+    this.rimBackSprite.flipX = isFlipX
   }
 
   toggleRimCollider(state: boolean) {
-    this.rim.body.enable = state
+    this.rimCollider.active = state
     this.backboard.body.enable = state
+  }
+
+  toggleRimOverlap(state: boolean) {
+    this.rimOverlap.active = state
+    this.backboard.body.enable = state
+  }
+
+  handleOnOverlapWithRim() {
+    console.log(this.hasBallCollidedWithRim)
+    if (!this.hasBallCollidedWithRim) {
+      console.log('Overlapped!')
+      this.hasBallCollidedWithRim = true
+      this.rimOverlap.active = false
+      if (this.onCollideWithRimCallback) {
+        this.onCollideWithRimCallback(this)
+      }
+    }
   }
 
   handleOnCollideWithRim() {
     if (!this.hasBallCollidedWithRim) {
       this.hasBallCollidedWithRim = true
-      this.rim.body.enable = false
-      this.game.ball.setRandomRebound(this, () => {
-        this.hasBallCollidedWithRim = false
-      })
+      this.rimCollider.active = false
+      if (this.onCollideWithRimCallback) {
+        this.onCollideWithRimCallback(this)
+      }
     }
   }
 
-  setOnCollideRimHandler(onCollideRimHandler: Function) {
-    this.onCollideRimHandler = onCollideRimHandler
+  setOnCollideWithRimCallback(fn: Function) {
+    this.onCollideWithRimCallback = fn
+  }
+
+  setRimDepth(ball: Ball) {
+    this.backboard.setDepth(ball.sprite.depth - 5)
+    this.rimBackSprite.setDepth(ball.sprite.depth - 5)
+    this.rimFrontSprite.setDepth(ball.sprite.depth + 5)
+    console.log(ball.sprite.depth)
   }
 }
