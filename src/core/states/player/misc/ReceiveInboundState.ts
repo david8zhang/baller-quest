@@ -4,7 +4,7 @@ import { Side, Team } from '~/core/teams/Team'
 import { UI } from '~/scenes/UI'
 import { Constants } from '~/utils/Constants'
 import { State } from '../../StateMachine'
-import { PlayerStates, TeamStates } from '../../StateTypes'
+import { TeamStates } from '../../StateTypes'
 
 export class ReceiveInboundState extends State {
   public receiveInboundPosition: Phaser.Math.Vector2 | null = null

@@ -42,6 +42,7 @@ export class InboundBallState extends State {
     )
 
     // Receive inbound
+    team.getBall().setInboundPassTarget(this.playerToReceiveInbound!)
     this.playerToReceiveInbound!.setState(PlayerStates.RECEIVE_INBOUND, positionToReceiveInbound)
   }
 

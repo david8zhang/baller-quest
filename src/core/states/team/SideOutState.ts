@@ -45,6 +45,7 @@ export class SideOutState extends State {
         receiveInboundPlayer,
         1000
       )
+      team.getBall().setInboundPassTarget(receiveInboundPlayer)
       receiveInboundPlayer.setState(PlayerStates.RECEIVE_INBOUND, positionToReceiveInbound)
 
       team.courtPlayers.forEach((player) => {

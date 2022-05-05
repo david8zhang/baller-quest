@@ -38,6 +38,7 @@ export class Ball {
   public arcDestination: Phaser.GameObjects.Arc
   public shotType!: ShotType
   public ballStateText!: Phaser.GameObjects.Text
+  public inboundPassTarget: CourtPlayer | null = null
 
   public static IGNORE_OOB_STATES = [BallState.MID_SHOT, BallState.REBOUND, BallState.KNOCKED_AWAY]
 
@@ -123,9 +124,7 @@ export class Ball {
       return
     }
     this.currState = BallState.MID_SHOT
-    // const { isSuccess, shotType } = shotConfig
-    const { shotType } = shotConfig
-    const isSuccess = true
+    const { isSuccess, shotType } = shotConfig
     const playerTeam: Team = this.player!.team
     const playerPosition = new Phaser.Math.Vector2(this.player!.sprite.x, this.player!.sprite.y)
     const playerHeight = this.player!.sprite.displayHeight
@@ -260,6 +259,10 @@ export class Ball {
     this.onScoreHandlers.push(fn)
   }
 
+  setInboundPassTarget(player: CourtPlayer) {
+    this.inboundPassTarget = player
+  }
+
   isInPossessionOf(player: CourtPlayer) {
     return this.player == player
   }
@@ -333,7 +336,7 @@ export class Ball {
         return false
       }
       case BallState.INBOUND: {
-        return currPlayer && currPlayer.getSide() === newPlayer.getSide()
+        return newPlayer === this.inboundPassTarget
       }
       case BallState.RETRIEVE_AFTER_SCORE: {
         if (!currPlayer) {

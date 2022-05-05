@@ -5,31 +5,31 @@ export class ShotClock {
   private ui: UI
   private shotClockText!: Phaser.GameObjects.Text
   public secondsOnClock: number = 24
-  // public shotClockTickEvent: Phaser.Time.TimerEvent
+  public shotClockTickEvent: Phaser.Time.TimerEvent
 
   constructor(ui: UI) {
     this.ui = ui
     this.setupShotClockText()
-    // this.shotClockTickEvent = this.ui.time.addEvent({
-    //   delay: 1000,
-    //   callback: () => {
-    //     this.secondsOnClock = Math.max(0, this.secondsOnClock - 1)
-    //     if (this.secondsOnClock === 0) {
-    //       Game.instance.onHandleShotClockExpiration()
-    //     }
-    //     this.updateShotClockText()
-    //   },
-    //   repeat: -1,
-    // })
-    // this.shotClockTickEvent.paused = true
+    this.shotClockTickEvent = this.ui.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        this.secondsOnClock = Math.max(0, this.secondsOnClock - 1)
+        if (this.secondsOnClock === 0) {
+          Game.instance.onHandleShotClockExpiration()
+        }
+        this.updateShotClockText()
+      },
+      repeat: -1,
+    })
+    this.shotClockTickEvent.paused = true
   }
 
   stopClock() {
-    // this.shotClockTickEvent.paused = true
+    this.shotClockTickEvent.paused = true
   }
 
   startClock() {
-    // this.shotClockTickEvent.paused = false
+    this.shotClockTickEvent.paused = false
   }
 
   resetShotClock(numToResetTo: number = 24) {
