@@ -79,7 +79,7 @@ export abstract class Team {
           position: centerPosition,
           team: this,
           role: role,
-          texture: this.side === Side.PLAYER ? 'player' : 'cpu-player',
+          texture: this.side === Side.PLAYER ? 'player-placeholder' : 'cpu-player',
           name: Constants.generateRandomName(),
         })
         this.courtPlayers.push(courtPlayer)

@@ -361,7 +361,6 @@ export class CourtPlayer {
   }
 
   shootBall(isSuccess: boolean, shotType: ShotType, missType?: MissType) {
-    console.log('HAS POSSESSION', this.game.ball.isInPossessionOf(this))
     if (this.game.ball.isInPossessionOf(this)) {
       const enemyHoop = this.team.getOpposingTeam().getHoop()
       this.game.ball.shoot(enemyHoop, {

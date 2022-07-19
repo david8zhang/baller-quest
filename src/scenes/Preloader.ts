@@ -4,7 +4,8 @@ export class Preloader extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('player', 'player/idle.png')
+    this.load.image('player-placeholder', 'player/idle.png')
+    this.load.atlas('player', 'player/player.png', 'player/player.json')
     this.load.image('cpu-player', 'cpu/idle.png')
     this.load.image('backboard', 'backboard.png')
 
